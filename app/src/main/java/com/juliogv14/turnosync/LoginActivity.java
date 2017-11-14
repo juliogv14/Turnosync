@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
+
 /**
  * Created by Julio on 14/11/2017.
  * LoginActivity.java
@@ -23,18 +25,15 @@ import android.widget.TextView;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText mTextViewEmail;
-    private EditText mTextViewPassword;
-    private FrameLayout mProgressOverlay;
+
+    ActivityLoginBinding mViewBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //FindView
-
-        mTextViewPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mViewBinding.editTextPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -45,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.button_login).setOnClickListener(new View.OnClickListener() {
+        mViewBinding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 attemptLogin();
