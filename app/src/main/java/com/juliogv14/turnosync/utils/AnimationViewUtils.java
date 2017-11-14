@@ -6,10 +6,10 @@ import android.view.View;
 
 /**
  * Created by Julio on 14/11/2017.
- * ViewAnimationUtils.java
+ * AnimationViewUtils.java
  */
 
-public class ViewAnimationUtils {
+public class AnimationViewUtils {
 
     //AndroidUtils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
     public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
