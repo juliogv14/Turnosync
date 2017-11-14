@@ -11,6 +11,7 @@ import android.view.View;
 
 public class AnimationUtils {
 
+    //AndroidUtils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
     public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
         boolean show = toVisibility == View.VISIBLE;
         if (show) {
