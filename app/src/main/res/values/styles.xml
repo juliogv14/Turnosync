@@ -9,7 +9,8 @@
     </style>
 
     <style name="LoginTheme" parent="AppTheme">
-        <item name="actionBarStyle">@style/Theme.AppCompat.NoActionBar</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
 
     </style>
 
