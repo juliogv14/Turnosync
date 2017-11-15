@@ -30,5 +30,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:11.4.2'
     implementation 'com.google.firebase:firebase-auth:11.4.2'
     implementation 'com.firebaseui:firebase-ui-auth:3.1.0'
+
+    compile 'com.google.android.gms:play-services-auth:11.2.0'
 }
 apply plugin: 'com.google.gms.google-services'
