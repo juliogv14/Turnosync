@@ -13,5 +13,6 @@
     <string name="login_error_invalid_password">This password is too short</string>
     <string name="login_error_incorrect_password">This password is incorrect</string>
     <string name="login_error_field_required">This field is required</string>
+    <string name="login_error_auth_failed">Authentication failed</string>
 
 </resources>
