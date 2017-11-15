@@ -35,24 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
         mViewBinding.testbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(v.getContext(), LoginActivity.class));
             }
         });
-
-
-    }
-
-/*
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         mFirebaseAuth = FirebaseAuth.getInstance();
-
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -64,30 +54,23 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //No user logged in
                     onSignedOutCleanup();
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(
-                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
-                                    .build(),
-                            RC_SIGN_IN);
+                    Intent signInIntent = new Intent(getBaseContext(), LoginActivity.class);
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
                 }
             }
         };
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        if (mFirebaseAuth != null) {
+    protected void onStop() {
+        super.onStop();
+        if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }
@@ -107,12 +90,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
-        tvUsername = findViewById(R.id.tv_user);
-        tvUsername.setText(username);
+        mViewBinding.tvUser.setText(username);
     }
 
     private void onSignedOutCleanup() {
         mUsername = "";
     }
-    */
 }
