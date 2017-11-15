@@ -49,10 +49,11 @@
 
             <Button
                 android:id="@+id/button_signin"
+                style="@style/FirebaseUI.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="@string/login_action" />
+                android:text="@string/login_action_signin" />
 
             <TextView
                 android:layout_width="wrap_content"
