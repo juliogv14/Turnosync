@@ -56,6 +56,14 @@
                 android:text="@string/login_action_signin" />
 
             <TextView
+                android:id="@+id/action_register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_vertical"
+                android:padding="4dp"
+                android:text="@string/login_action_register" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_vertical"

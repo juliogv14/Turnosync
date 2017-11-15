@@ -4,10 +4,9 @@
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
-    <string name="login_register_inquiry">Don\'t have an account?</string>
+    <string name="login_action_register">Don\'t have an account? Register</string>
     <string name="login_or">Or</string>
     <string name="login_action_signin">Sign in</string>
-    <string name="login_action_register">Register</string>
     <!--LOGIN ERROR STRINGS-->
     <string name="login_error_invalid_email">This email address is invalid</string>
     <string name="login_error_invalid_password">This password is too short</string>
