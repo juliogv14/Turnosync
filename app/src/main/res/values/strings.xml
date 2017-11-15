@@ -15,4 +15,6 @@
     <string name="login_error_field_required">This field is required</string>
     <string name="login_error_auth_failed">Authentication failed</string>
 
+    <item name="visible" type="id" />
+    <item name="masked" type="id" />
 </resources>
