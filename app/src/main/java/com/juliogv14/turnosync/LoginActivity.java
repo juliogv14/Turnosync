@@ -1,5 +1,6 @@
 package com.juliogv14.turnosync;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,9 +14,20 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
 import com.juliogv14.turnosync.utils.AnimationViewUtils;
 import com.juliogv14.turnosync.utils.LoginUtils;
@@ -28,6 +40,7 @@ import com.juliogv14.turnosync.utils.LoginUtils;
 public class LoginActivity extends AppCompatActivity {
 
     public final String TAG = this.getClass().getSimpleName();
+    public static final int RC_GOOGLE_SIGN_IN = 0;
 
     //View Binding
     ActivityLoginBinding mViewBinding;
@@ -35,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     UserLoginTask mLoginTask;
     //Firebase auth
     private FirebaseAuth mFirebaseAuth;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         mFirebaseAuth = FirebaseAuth.getInstance();
+
 
         //EditText done listener, attempt login
         mViewBinding.editTextPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -62,6 +77,51 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //Login with google
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_token))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mViewBinding.buttonGoogleSignin.setSize(SignInButton.SIZE_WIDE);
+        mViewBinding.buttonGoogleSignin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent googleSignInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(googleSignInIntent, RC_GOOGLE_SIGN_IN);
+            }
+        });
+
+
+    }
+
+    /*Google sign in*/
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+            if (result.isSuccess()) {
+                GoogleSignInAccount account = result.getSignInAccount();
+                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+
+                //Firebase sign in with google
+                mFirebaseAuth.signInWithCredential(credential).
+                        addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    finish();
+                                } else {
+                                    Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+            }
+        }
     }
 
     @Override
@@ -121,6 +181,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+
     void showLoadingIndicator(boolean show) {
         if (show) {
             AnimationViewUtils.animateView(mViewBinding.layoutProgressbar.getRoot(),
@@ -154,11 +215,13 @@ public class LoginActivity extends AppCompatActivity {
             //TODO authentication
             // Simulate network access.
             mFirebaseAuth.signInWithEmailAndPassword(mEmail, mPassword).
-                    addOnFailureListener(new OnFailureListener() {
+                    addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
-                            success = false;
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                success = false;
+                            }
                         }
                     });
 

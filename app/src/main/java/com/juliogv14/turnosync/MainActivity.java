@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (user != null) {
                     //User logged in
-                    onSignedInInitialize(user.getDisplayName());
+                    onSignedInInitialize(user);
                 } else {
                     //No user logged in
                     onSignedOutCleanup();
@@ -64,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            onSignedInInitialize(currentUser);
+        }
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
@@ -88,9 +92,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void onSignedInInitialize(String username) {
-        mUsername = username;
-        mViewBinding.tvUser.setText(username);
+    private void onSignedInInitialize(FirebaseUser user) {
+        mUsername = user.getDisplayName();
+        String displaytext = mUsername + ":" + user.getUid();
+        mViewBinding.tvUser.setText(displaytext);
     }
 
     private void onSignedOutCleanup() {

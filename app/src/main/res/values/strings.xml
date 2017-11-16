@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Turnosync</string>
+    <string name="web_client_token">424030572418-q0mtitaf63mus90332mh6pud2kcp6c9d.apps.googleusercontent.com</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
