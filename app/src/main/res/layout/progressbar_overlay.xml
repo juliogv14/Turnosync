@@ -9,6 +9,7 @@
         android:animateLayoutChanges="true"
         android:background="@android:color/black"
         android:clickable="true"
+        android:focusable="true"
         android:visibility="visible">
 
         <ProgressBar
