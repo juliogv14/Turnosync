@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -37,13 +39,12 @@ import com.juliogv14.turnosync.utils.LoginUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
+    //Constants
     public final String TAG = this.getClass().getSimpleName();
     public static final int RC_GOOGLE_SIGN_IN = 0;
 
     //View Binding
     ActivityLoginBinding mViewBinding;
-    //Login Async task TODO: remove async task variable
-    //UserLoginTask mLoginTask;
     //Firebase auth
     private FirebaseAuth mFirebaseAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -54,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         mFirebaseAuth = FirebaseAuth.getInstance();
-
 
         //EditText done listener, attempt login
         mViewBinding.editTextPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -91,7 +91,20 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.login, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_register) {
+            Toast.makeText(this, "Go to register activity", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /*Google sign in*/
@@ -160,11 +173,6 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            //TODO: Remove asynctask call
-            /*mLoginTask = new UserLoginTask(email, password);
-            mLoginTask.execute((Void) null);*/
 
             //Firebase signin with email and password
             showLoadingIndicator(true);
@@ -199,67 +207,4 @@ public class LoginActivity extends AppCompatActivity {
                     View.GONE, 0, 200);
         }
     }
-
-
-//TODO: remove async task body
-/*    private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-        private boolean success = false;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showLoadingIndicator(true);
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            //TODO authentication
-            // Simulate network access.
-            mFirebaseAuth.signInWithEmailAndPassword(mEmail, mPassword).
-                    addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
-                                success = false;
-                            } else {
-                                success = true;
-                            }
-                        }
-                    });
-
-            return success;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
-            showLoadingIndicator(false);
-
-            if (success) {
-                finish();
-            } else {
-                mViewBinding.editTextLayoutPassword.
-                        setError(getString(R.string.login_error_incorrect_password));
-                mViewBinding.editTextPassword.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mLoginTask = null;
-            showLoadingIndicator(false);
-        }
-    }
-*/
-
 }
