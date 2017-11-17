@@ -5,7 +5,7 @@
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
-    <string name="login_forgot_password">Forgot password?r</string>
+    <string name="login_forgot_password">Forgot password?</string>
     <string name="login_or">Or</string>
     <string name="login_action_signin">Sign in</string>
     <!--LOGIN MENU STRINGS-->
