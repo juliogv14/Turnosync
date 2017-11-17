@@ -9,9 +9,9 @@
         <item name="textColorError">?attr/colorError</item>
     </style>
 
-    <style name="LoginTheme" parent="AppTheme">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="LoginOptionsMenu" parent="AppTheme">
+        <item name="android:actionBarItemBackground">@drawable/layout_login_register</item>
+
 
     </style>
 

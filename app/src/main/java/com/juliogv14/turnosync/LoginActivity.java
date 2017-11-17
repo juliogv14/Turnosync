@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.login, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
