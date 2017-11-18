@@ -5,8 +5,13 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,6 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         //Login button listener, attempt login
         mViewBinding.buttonSignin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +97,25 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //Forgot Password
+        mViewBinding.actionResetPassword.setMovementMethod(LinkMovementMethod.getInstance());
+
+        mViewBinding.actionResetPassword.setTextColor(ContextCompat.getColorStateList(this, R.color.selector_link));
+
+        Spannable span = (Spannable) mViewBinding.actionResetPassword.getText();
+        span.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                //TODO: Forgot password handle
+                Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                ds.setColor(getResources().getColor(android.R.color.holo_blue_light));
+                super.updateDrawState(ds);
+            }
+        }, 0, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     @Override
@@ -101,7 +126,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         if (item.getItemId() == R.id.action_register) {
+            //TODO: Change to intent > register activity
             Toast.makeText(this, "Go to register activity", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
