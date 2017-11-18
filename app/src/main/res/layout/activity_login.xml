@@ -3,116 +3,122 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        tools:context=".LoginActivity">
+        android:fillViewport="true">
 
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_margin="16dp"
-            android:layout_marginEnd="8dp"
-            android:src="@android:drawable/ic_menu_my_calendar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/editTextLayout_email"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:errorEnabled="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView">
+            android:layout_gravity="center_horizontal"
+            tools:context=".LoginActivity">
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/editText_email"
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_margin="16dp"
+                android:layout_marginEnd="8dp"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/editTextLayout_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_email"
-                android:inputType="textEmailAddress" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                app:errorEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/editTextLayout_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:errorEnabled="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextLayout_email"
-            app:passwordToggleEnabled="true">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/editText_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_email"
+                    android:inputType="textEmailAddress" />
+            </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/editText_password"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/editTextLayout_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_password"
-                android:inputType="textPassword" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                app:errorEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextLayout_email"
+                app:passwordToggleEnabled="true">
 
-        <Button
-            android:id="@+id/button_signin"
-            style="@style/FirebaseUI.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/login_action_signin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextLayout_password" />
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/editText_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_password"
+                    android:inputType="textPassword" />
+            </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:id="@+id/action_reset_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|center_vertical"
-            android:layout_marginTop="8dp"
-            android:text="@string/login_forgot_password"
-            android:textColorLink="@color/selector_link"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_signin" />
+            <Button
+                android:id="@+id/button_signin"
+                style="@style/FirebaseUI.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/login_action_signin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextLayout_password" />
 
-        <TextView
-            android:id="@+id/textView_or"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|center_vertical"
-            android:layout_marginTop="16dp"
-            android:text="@string/login_or"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/action_reset_password" />
+            <TextView
+                android:id="@+id/action_reset_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_vertical"
+                android:layout_marginTop="8dp"
+                android:text="@string/login_forgot_password"
+                android:textColorLink="@color/selector_link"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_signin" />
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/button_google_signin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|center_vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_or" />
+            <TextView
+                android:id="@+id/textView_or"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_vertical"
+                android:layout_marginTop="16dp"
+                android:text="@string/login_or"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/action_reset_password" />
 
-        <include
-            android:id="@+id/layout_progressbar"
-            layout="@layout/progressbar_overlay"
-            android:visibility="gone" />
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/button_google_signin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_or" />
 
-    </android.support.constraint.ConstraintLayout>
+            <include
+                android:id="@+id/layout_progressbar"
+                layout="@layout/progressbar_overlay"
+                android:visibility="gone" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
 </layout>
