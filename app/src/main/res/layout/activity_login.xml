@@ -13,6 +13,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="16dp"
+            android:focusableInTouchMode="true"
             tools:context=".LoginActivity">
 
 
