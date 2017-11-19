@@ -20,7 +20,7 @@
             <ImageView
                 android:id="@+id/imageView_icon"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="80dp"
                 android:layout_margin="16dp"
                 android:layout_marginEnd="8dp"
                 android:src="@android:drawable/ic_menu_my_calendar"
@@ -101,7 +101,7 @@
                     android:id="@+id/editText_password_repeat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/login_password"
+                    android:hint="@string/register_password_repeat"
                     android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
 
