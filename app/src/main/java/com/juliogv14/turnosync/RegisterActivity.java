@@ -23,14 +23,14 @@ import com.juliogv14.turnosync.utils.LoginUtils;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    public final String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
 
-    ActivityRegisterBinding mViewBinding;
-    FirebaseAuth mFirebaseAuth;
+    private ActivityRegisterBinding mViewBinding;
+    private FirebaseAuth mFirebaseAuth;
 
-    String mEmail;
-    String mDisplayName;
-    String mPassword;
+    private String mEmail;
+    private String mDisplayName;
+    private String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

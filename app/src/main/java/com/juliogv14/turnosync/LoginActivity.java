@@ -34,7 +34,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
-import com.juliogv14.turnosync.utils.AnimationViewUtils;
 import com.juliogv14.turnosync.utils.LoginUtils;
 
 /**
@@ -45,11 +44,11 @@ import com.juliogv14.turnosync.utils.LoginUtils;
 public class LoginActivity extends AppCompatActivity {
 
     //Constants
-    public final String TAG = this.getClass().getSimpleName();
-    public static final int RC_GOOGLE_SIGN_IN = 0;
+    private final String TAG = this.getClass().getSimpleName();
+    private static final int RC_GOOGLE_SIGN_IN = 0;
 
     //View Binding
-    ActivityLoginBinding mViewBinding;
+    private ActivityLoginBinding mViewBinding;
     //Firebase auth
     private FirebaseAuth mFirebaseAuth;
     private GoogleSignInClient mGoogleSignInClient;

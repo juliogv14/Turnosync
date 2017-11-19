@@ -1,29 +1,24 @@
 package com.juliogv14.turnosync;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.juliogv14.turnosync.databinding.ActivityMainBinding;
 
-import java.util.Arrays;
-
 public class MainActivity extends AppCompatActivity {
 
-    public static final int RC_SIGN_IN = 1;
+    private static final int RC_SIGN_IN = 1;
 
     //Activity views
-    ActivityMainBinding mViewBinding;
+    private ActivityMainBinding mViewBinding;
 
     //Auth
     private String mUsername;
@@ -36,12 +31,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        mViewBinding.testbutton.setOnClickListener(new View.OnClickListener() {
+        mViewBinding.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(v.getContext(), LoginActivity.class));
             }
         });
+
+        mViewBinding.logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFirebaseAuth.signOut();
+            }
+        });
+
+
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
