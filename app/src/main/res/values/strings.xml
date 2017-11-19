@@ -20,6 +20,9 @@
     <!--REGISTER STRINGS-->
     <string name="register_name">Display name</string>
     <string name="register_password_repeat">Repeat password</string>
+    <!--REGISTER ERROR STRINGS-->
+    <string name="register_error_name">This name is invalid. Symbols and numbers not allowed.</string>
+    <string name="register_error_repeat">Passwords doesn\'t match</string>
 
     <item name="visible" type="id" />
     <item name="masked" type="id" />
