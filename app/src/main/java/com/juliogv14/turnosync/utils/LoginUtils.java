@@ -12,18 +12,23 @@ public class LoginUtils {
     public static boolean isEmailValid(String email) {
 
         //Regex to check if the string contains '@' and '.' as in an email.
-        String regEx = ".*@.*\\..*";
+        String regEx = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
         return Pattern.compile(regEx).matcher(email).matches();
     }
 
     public static boolean isLoginPasswordValid(String password) {
 
-        return password.length() > 6;
+        return password.length() >= 6;
     }
 
     public static boolean isRegisterPasswordValid(String password) {
 
         String regEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";
         return Pattern.compile(regEx).matcher(password).matches();
+    }
+
+    public static boolean isDisplayNameValid(String displayName) {
+        String regEx = "^[\\p{L}-' ]+$";
+        return Pattern.compile(regEx).matcher(displayName).matches();
     }
 }
