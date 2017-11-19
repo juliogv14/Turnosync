@@ -158,7 +158,6 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }
                         });
-
             }
         }
     }
@@ -188,7 +187,7 @@ public class LoginActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        /*Check for a valid password, if the user entered one.*/
+        /*Check for a valid password.*/
         if (!TextUtils.isEmpty(password) && !LoginUtils.isLoginPasswordValid(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
@@ -203,36 +202,27 @@ public class LoginActivity extends AppCompatActivity {
         } else {
 
             //Firebase signin with email and password
-            showLoadingIndicator(true);
+            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.signInWithEmailAndPassword(email, password).
                     addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            showLoadingIndicator(false);
+                            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                                    true);
                             if (task.isSuccessful()) {
                                 finish();
                             } else {
-                                Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this,
+                                        R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
                                 mViewBinding.editTextLayoutPassword.
                                         setError(getString(R.string.login_error_incorrect_password));
-                                //mViewBinding.editTextPassword.requestFocus();
+                                mViewBinding.editTextPassword.requestFocus();
 
                             }
 
 
                         }
                     });
-        }
-    }
-
-
-    void showLoadingIndicator(boolean show) {
-        if (show) {
-            AnimationViewUtils.animateView(mViewBinding.layoutProgressbar.getRoot(),
-                    View.VISIBLE, 0.4f, 200);
-        } else {
-            AnimationViewUtils.animateView(mViewBinding.layoutProgressbar.getRoot(),
-                    View.GONE, 0, 200);
         }
     }
 }
