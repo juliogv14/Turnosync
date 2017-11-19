@@ -127,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_register) {
-            //TODO: Change to intent > register activity
             Toast.makeText(this, "Go to register activity", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, RegisterActivity.class));
         }
@@ -151,9 +150,11 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
+                                    setResult(RESULT_OK);
                                     finish();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this,
+                                            R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -209,6 +210,7 @@ public class LoginActivity extends AppCompatActivity {
                             LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
+                                setResult(RESULT_OK);
                                 finish();
                             } else {
                                 Toast.makeText(LoginActivity.this,
