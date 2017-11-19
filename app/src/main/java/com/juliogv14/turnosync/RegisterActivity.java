@@ -120,25 +120,31 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
-        mFirebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
-                                false);
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(displayName).build());
-                            Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            startActivity(startMainIntent);
-                            finish();
-                        } else {
-                            Toast.makeText(RegisterActivity.this,
-                                    R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                                    false);
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(displayName).build());
+                                Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                startActivity(startMainIntent);
+                                finish();
+                            } else {
+                                Toast.makeText(RegisterActivity.this,
+                                        R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
 }
