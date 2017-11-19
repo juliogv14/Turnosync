@@ -1,5 +1,7 @@
 package com.juliogv14.turnosync.utils;
 
+import android.view.View;
+
 import java.util.regex.Pattern;
 
 /**
@@ -12,7 +14,7 @@ public class LoginUtils {
     public static boolean isEmailValid(String email) {
 
         //Regex to check if the string contains '@' and '.' as in an email.
-        String regEx = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+        String regEx = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
         return Pattern.compile(regEx).matcher(email).matches();
     }
 
@@ -31,4 +33,13 @@ public class LoginUtils {
         String regEx = "^[\\p{L}-' ]+$";
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
+
+    public static void showLoadingIndicator(View indicatorView, boolean show) {
+        if (show) {
+            AnimationViewUtils.animateView(indicatorView, View.VISIBLE, 0.4f, 200);
+        } else {
+            AnimationViewUtils.animateView(indicatorView, View.GONE, 0, 200);
+        }
+    }
+
 }
