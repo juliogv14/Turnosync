@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
 import com.juliogv14.turnosync.utils.LoginUtils;
 
@@ -64,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         /*get strings from editTexts*/
         String email = mViewBinding.editTextEmail.getText().toString();
-        String displayName = mViewBinding.editTextName.getText().toString();
+        final String displayName = mViewBinding.editTextName.getText().toString();
         String password = mViewBinding.editTextPassword.getText().toString();
         String passwordRepeat = mViewBinding.editTextPasswordRepeat.getText().toString();
 
@@ -126,6 +128,8 @@ public class RegisterActivity extends AppCompatActivity {
                         LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                 false);
                         if (task.isSuccessful()) {
+                            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(displayName).build());
                             Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
                             startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             startActivity(startMainIntent);
