@@ -2,11 +2,10 @@ package com.juliogv14.turnosync;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -28,6 +27,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     ActivityRegisterBinding mViewBinding;
     FirebaseAuth mFirebaseAuth;
+
+    String mEmail;
+    String mDisplayName;
+    String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,21 +68,21 @@ public class RegisterActivity extends AppCompatActivity {
         mViewBinding.editTextLayoutPasswordRepeat.setError(null);
 
         /*get strings from editTexts*/
-        String email = mViewBinding.editTextEmail.getText().toString();
-        final String displayName = mViewBinding.editTextName.getText().toString();
-        String password = mViewBinding.editTextPassword.getText().toString();
+        mEmail = mViewBinding.editTextEmail.getText().toString();
+        mDisplayName = mViewBinding.editTextName.getText().toString();
+        mPassword = mViewBinding.editTextPassword.getText().toString();
         String passwordRepeat = mViewBinding.editTextPasswordRepeat.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         /*Check for a valid email address.*/
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(mEmail)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
-        } else if (!LoginUtils.isEmailValid(email)) {
+        } else if (!LoginUtils.isEmailValid(mEmail)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_invalid_email));
             focusView = mViewBinding.editTextEmail;
@@ -87,12 +90,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for a valid displayName*/
-        if (TextUtils.isEmpty(displayName)) {
+        if (TextUtils.isEmpty(mDisplayName)) {
             mViewBinding.editTextLayoutName
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextName;
             cancel = true;
-        } else if (!LoginUtils.isDisplayNameValid(displayName)) {
+        } else if (!LoginUtils.isDisplayNameValid(mDisplayName)) {
             mViewBinding.editTextLayoutName
                     .setError(getString(R.string.register_error_name));
             focusView = mViewBinding.editTextName;
@@ -100,12 +103,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for a valid password.*/
-        if (TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(mPassword)) {
             mViewBinding.editTextLayoutPassword
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
-        } else if (!LoginUtils.isRegisterPasswordValid(password)) {
+        } else if (!LoginUtils.isRegisterPasswordValid(mPassword)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPassword;
@@ -113,7 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for passwords match*/
-        if (!TextUtils.equals(password, passwordRepeat)) {
+        if (!TextUtils.equals(mPassword, passwordRepeat)) {
             mViewBinding.editTextPasswordRepeat.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPasswordRepeat;
@@ -126,7 +129,7 @@ public class RegisterActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
-            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+            mFirebaseAuth.createUserWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -134,7 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     false);
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(displayName).build());
+                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build());
                                 Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
                                 startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                                 startActivity(startMainIntent);
