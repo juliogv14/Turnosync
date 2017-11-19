@@ -22,6 +22,7 @@
     <string name="register_password_repeat">Repeat password</string>
     <!--REGISTER ERROR STRINGS-->
     <string name="register_error_name">This name is invalid. Symbols and numbers not allowed.</string>
+    <string name="register_error_password">This password is too weak. Need at least one uppercase, one lowercase and one number.</string>
     <string name="register_error_repeat">Passwords doesn\'t match</string>
 
     <item name="visible" type="id" />

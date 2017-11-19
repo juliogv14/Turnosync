@@ -110,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         } else if (!LoginUtils.isRegisterPasswordValid(mPassword)) {
             mViewBinding.editTextLayoutPassword.
-                    setError(getString(R.string.login_error_invalid_password));
+                    setError(getString(R.string.register_error_password));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
         }
@@ -118,7 +118,7 @@ public class RegisterActivity extends AppCompatActivity {
         /*Check for passwords match*/
         if (!TextUtils.equals(mPassword, passwordRepeat)) {
             mViewBinding.editTextPasswordRepeat.
-                    setError(getString(R.string.login_error_invalid_password));
+                    setError(getString(R.string.register_error_repeat));
             focusView = mViewBinding.editTextPasswordRepeat;
             cancel = true;
         }
