@@ -104,5 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSignedOutCleanup() {
         mUsername = "";
+        mViewBinding.tvUser.setText("");
     }
 }
