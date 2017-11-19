@@ -130,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_register) {
             //TODO: Change to intent > register activity
             Toast.makeText(this, "Go to register activity", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, RegisterActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
