@@ -208,7 +208,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
-                                    true);
+                                    false);
                             if (task.isSuccessful()) {
                                 finish();
                             } else {
