@@ -105,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
-        } else if (!LoginUtils.isLoginPasswordValid(password)) {
+        } else if (!LoginUtils.isRegisterPasswordValid(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPassword;
