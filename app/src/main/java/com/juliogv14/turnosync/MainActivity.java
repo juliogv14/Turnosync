@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,7 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.juliogv14.turnosync.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
 
     //Activity views
@@ -53,9 +54,12 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
                 if (user != null) {
+                    Log.d(TAG, "Authlistener: logged in user" + user.getDisplayName());
                     //User logged in
                     onSignedInInitialize(user);
+
                 } else {
+                    Log.d(TAG, "Authlistener: logged out");
                     //No user logged in
                     onSignedOutCleanup();
                     Intent signInIntent = new Intent(getBaseContext(), LoginActivity.class);
