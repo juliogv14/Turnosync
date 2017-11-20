@@ -30,7 +30,7 @@ public class LoginUtils {
     }
 
     public static boolean isDisplayNameValid(String displayName) {
-        String regEx = "^[\\p{L}-' ]+$";
+        String regEx = "^[\\p{L}-' 0-9]+$";
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
 
