@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             onSignedInInitialize(currentUser);
         }
+        Log.d(TAG, "AddAuthStateListener");
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (mAuthStateListener != null) {
+            Log.d(TAG, "RemoveAuthStateListener");
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }
