@@ -117,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         /*Check for passwords match*/
         if (!TextUtils.equals(mPassword, passwordRepeat)) {
-            mViewBinding.editTextPasswordRepeat.
+            mViewBinding.editTextLayoutPasswordRepeat.
                     setError(getString(R.string.register_error_repeat));
             focusView = mViewBinding.editTextPasswordRepeat;
             cancel = true;
