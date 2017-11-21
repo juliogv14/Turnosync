@@ -2,6 +2,11 @@
     <string name="app_name">Turnosync</string>
     <string name="web_client_token">424030572418-q0mtitaf63mus90332mh6pud2kcp6c9d.apps.googleusercontent.com</string>
 
+    <!--ACTIVITY LABELS-->
+    <string name="activity_signin">Sign in</string>
+    <string name="activity_register">Register</string>
+    <string name="activity_reset_password">Reset password</string>
+
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>

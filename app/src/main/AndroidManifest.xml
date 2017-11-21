@@ -29,17 +29,23 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/login_action_signin"
+            android:label="@string/activity_signin"
             android:theme="@style/LoginOptionsMenu" />
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/login_action_register"
+            android:label="@string/activity_register"
             android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-        <activity android:name=".ResetPasswordActivity"></activity>
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:label="@string/activity_reset_password">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
     </application>
 
 </manifest>
