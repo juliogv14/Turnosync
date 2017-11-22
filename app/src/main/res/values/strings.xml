@@ -30,6 +30,11 @@
     <string name="register_error_password">This password is too weak. Need at least one uppercase, one lowercase and one number.</string>
     <string name="register_error_repeat">Passwords doesn\'t match</string>
 
+    <!--RESET PASSWORD STRINGS-->
+    <string name="resetpassword_label_question">Forgot your account password? </string>
+    <string name="resetpassword_label_instructions">Enter your email below ro reset your password</string>
+    <string name="resetpassword_action_sendemail">Send email</string>
+
     <item name="visible" type="id" />
     <item name="masked" type="id" />
 </resources>

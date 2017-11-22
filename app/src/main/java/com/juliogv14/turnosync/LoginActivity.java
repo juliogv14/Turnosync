@@ -104,8 +104,7 @@ public class LoginActivity extends AppCompatActivity {
         span.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-                //TODO: Forgot password handle
-                Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
 
             @Override
@@ -126,7 +125,6 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_register) {
-            Toast.makeText(this, "Go to register activity", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, RegisterActivity.class));
         }
         return super.onOptionsItemSelected(item);
