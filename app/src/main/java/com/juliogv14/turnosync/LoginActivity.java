@@ -87,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        mViewBinding.buttonGoogleSignin.setSize(SignInButton.SIZE_WIDE);
         mViewBinding.buttonGoogleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
