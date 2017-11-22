@@ -2,7 +2,8 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.juliogv14.turnosync.RegisterActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -13,8 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:focusableInTouchMode="true"
-            tools:context="com.juliogv14.turnosync.RegisterActivity">
+            android:focusableInTouchMode="true">
 
             <ImageView
                 android:id="@+id/imageView_icon"
