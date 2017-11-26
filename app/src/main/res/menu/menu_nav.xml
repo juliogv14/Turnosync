@@ -4,13 +4,17 @@
     tools:showIn="navigation_view">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_main"
+            android:id="@+id/nav_item_main"
             android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/nav_item_home" />
+        <item
+            android:id="@+id/nav_item_calendar"
+            android:icon="@drawable/ic_today_black_24dp"
             android:title="@string/nav_item_home" />
     </group>
     <group>
         <item
-            android:id="@+id/nav_signout"
+            android:id="@+id/nav_item_signout"
             android:icon="@drawable/ic_exit_to_app_black_24dp"
             android:title="@string/nav_item_signout" />
     </group>
