@@ -16,16 +16,16 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.juliogv14.turnosync.databinding.ActivityMainBinding;
+import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 
-public class MainActivity extends AppCompatActivity
+public class BaseDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
 
     //Activity views
-    private ActivityMainBinding mViewBinding;
+    private ActivityDrawerBinding mViewBinding;
 
     //Auth
     private String mUsername;
@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        setContentView(R.layout.activity_drawer);
+        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
 
         /*------DRAWER-----*/
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
