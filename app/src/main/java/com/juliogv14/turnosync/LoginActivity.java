@@ -91,6 +91,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent googleSignInIntent = mGoogleSignInClient.getSignInIntent();
+                LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
                 startActivityForResult(googleSignInIntent, RC_GOOGLE_SIGN_IN);
             }
         });
@@ -147,6 +148,7 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
+                                    LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                                     setResult(RESULT_OK);
                                     finish();
                                 } else {
