@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--APP COLORS-->
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#338A3E</color>
+
+    <!--LINK COLORS-->
     <color name="linkColor">#0000EE</color>
     <color name="visitedLinkColor">#551A8B</color>
+
+    <!--NAV DRAWER ITEM COLORS-->
+    <color name="statecolor_selected">#EEDDDDDD</color>
+    <color name="statecolor_pressed">#DDDDDD</color>
 
 </resources>
