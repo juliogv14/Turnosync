@@ -6,5 +6,5 @@
     <dimen name="register_button_horizontal_margin">@dimen/login_button_horizontal_margin</dimen>
     <dimen name="header_drawer_left_padding">16dp</dimen>
     <dimen name="header_drawer_height">176dp</dimen>
-    <dimen name="header_drawer_imageview">64dp</dimen>
+    <dimen name="header_drawer_imageview">56dp</dimen>
 </resources>
