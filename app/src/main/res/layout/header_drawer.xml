@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_drawer_height">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/header_drawer_left_padding">
+
+            <ImageView
+                android:id="@+id/imageView_profile"
+                android:layout_width="@dimen/header_drawer_imageview"
+                android:layout_height="@dimen/header_drawer_imageview"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:background="@android:drawable/ic_menu_gallery"
+                tools:background="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/textView_display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textStyle="bold"
+                tools:text="Nombre del usuario" />
+
+            <TextView
+                android:id="@+id/textView_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="usuario@email.com" />
+
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>

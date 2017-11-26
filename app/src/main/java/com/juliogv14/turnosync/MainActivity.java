@@ -5,14 +5,17 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.juliogv14.turnosync.databinding.ActivityMainBinding;
+import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
@@ -26,13 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    HeaderDrawerBinding mHeaderBinding;
+    private ActionBarDrawerToggle mDrawerToggle;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-        mViewBinding.login.setOnClickListener(new View.OnClickListener() {
+        /********************Test buttons**************/
+        /*mViewBinding.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(v.getContext(), LoginActivity.class));
@@ -44,9 +49,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mFirebaseAuth.signOut();
             }
-        });
+        });*/
+        /***************************************************/
 
+        DrawerLayout drawerLayout = (DrawerLayout) mViewBinding.getRoot();
+        mDrawerToggle = new ActionBarDrawerToggle(this,
+                drawerLayout,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawerToggle.syncState();
+        mHeaderBinding = DataBindingUtil.bind(mViewBinding.navView.getHeaderView(0));
 
+        getLayoutInflater().inflate(R.layout.content_main, mViewBinding.contentView);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -67,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+
     }
 
     @Override
@@ -102,14 +121,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void onSignedInInitialize(FirebaseUser user) {
         mUsername = user.getDisplayName();
         String displaytext = mUsername + ":" + user.getUid();
-        mViewBinding.tvUser.setText(displaytext);
+        mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
+        mHeaderBinding.textViewEmail.setText(user.getEmail());
+
     }
 
     private void onSignedOutCleanup() {
         mUsername = "";
-        mViewBinding.tvUser.setText("");
+        mHeaderBinding.textViewDisplayName.setText("");
     }
 }
