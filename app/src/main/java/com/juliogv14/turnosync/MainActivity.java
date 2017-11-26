@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity
         }
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
-        mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
         mHeaderBinding = DataBindingUtil.bind(mViewBinding.viewNav.getHeaderView(0));
 
         /*-------FIREBASE STATE LISTENER-------*/
@@ -66,7 +65,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-
                 if (user != null) {
                     Log.d(TAG, "Authlistener: logged in user" + user.getDisplayName());
                     //User logged in
@@ -106,6 +104,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Signed in", Toast.LENGTH_SHORT).show();
