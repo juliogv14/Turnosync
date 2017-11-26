@@ -21,11 +21,12 @@ import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 
 public class BaseDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
     private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
 
     //Activity views
-    private ActivityDrawerBinding mViewBinding;
+    protected ActivityDrawerBinding mViewBinding;
 
     //Auth
     private String mUsername;
