@@ -10,7 +10,7 @@
     <color name="visitedLinkColor">#551A8B</color>
 
     <!--NAV DRAWER ITEM COLORS-->
-    <color name="statecolor_selected">#EEDDDDDD</color>
+    <color name="statecolor_checked">#EEDDDDDD</color>
     <color name="statecolor_pressed">#DDDDDD</color>
 
 </resources>
