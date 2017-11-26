@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 
-public class BaseDrawerActivity extends AppCompatActivity
+public abstract class BaseDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String TAG = this.getClass().getSimpleName();
