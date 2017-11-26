@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity
         }
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
+        mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
         mHeaderBinding = DataBindingUtil.bind(mViewBinding.viewNav.getHeaderView(0));
 
         /*-------FIREBASE STATE LISTENER-------*/
