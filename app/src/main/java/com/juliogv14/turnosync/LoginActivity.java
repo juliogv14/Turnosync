@@ -1,5 +1,6 @@
 package com.juliogv14.turnosync;
 
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -16,7 +17,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethod;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    LoginUtils.closeKeyboard(LoginActivity.this, textView);
                     attemptLogin();
                     return true;
                 }
@@ -76,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         mViewBinding.buttonSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LoginUtils.closeKeyboard(LoginActivity.this, v);
                 attemptLogin();
             }
         });

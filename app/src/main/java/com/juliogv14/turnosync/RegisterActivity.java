@@ -45,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    LoginUtils.closeKeyboard(RegisterActivity.this, textView);
                     attemptRegister();
                     return true;
                 }
@@ -55,6 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
         mViewBinding.buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LoginUtils.closeKeyboard(RegisterActivity.this, v);
                 attemptRegister();
             }
         });

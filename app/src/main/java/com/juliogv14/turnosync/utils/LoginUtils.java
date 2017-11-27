@@ -1,6 +1,8 @@
 package com.juliogv14.turnosync.utils;
 
+import android.content.Context;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.regex.Pattern;
 
@@ -42,4 +44,13 @@ public class LoginUtils {
         }
     }
 
+    public static boolean closeKeyboard(Context context, View focusView) {
+        InputMethodManager imm =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (focusView != null && imm != null) {
+            imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+            return true;
+        }
+        return false;
+    }
 }
