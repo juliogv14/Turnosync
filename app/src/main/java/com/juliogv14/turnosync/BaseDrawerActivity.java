@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
+
+import java.lang.reflect.Field;
 
 public abstract class BaseDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -56,6 +59,20 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+
+        //Increase slide width from edge
+        try {
+            Field mDragger = mDrawerLayout.getClass().getDeclaredField("mLeftDragger");
+            mDragger.setAccessible(true);
+            ViewDragHelper dragHelper = (ViewDragHelper) mDragger.get(mDrawerLayout);
+            Field mEdgeSize = dragHelper.getClass().getDeclaredField("mEdgeSize");
+            mEdgeSize.setAccessible(true);
+            int edge = mEdgeSize.getInt((dragHelper));
+            mEdgeSize.setInt(dragHelper, edge * 8);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
         mHeaderBinding = DataBindingUtil.bind(mViewBinding.viewNav.getHeaderView(0));
