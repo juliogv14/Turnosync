@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Profile settings">
+        <Preference
+            android:key="@string/pref_email_key"
+            android:title="@string/pref_email_title" />
+        <EditTextPreference
+            android:defaultValue="@string/pref_displayname_default"
+            android:key="@string/pref_displayname_key"
+            android:title="@string/pref_displayname_title" />
+    </PreferenceCategory>
+</PreferenceScreen>

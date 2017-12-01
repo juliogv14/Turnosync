@@ -35,15 +35,26 @@
     <string name="resetpassword_label_instructions">Enter your email below ro reset your password</string>
     <string name="resetpassword_action_sendemail">Send email</string>
 
-    <!--DRAWER STRINGS-->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_calendar">My calendar</string>
     <string name="nav_item_settings">Settings</string>
     <string name="nav_item_signout">Sign out</string>
+
+    <!--SETTINGS ITEM TITLES-->
+    <string name="pref_displayname_title">Display name</string>
+    <string name="pref_email_title">Email</string>
+    <!--SETTINGS KEY STRINGS-->
+    <string name="pref_displayname_key" translatable="false">display_name</string>
+    <string name="pref_email_key" translatable="false">email</string>
+    <!--SETTINGS DEFAULT VALUES-->
+    <string name="pref_displayname_default">Name</string>
+    <string name="pref_email_default">email@mail.com</string>
+
+
+    <!--DRAWER STRINGS-->
+    <string name="a11y_navigation_drawer_open">Open navigation drawer</string>
+    <string name="a11y_navigation_drawer_close">Close navigation drawer</string>
 
     <item name="visible" type="id" />
     <item name="masked" type="id" />
