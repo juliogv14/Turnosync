@@ -150,6 +150,8 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
             case R.id.nav_item_signout:
                 mFirebaseAuth.signOut();
                 break;
+            case R.id.nav_item_settings:
+                break;
         }
 
 
