@@ -60,7 +60,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        //Increase slide width from edge
+        //Increase slide margin from edge
         try {
             Field mDragger = mDrawerLayout.getClass().getDeclaredField("mLeftDragger");
             mDragger.setAccessible(true);
