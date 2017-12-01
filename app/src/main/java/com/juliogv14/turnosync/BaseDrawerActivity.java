@@ -51,8 +51,8 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
         mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
+                R.string.a11y_navigation_drawer_open,
+                R.string.a11y_navigation_drawer_close);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         if (getSupportActionBar() != null) {
