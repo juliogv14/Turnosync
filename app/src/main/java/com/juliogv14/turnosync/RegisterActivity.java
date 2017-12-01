@@ -140,16 +140,18 @@ public class RegisterActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
 
                                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                                                startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                                startActivity(startMainIntent);
-                                                finish();
-                                            }
-                                        });
+                                if (user != null) {
+                                    user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                                    startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                                    startActivity(startMainIntent);
+                                                    finish();
+                                                }
+                                            });
+                                }
                             } else {
                                 Toast.makeText(RegisterActivity.this,
                                         R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();

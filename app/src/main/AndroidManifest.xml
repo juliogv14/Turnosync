@@ -43,6 +43,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
+        <activity android:name=".settings.SettingsActivity"></activity>
     </application>
 
 </manifest>

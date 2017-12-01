@@ -1,6 +1,7 @@
 package com.juliogv14.turnosync;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,19 +12,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.juliogv14.turnosync.settings.SettingsActivity;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 
 import java.lang.reflect.Field;
 
 public abstract class BaseDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
@@ -151,12 +157,30 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
                 mFirebaseAuth.signOut();
                 break;
             case R.id.nav_item_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
 
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
+            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+            if (user != null) {
+                user.updateProfile(new UserProfileChangeRequest.Builder()
+                        .setDisplayName(sharedPreferences.getString(key, null)).build())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(BaseDrawerActivity.this, "Display name successfully updated", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
     }
 
     private void onSignedInInitialize(FirebaseUser user) {
