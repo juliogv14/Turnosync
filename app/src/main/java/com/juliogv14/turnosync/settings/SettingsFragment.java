@@ -18,6 +18,7 @@ import com.juliogv14.turnosync.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private final String TAG = this.getClass().getSimpleName();
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -39,7 +40,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        Preference preference = findPreference(key);
+        if (null != preference) {
+            if (!(preference instanceof CheckBoxPreference)) {
+                setPreferenceSummary(preference, sharedPreferences.getString(key, ""));
+            }
+        }
     }
 
     @Override
