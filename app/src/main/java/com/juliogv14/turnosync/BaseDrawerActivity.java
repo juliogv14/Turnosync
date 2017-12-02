@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -103,6 +104,9 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
                 }
             }
         };
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -123,6 +127,14 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
             Log.d(TAG, "RemoveAuthStateListener");
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -188,6 +200,11 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
     private void onSignedInInitialize(FirebaseUser user) {
         mUsername = user.getDisplayName();
         String displaytext = mUsername + ":" + user.getUid();
+        SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = shrPreferences.edit();
+        editor.putString(getString(R.string.pref_displayname_key), user.getDisplayName());
+        editor.putString(getString(R.string.pref_email_key), user.getEmail());
+        editor.apply();
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
 
