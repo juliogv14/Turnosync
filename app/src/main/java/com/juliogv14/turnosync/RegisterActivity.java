@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -153,8 +154,9 @@ public class RegisterActivity extends AppCompatActivity {
                                             });
                                 }
                             } else {
+                                Log.d(TAG, task.getException().getMessage());
                                 Toast.makeText(RegisterActivity.this,
-                                        R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                        R.string.toast_register_failed, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

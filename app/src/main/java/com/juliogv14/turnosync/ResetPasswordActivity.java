@@ -1,7 +1,6 @@
 package com.juliogv14.turnosync;
 
 import android.databinding.DataBindingUtil;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
 import com.juliogv14.turnosync.databinding.ActivityResetPasswordBinding;
 import com.juliogv14.turnosync.utils.LoginUtils;
 
@@ -83,10 +81,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Sent successful");
-                                Toast.makeText(ResetPasswordActivity.this, "Follow the instructions inside the email", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ResetPasswordActivity.this, R.string.toast_resetpassword_successfully, Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.d(TAG, "Failed to send email");
-                                Toast.makeText(ResetPasswordActivity.this, "Failed to send email, try again", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ResetPasswordActivity.this, R.string.toast_resetpassword_failed, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

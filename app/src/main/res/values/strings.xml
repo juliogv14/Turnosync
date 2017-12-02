@@ -2,10 +2,19 @@
     <string name="app_name" translatable="false">Turnosync</string>
     <string name="web_client_token" translatable="false">424030572418-q0mtitaf63mus90332mh6pud2kcp6c9d.apps.googleusercontent.com</string>
 
+    <!--TOASTS MESSAGES-->
+    <string name="toast_displayname_update">Display name successfully updated</string>
+    <string name="toast_sign_in_successfully">Signed in</string>
+    <string name="toast_sign_in_canceled">Signed in canceled</string>
+    <string name="toast_resetpassword_successfully">Follow the instructions inside the email</string>
+    <string name="toast_resetpassword_failed">This email isn\'t registered</string>
+    <string name="toast_register_failed">This email is already in use</string>
+
     <!--ACTIVITY LABELS-->
     <string name="activity_signin">Sign in</string>
     <string name="activity_register">Register</string>
     <string name="activity_reset_password">Reset password</string>
+    <string name="activity_settings">Settings</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
@@ -50,7 +59,6 @@
     <!--SETTINGS DEFAULT VALUES-->
     <string name="pref_displayname_default">Name</string>
     <string name="pref_email_default">email@mail.com</string>
-
 
     <!--DRAWER STRINGS-->
     <string name="a11y_navigation_drawer_open">Open navigation drawer</string>

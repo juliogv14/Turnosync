@@ -90,7 +90,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d(TAG, "Authlistener: logged in user" + user.getDisplayName());
+                    Log.d(TAG, "Authlistener: logged in user " + user.getDisplayName());
                     //User logged in
                     onSignedInInitialize(user);
 
@@ -131,9 +131,11 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
         mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Signed in", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Signed in successfully");
+                Toast.makeText(this, R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Signed canceled", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Signed in canceled");
+                Toast.makeText(this, R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -176,7 +178,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(BaseDrawerActivity.this, "Display name successfully updated", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BaseDrawerActivity.this, R.string.toast_displayname_update, Toast.LENGTH_SHORT).show();
                             }
                         });
             }
