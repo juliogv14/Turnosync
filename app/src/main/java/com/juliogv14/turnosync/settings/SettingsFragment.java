@@ -3,21 +3,14 @@ package com.juliogv14.turnosync.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
-import android.text.TextUtils;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.juliogv14.turnosync.R;
 
 /**
@@ -45,7 +38,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     }
 
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference preference = findPreference(key);
@@ -54,36 +46,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 setPreferenceSummary(preference, sharedPreferences.getString(key, ""));
             }
         }
-        /*Update Firebase with new settings*/
-        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
-            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-            if (user != null) {
-                user.updateProfile(new UserProfileChangeRequest.Builder()
-                        .setDisplayName(sharedPreferences.getString(key, "")).build())
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(getContext(), R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
-            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-            if (user != null) {
-                user.updateEmail(sharedPreferences.getString(key, ""))
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
 
-                            }
-                        });
-            }
-        }
     }
 
     @Override

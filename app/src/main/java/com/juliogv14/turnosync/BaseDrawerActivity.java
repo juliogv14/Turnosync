@@ -23,9 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.juliogv14.turnosync.settings.SettingsActivity;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
+import com.juliogv14.turnosync.settings.SettingsActivity;
 
 import java.lang.reflect.Field;
 
@@ -183,6 +183,39 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+
+        /*Update Firebase with new settings*/
+        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
+            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+            String displayName = sharedPreferences.getString(key, "");
+            if (user != null && !TextUtils.equals(user.getEmail(), displayName)) {
+                user.updateProfile(new UserProfileChangeRequest.Builder()
+                        .setDisplayName(sharedPreferences.getString(key, "")).build())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(getApplicationContext(), R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
+            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+            String email = sharedPreferences.getString(key, "");
+            if (user != null && !TextUtils.equals(user.getEmail(), email)) {
+                user.updateEmail(email)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getApplicationContext().getApplicationContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+            }
+        }
     }
 
     private void onSignedInInitialize(FirebaseUser user) {
