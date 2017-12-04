@@ -3,7 +3,8 @@
     <string name="web_client_token" translatable="false">424030572418-q0mtitaf63mus90332mh6pud2kcp6c9d.apps.googleusercontent.com</string>
 
     <!--TOASTS MESSAGES-->
-    <string name="toast_displayname_update">Display name successfully updated</string>
+    <string name="toast_profile_displayname">Display name successfully updated</string>
+    <string name="toast_profile_email">Account email successfully updated</string>
     <string name="toast_sign_in_successfully">Signed in</string>
     <string name="toast_sign_in_canceled">Signed in canceled</string>
     <string name="toast_resetpassword_successfully">Follow the instructions inside the email</string>

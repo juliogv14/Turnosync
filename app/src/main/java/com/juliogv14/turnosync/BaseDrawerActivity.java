@@ -182,19 +182,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
-            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-            if (user != null) {
-                user.updateProfile(new UserProfileChangeRequest.Builder()
-                        .setDisplayName(sharedPreferences.getString(key, null)).build())
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(BaseDrawerActivity.this, R.string.toast_displayname_update, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        }
+
     }
 
     private void onSignedInInitialize(FirebaseUser user) {
