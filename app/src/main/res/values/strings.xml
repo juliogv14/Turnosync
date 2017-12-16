@@ -42,7 +42,7 @@
 
     <!--RESET PASSWORD STRINGS-->
     <string name="resetpassword_label_question">Forgot your account password? </string>
-    <string name="resetpassword_label_instructions">Enter your email below ro reset your password</string>
+    <string name="resetpassword_label_instructions">Enter your email below to reset your password</string>
     <string name="resetpassword_action_sendemail">Send email</string>
 
     <!--DRAWER NAV ITEM TITLES-->
