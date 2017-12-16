@@ -83,7 +83,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 Log.d(TAG, "Sent successful");
                                 Toast.makeText(ResetPasswordActivity.this, R.string.toast_resetpassword_successfully, Toast.LENGTH_SHORT).show();
                             } else {
-                                Log.d(TAG, "Failed to send email");
+                                Log.d(TAG, "Failed to send email" + task.getException().getMessage());
                                 Toast.makeText(ResetPasswordActivity.this, R.string.toast_resetpassword_failed, Toast.LENGTH_SHORT).show();
                             }
                         }
