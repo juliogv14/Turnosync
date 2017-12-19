@@ -12,6 +12,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -153,6 +154,7 @@ public class LoginActivity extends AppCompatActivity {
                                     setResult(RESULT_OK);
                                     finish();
                                 } else {
+                                    Log.d(TAG, "login failed: " + task.getException().getMessage());
                                     Toast.makeText(LoginActivity.this,
                                             R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
                                 }
@@ -188,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         /*Check for a valid password.*/
-        if (!TextUtils.isEmpty(password) && !FormUtils.isLoginPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) && !FormUtils.isLoginPasswordValid(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPassword;
