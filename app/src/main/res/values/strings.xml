@@ -7,7 +7,7 @@
     <string name="toast_profile_email">Account email successfully updated</string>
     <string name="toast_sign_in_successfully">Signed in</string>
     <string name="toast_sign_in_canceled">Signed in canceled</string>
-    <string name="toast_resetpassword_successfully">Follow the instructions inside the email</string>
+    <string name="toast_resetpassword_successfully">Follow the instructions inside the email. Make sure to check the spam inbox</string>
     <string name="toast_resetpassword_failed">This email isn\'t registered</string>
     <string name="toast_register_failed">This email is already in use</string>
 
