@@ -1,9 +1,9 @@
 package com.juliogv14.turnosync;
 
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,7 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.juliogv14.turnosync.databinding.ActivityResetPasswordBinding;
-import com.juliogv14.turnosync.utils.LoginUtils;
+import com.juliogv14.turnosync.utils.FormUtils;
 
 public class ResetPasswordActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
@@ -37,7 +37,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                     attemptSendEmail();
-                    LoginUtils.closeKeyboard(getApplicationContext(), textView);
+                    FormUtils.closeKeyboard(getApplicationContext(), textView);
                     return true;
                 }
                 return false;
@@ -48,7 +48,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 attemptSendEmail();
-                LoginUtils.closeKeyboard(getApplicationContext(), v);
+                FormUtils.closeKeyboard(getApplicationContext(), v);
             }
         });
 
@@ -65,7 +65,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_field_required));
             cancel = true;
-        } else if (!LoginUtils.isEmailValid(email)) {
+        } else if (!FormUtils.isEmailValid(email)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_invalid_email));
             cancel = true;
@@ -75,12 +75,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
             mViewBinding.editTextEmail.requestFocus();
         } else {
 
-            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
+                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Sent successful");
                                 Toast.makeText(ResetPasswordActivity.this, R.string.toast_resetpassword_successfully, Toast.LENGTH_SHORT).show();

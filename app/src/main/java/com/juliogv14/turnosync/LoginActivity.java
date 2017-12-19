@@ -1,6 +1,5 @@
 package com.juliogv14.turnosync;
 
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -17,10 +16,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethod;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -38,7 +33,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
-import com.juliogv14.turnosync.utils.LoginUtils;
+import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
  * Created by Julio on 14/11/2017.
@@ -69,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    LoginUtils.closeKeyboard(LoginActivity.this, textView);
+                    FormUtils.closeKeyboard(LoginActivity.this, textView);
                     attemptLogin();
                     return true;
                 }
@@ -81,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         mViewBinding.buttonSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginUtils.closeKeyboard(LoginActivity.this, v);
+                FormUtils.closeKeyboard(LoginActivity.this, v);
                 attemptLogin();
             }
         });
@@ -97,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent googleSignInIntent = mGoogleSignInClient.getSignInIntent();
-                LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
                 startActivityForResult(googleSignInIntent, RC_GOOGLE_SIGN_IN);
             }
         });
@@ -154,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
+                                    FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                                     setResult(RESULT_OK);
                                     finish();
                                 } else {
@@ -185,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                     setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
-        } else if (!LoginUtils.isEmailValid(email)) {
+        } else if (!FormUtils.isEmailValid(email)) {
             mViewBinding.editTextLayoutEmail.
                     setError(getString(R.string.login_error_invalid_email));
             focusView = mViewBinding.editTextEmail;
@@ -193,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         /*Check for a valid password.*/
-        if (!TextUtils.isEmpty(password) && !LoginUtils.isLoginPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && !FormUtils.isLoginPasswordValid(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPassword;
@@ -207,12 +202,12 @@ public class LoginActivity extends AppCompatActivity {
         } else {
 
             //Firebase signin with email and password
-            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.signInWithEmailAndPassword(email, password).
                     addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
                                 setResult(RESULT_OK);

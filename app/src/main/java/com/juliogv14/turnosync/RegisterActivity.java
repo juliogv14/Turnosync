@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
-import com.juliogv14.turnosync.utils.LoginUtils;
+import com.juliogv14.turnosync.utils.FormUtils;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -46,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    LoginUtils.closeKeyboard(RegisterActivity.this, textView);
+                    FormUtils.closeKeyboard(RegisterActivity.this, textView);
                     attemptRegister();
                     return true;
                 }
@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         mViewBinding.buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginUtils.closeKeyboard(RegisterActivity.this, v);
+                FormUtils.closeKeyboard(RegisterActivity.this, v);
                 attemptRegister();
             }
         });
@@ -85,7 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
-        } else if (!LoginUtils.isEmailValid(mEmail)) {
+        } else if (!FormUtils.isEmailValid(mEmail)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_invalid_email));
             focusView = mViewBinding.editTextEmail;
@@ -98,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextName;
             cancel = true;
-        } else if (!LoginUtils.isDisplayNameValid(mDisplayName)) {
+        } else if (!FormUtils.isDisplayNameValid(mDisplayName)) {
             mViewBinding.editTextLayoutName
                     .setError(getString(R.string.register_error_name));
             focusView = mViewBinding.editTextName;
@@ -111,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .setError(getString(R.string.login_error_field_required));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
-        } else if (!LoginUtils.isRegisterPasswordValid(mPassword)) {
+        } else if (!FormUtils.isRegisterPasswordValid(mPassword)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.register_error_password));
             focusView = mViewBinding.editTextPassword;
@@ -131,12 +131,12 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.createUserWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            LoginUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
 

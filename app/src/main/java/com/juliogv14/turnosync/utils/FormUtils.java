@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * ${FILE_NAME}
  */
 
-public class LoginUtils {
+public class FormUtils {
 
     public static boolean isEmailValid(String email) {
 
