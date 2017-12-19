@@ -37,6 +37,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                     attemptSendEmail();
+                    LoginUtils.closeKeyboard(getApplicationContext(), textView);
                     return true;
                 }
                 return false;
@@ -47,6 +48,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 attemptSendEmail();
+                LoginUtils.closeKeyboard(getApplicationContext(), v);
             }
         });
 
