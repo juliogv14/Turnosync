@@ -147,7 +147,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
-                                                    Intent startMainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                                    Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
                                                     startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                                                     startActivity(startMainIntent);
                                                     finish();

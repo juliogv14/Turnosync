@@ -5,13 +5,13 @@ import android.support.annotation.Nullable;
 
 /**
  * Created by Julio on 26/11/2017.
- * MainActivity.class
+ * HomeActivity.class
  */
 
-public class MainActivity extends BaseDrawerActivity {
+public class HomeActivity extends BaseDrawerActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.content_main, super.mViewBinding.contentView);
+        getLayoutInflater().inflate(R.layout.content_home, super.mViewBinding.contentView);
     }
 }
