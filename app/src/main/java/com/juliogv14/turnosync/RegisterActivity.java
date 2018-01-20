@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
@@ -154,9 +155,20 @@ public class RegisterActivity extends AppCompatActivity {
                                             });
                                 }
                             } else {
-                                Log.d(TAG, task.getException().getMessage());
-                                Toast.makeText(RegisterActivity.this,
-                                        R.string.toast_register_failed, Toast.LENGTH_SHORT).show();
+                                try {
+                                    throw task.getException();
+                                } catch (FirebaseAuthUserCollisionException e) {
+                                    Log.d(TAG, "Register failed: " + e.getMessage());
+                                    Toast.makeText(RegisterActivity.this,
+                                            R.string.toast_register_failed, Toast.LENGTH_SHORT).show();
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Exception error: " + e.getMessage());
+                                    Toast.makeText(RegisterActivity.this,
+                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+
+
+
                             }
                         }
                     });
