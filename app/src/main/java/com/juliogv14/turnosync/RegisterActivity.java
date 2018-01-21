@@ -14,12 +14,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
@@ -140,20 +145,49 @@ public class RegisterActivity extends AppCompatActivity {
                             FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
+                                final boolean[] asyncTastComplete = {false, false};
+                                FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
 
-                                FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                                if (user != null) {
-                                    user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                if (firebaseUser != null) {
+                                    //Add display name to firebase user profile
+                                    Task<Void> updateTask = firebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
+                                            .addOnFailureListener(new OnFailureListener() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
-                                                    startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                                    startActivity(startMainIntent);
-                                                    finish();
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Exception error: " + e.getMessage());
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
+
+                                    //TODO: change string reference
+                                    DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference().child("users");
+                                    User user = new User(firebaseUser.getEmail(), mDisplayName);
+
+                                    //Add user to database
+                                    Task<Void> databaseTask = usersReference.push().setValue(user)
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Exception error: " + e.getMessage());
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                    //When all tasks are done
+                                    Task<Void> alltasks = Tasks.whenAll(updateTask, databaseTask);
+                                    alltasks.addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
+                                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                            startActivity(startMainIntent);
+                                            finish();
+                                        }
+                                    });
                                 }
+
                             } else {
                                 try {
                                     throw task.getException();
@@ -166,7 +200,6 @@ public class RegisterActivity extends AppCompatActivity {
                                     Toast.makeText(RegisterActivity.this,
                                             "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
-
 
 
                             }
