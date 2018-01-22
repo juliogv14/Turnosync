@@ -1,8 +1,13 @@
 package com.juliogv14.turnosync.utils;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.regex.Pattern;
 
@@ -52,5 +57,25 @@ public class FormUtils {
             return true;
         }
         return false;
+    }
+
+    public static void checkGooglePlayServices(Context context) {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int result = googleApiAvailability.isGooglePlayServicesAvailable(context);
+        String TAG = context.getClass().getSimpleName();
+
+        switch (result) {
+            //TODO: Toast string
+            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
+                Log.w(TAG, "SERVICE_VERSION_UPDATE_REQUIRED");
+                Toast.makeText(context, "Please update Google Play Services", Toast.LENGTH_SHORT).show();
+                break;
+            case ConnectionResult.SUCCESS:
+                Log.d(TAG, "Play service available success");
+                break;
+            default:
+                Log.d(TAG, "unknown services result: " + result);
+
+        }
     }
 }
