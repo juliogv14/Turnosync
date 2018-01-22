@@ -162,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 User user = new User(firebaseUser.getEmail(), mDisplayName);
 
                                 //Add user to database
-                                Task<Void> databaseTask = usersReference.push().setValue(user)
+                                Task<Void> databaseTask = usersReference.child(firebaseUser.getUid()).setValue(user)
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
@@ -190,6 +190,8 @@ public class RegisterActivity extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception ex) {
+                    FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                            false);
                     try {
                         throw ex;
                     } catch (FirebaseAuthUserCollisionException e) {
