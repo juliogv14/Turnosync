@@ -23,8 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
@@ -158,11 +158,11 @@ public class RegisterActivity extends AppCompatActivity {
                                         });
 
                                 //TODO: change string reference
-                                DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference().child("users");
+                                CollectionReference usersReference = FirebaseFirestore.getInstance().collection("users");
                                 User user = new User(firebaseUser.getEmail(), mDisplayName);
 
                                 //Add user to database
-                                Task<Void> databaseTask = usersReference.child(firebaseUser.getUid()).setValue(user)
+                                Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
