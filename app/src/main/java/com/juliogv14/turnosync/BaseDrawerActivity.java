@@ -100,6 +100,8 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
                     //No user logged in
                     onSignedOutCleanup();
                     Intent signInIntent = new Intent(getBaseContext(), LoginActivity.class);
+                    signInIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivityForResult(signInIntent, RC_SIGN_IN);
                 }
             }

@@ -180,7 +180,8 @@ public class RegisterActivity extends AppCompatActivity {
                                         FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                                 false);
                                         Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
-                                        startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                        startMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(startMainIntent);
                                         finish();
                                     }
