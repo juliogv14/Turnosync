@@ -109,6 +109,13 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
+
+        if (this instanceof HomeActivity) {
+            mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
+        } else if (this instanceof MyCalendarActivity) {
+            mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
+        }
+
     }
 
     @Override
@@ -142,7 +149,6 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 Log.d(TAG, "Signed in successfully");
