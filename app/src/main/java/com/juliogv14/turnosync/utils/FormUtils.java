@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.juliogv14.turnosync.R;
 
 import java.util.regex.Pattern;
 
@@ -65,10 +66,9 @@ public class FormUtils {
         String TAG = context.getClass().getSimpleName();
 
         switch (result) {
-            //TODO: Toast string
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
                 Log.w(TAG, "SERVICE_VERSION_UPDATE_REQUIRED");
-                Toast.makeText(context, "Please update Google Play Services", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.toast_update_services, Toast.LENGTH_SHORT).show();
                 break;
             case ConnectionResult.SUCCESS:
                 Log.d(TAG, "Play service available success");

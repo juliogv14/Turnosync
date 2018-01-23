@@ -157,12 +157,12 @@ public class RegisterActivity extends AppCompatActivity {
                                                 public void onFailure(@NonNull Exception e) {
                                                     Log.e(TAG, "Exception error: " + e.getMessage());
                                                     Toast.makeText(RegisterActivity.this,
-                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            R.string.toast_generic_error + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
                                     //TODO: change string reference
-                                    CollectionReference usersReference = FirebaseFirestore.getInstance().collection("users");
+                                    CollectionReference usersReference = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users));
                                     User user = new User(firebaseUser.getEmail(), mDisplayName);
 
                                     //Add user to database
@@ -172,7 +172,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                 public void onFailure(@NonNull Exception e) {
                                                     Log.e(TAG, "Exception error: " + e.getMessage());
                                                     Toast.makeText(RegisterActivity.this,
-                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            R.string.toast_generic_error + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
@@ -200,7 +200,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         Log.e(TAG, "Exception error: " + e.getMessage());
                                         Toast.makeText(RegisterActivity.this,
-                                                "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                R.string.toast_generic_error + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             }

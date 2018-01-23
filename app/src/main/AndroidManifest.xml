@@ -10,7 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
         <activity
             android:name=".HomeActivity"
             android:launchMode="singleTop"
@@ -21,6 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/activity_signin"
@@ -33,6 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
+
         <activity
             android:name=".ResetPasswordActivity"
             android:label="@string/activity_reset_password"
@@ -41,15 +42,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-        <activity android:name=".settings.SettingsActivity" />
 
-        <!--TODO label to strings-->
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="@string/activity_settings" />
+
         <activity
             android:name=".MyCalendarActivity"
-            android:label="MyCalendarActivity">
-
-        </activity>
-
+            android:label="@string/activity_mycalendar" />
 
     </application>
 
