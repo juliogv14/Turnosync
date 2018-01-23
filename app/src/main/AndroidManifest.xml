@@ -43,6 +43,13 @@
         </activity>
         <activity android:name=".settings.SettingsActivity" />
 
+        <!--TODO label to strings-->
+        <activity
+            android:name=".MyCalendarActivity"
+            android:label="MyCalendarActivity">
+
+        </activity>
+
 
     </application>
 
