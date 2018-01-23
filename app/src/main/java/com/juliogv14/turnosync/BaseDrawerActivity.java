@@ -168,12 +168,22 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.nav_item_main:
+                Intent homeIntent = new Intent(this, HomeActivity.class);
+                homeIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(homeIntent);
+                break;
+            case R.id.nav_item_calendar:
+                Intent calendarIntent = new Intent(this, MyCalendarActivity.class);
+                calendarIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(calendarIntent);
                 break;
             case R.id.nav_item_signout:
                 mFirebaseAuth.signOut();
                 break;
             case R.id.nav_item_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(settingsIntent);
                 break;
         }
 
