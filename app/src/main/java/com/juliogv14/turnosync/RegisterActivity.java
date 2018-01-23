@@ -140,72 +140,73 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.createUserWithEmailAndPassword(mEmail, mPassword)
-                    .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
-                        public void onSuccess(AuthResult authResult) {
-                            FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                                    false);
+                            if (task.isSuccessful()) {
 
-                            if (firebaseUser != null) {
-                                //Add display name to firebase user profile
-                                Task<Void> updateTask = firebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "Exception error: " + e.getMessage());
-                                                Toast.makeText(RegisterActivity.this,
-                                                        "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
 
-                                //TODO: change string reference
-                                CollectionReference usersReference = FirebaseFirestore.getInstance().collection("users");
-                                User user = new User(firebaseUser.getEmail(), mDisplayName);
+                                if (firebaseUser != null) {
+                                    //Add display name to firebase user profile
+                                    Task<Void> updateTask = firebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Exception error: " + e.getMessage());
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
 
-                                //Add user to database
-                                Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "Exception error: " + e.getMessage());
-                                                Toast.makeText(RegisterActivity.this,
-                                                        "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                    //TODO: change string reference
+                                    CollectionReference usersReference = FirebaseFirestore.getInstance().collection("users");
+                                    User user = new User(firebaseUser.getEmail(), mDisplayName);
 
-                                //When all tasks are done
-                                Task<Void> alltasks = Tasks.whenAll(updateTask, databaseTask);
-                                alltasks.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
-                                                false);
-                                        Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
-                                        startMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(startMainIntent);
-                                        finish();
+                                    //Add user to database
+                                    Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Exception error: " + e.getMessage());
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                    //When all tasks are done
+                                    Task<Void> alltasks = Tasks.whenAll(updateTask, databaseTask);
+                                    alltasks.addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Intent startMainIntent = new Intent(RegisterActivity.this, HomeActivity.class);
+                                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(startMainIntent);
+                                            finish();
+                                        }
+                                    });
+                                }
+                            } else {
+                                if (task.getException() != null) {
+                                    try {
+                                        throw task.getException();
+                                    } catch (FirebaseAuthUserCollisionException e) {
+                                        Log.d(TAG, "Register failed: " + e.getMessage());
+                                        Toast.makeText(RegisterActivity.this,
+                                                R.string.toast_register_failed, Toast.LENGTH_SHORT).show();
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "Exception error: " + e.getMessage());
+                                        Toast.makeText(RegisterActivity.this,
+                                                "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
-                                });
+                                }
                             }
+
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception ex) {
-                    FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
-                            false);
-                    try {
-                        throw ex;
-                    } catch (FirebaseAuthUserCollisionException e) {
-                        Log.d(TAG, "Register failed: " + e.getMessage());
-                        Toast.makeText(RegisterActivity.this,
-                                R.string.toast_register_failed, Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Log.e(TAG, "Exception error: " + e.getMessage());
-                        Toast.makeText(RegisterActivity.this,
-                                "An error occurred:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+                    });
         }
     }
 }
