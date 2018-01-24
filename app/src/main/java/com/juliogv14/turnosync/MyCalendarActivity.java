@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * MyCalendarActivity
  */
 
-public class MyCalendarActivity extends BaseDrawerActivity {
+public class MyCalendarActivity extends DrawerActivity {
 
     private FirebaseFirestore mFirebaseFirestore;
     private final String TAG = this.getClass().getSimpleName();
@@ -19,7 +19,7 @@ public class MyCalendarActivity extends BaseDrawerActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.content_mycalendar, super.mViewBinding.contentView);
+        getLayoutInflater().inflate(R.layout.content_mycalendar, super.mViewBinding.contentFrame);
 
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         Log.d(TAG, "Start MyCalendarActivity");

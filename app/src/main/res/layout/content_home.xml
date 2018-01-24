@@ -2,10 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <include
             android:id="@+id/testlayout"
@@ -19,5 +18,5 @@
             android:layout_margin="@dimen/home_fab_margin"
             app:srcCompat="@android:drawable/ic_input_add" />
 
-    </android.support.design.widget.CoordinatorLayout>
+    </FrameLayout>
 </layout>

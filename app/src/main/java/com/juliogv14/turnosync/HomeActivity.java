@@ -19,7 +19,7 @@ import java.util.Map;
  * HomeActivity.class
  */
 
-public class HomeActivity extends BaseDrawerActivity {
+public class HomeActivity extends DrawerActivity {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -30,7 +30,7 @@ public class HomeActivity extends BaseDrawerActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.content_home, super.mViewBinding.contentView);
+        getLayoutInflater().inflate(R.layout.content_home, super.mViewBinding.contentFrame);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.content_home);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
 

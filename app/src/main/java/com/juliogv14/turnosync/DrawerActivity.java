@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -29,7 +30,7 @@ import com.juliogv14.turnosync.settings.SettingsActivity;
 
 import java.lang.reflect.Field;
 
-public abstract class BaseDrawerActivity extends AppCompatActivity
+public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String TAG = this.getClass().getSimpleName();
@@ -53,11 +54,12 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
-
+        Toolbar toolbar = mViewBinding.toolbar;
         /*------DRAWER-----*/
+
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
         mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout,
+                mDrawerLayout, toolbar,
                 R.string.a11y_navigation_drawer_open,
                 R.string.a11y_navigation_drawer_close);
 
@@ -110,12 +112,6 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
-        if (this instanceof HomeActivity) {
-            mViewBinding.viewNav.setCheckedItem(R.id.nav_item_main);
-        } else if (this instanceof MyCalendarActivity) {
-            mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
-        }
-
     }
 
     @Override
@@ -147,21 +143,6 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "Signed in successfully");
-                Toast.makeText(this, R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                Log.d(TAG, "Signed in canceled");
-                Toast.makeText(this, R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
@@ -173,7 +154,7 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.nav_item_main:
+            case R.id.nav_item_home:
                 Intent homeIntent = new Intent(this, HomeActivity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(homeIntent);
@@ -196,6 +177,21 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_OK) {
+                Log.d(TAG, "Signed in successfully");
+                Toast.makeText(this, R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                Log.d(TAG, "Signed in canceled");
+                Toast.makeText(this, R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
     }
 
     @Override
@@ -253,5 +249,6 @@ public abstract class BaseDrawerActivity extends AppCompatActivity
         mUsername = "";
         mHeaderBinding.textViewDisplayName.setText("");
     }
+
 
 }
