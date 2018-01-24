@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,8 +27,6 @@ import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.settings.SettingsActivity;
 
-import java.lang.reflect.Field;
-
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -46,7 +43,6 @@ public class DrawerActivity extends AppCompatActivity
 
     //drawer
     private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
     private HeaderDrawerBinding mHeaderBinding;
 
     @Override
@@ -54,23 +50,23 @@ public class DrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
-        Toolbar toolbar = mViewBinding.toolbar;
+
         /*------DRAWER-----*/
+        Toolbar toolbar = mViewBinding.toolbar;
+        setSupportActionBar(toolbar);
 
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
-        mDrawerToggle = new ActionBarDrawerToggle(this,
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,
                 mDrawerLayout, toolbar,
                 R.string.a11y_navigation_drawer_open,
                 R.string.a11y_navigation_drawer_close);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        }
 
+
+        //TODO: decide to remove or not
         //Increase slide margin from edge
-        try {
+        /*try {
             Field mDragger = mDrawerLayout.getClass().getDeclaredField("mLeftDragger");
             mDragger.setAccessible(true);
             ViewDragHelper dragHelper = (ViewDragHelper) mDragger.get(mDrawerLayout);
@@ -80,7 +76,7 @@ public class DrawerActivity extends AppCompatActivity
             mEdgeSize.setInt(dragHelper, edge * 8);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
-        }
+        }*/
 
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
@@ -143,11 +139,13 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
+    public void onBackPressed() {
+
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
