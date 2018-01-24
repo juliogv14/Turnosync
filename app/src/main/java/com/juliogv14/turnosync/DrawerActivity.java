@@ -45,6 +45,7 @@ public class DrawerActivity extends AppCompatActivity
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     //drawer
+    private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
     private HeaderDrawerBinding mHeaderBinding;
 
@@ -55,12 +56,13 @@ public class DrawerActivity extends AppCompatActivity
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
 
         /*------DRAWER-----*/
-        Toolbar toolbar = mViewBinding.toolbar;
-        setSupportActionBar(toolbar);
+        mToolbar = mViewBinding.toolbar;
+        setSupportActionBar(mToolbar);
+
 
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout, toolbar,
+                mDrawerLayout, mToolbar,
                 R.string.a11y_navigation_drawer_open,
                 R.string.a11y_navigation_drawer_close);
 
@@ -260,10 +262,10 @@ public class DrawerActivity extends AppCompatActivity
     public void onDrawerItemSelected(int itemid) {
         switch (itemid) {
             case R.id.nav_item_home:
-                getSupportActionBar().setTitle(R.string.fragment_home);
+                mToolbar.setTitle(R.string.fragment_home);
                 break;
             case R.id.nav_item_calendar:
-                getSupportActionBar().setTitle(R.string.fragment_mycalendar);
+                mToolbar.setTitle(R.string.fragment_mycalendar);
                 break;
         }
     }
