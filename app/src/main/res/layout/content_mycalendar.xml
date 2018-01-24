@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MyCalendarActivity">
+    tools:context=".MyCalendarFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,6 +16,8 @@
                     android:transcriptMode="alwaysScroll"
                     tools:listitem="@layout/item_shift" />
         -->
+
+        <include layout="@layout/item_shift" />
 
     </RelativeLayout>
 </layout>

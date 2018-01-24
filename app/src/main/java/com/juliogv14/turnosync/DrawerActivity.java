@@ -31,7 +31,7 @@ import com.juliogv14.turnosync.settings.SettingsActivity;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener, OnFragmentInteractionListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
@@ -65,6 +65,7 @@ public class DrawerActivity extends AppCompatActivity
                 R.string.a11y_navigation_drawer_close);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+
 
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
@@ -144,7 +145,7 @@ public class DrawerActivity extends AppCompatActivity
                 displaySelectedScreen(R.id.nav_item_home);
                 break;
             case R.id.nav_item_calendar:
-
+                displaySelectedScreen(R.id.nav_item_calendar);
                 break;
             case R.id.nav_item_signout:
                 mFirebaseAuth.signOut();
@@ -241,10 +242,9 @@ public class DrawerActivity extends AppCompatActivity
         switch (itemId) {
             case R.id.nav_item_home:
                 fragment = new HomeFragment();
-                setTitle(R.string.fragment_home);
                 break;
             case R.id.nav_item_calendar:
-                //fragment = new Menu2();
+                fragment = new MyCalendarFragment();
                 break;
         }
 
@@ -256,4 +256,15 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onDrawerItemSelected(int itemid) {
+        switch (itemid) {
+            case R.id.nav_item_home:
+                getSupportActionBar().setTitle(R.string.fragment_home);
+                break;
+            case R.id.nav_item_calendar:
+                getSupportActionBar().setTitle(R.string.fragment_mycalendar);
+                break;
+        }
+    }
 }

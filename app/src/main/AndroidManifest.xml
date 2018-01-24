@@ -47,9 +47,6 @@
             android:name=".settings.SettingsActivity"
             android:label="@string/activity_settings" />
 
-        <activity
-            android:name=".MyCalendarActivity"
-            android:label="@string/fragment_mycalendar" />
 
     </application>
 

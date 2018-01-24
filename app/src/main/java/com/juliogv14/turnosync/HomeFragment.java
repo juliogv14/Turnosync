@@ -59,6 +59,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mListener.onDrawerItemSelected(R.id.nav_item_home);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
 
         Log.d(TAG, "Start HomeFragment");
