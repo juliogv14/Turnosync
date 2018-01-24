@@ -18,7 +18,9 @@
     <string name="activity_register">Register</string>
     <string name="activity_reset_password">Reset password</string>
     <string name="activity_settings">Settings</string>
-    <string name="activity_mycalendar">My Calendar</string>
+    <!--DRAWER FRAGMENTS LABELS-->
+    <string name="fragment_home">Home</string>
+    <string name="fragment_mycalendar">My Calendar</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>

@@ -1,10 +1,14 @@
 package com.juliogv14.turnosync;
 
-import android.databinding.DataBindingUtil;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,10 +20,10 @@ import java.util.Map;
 
 /**
  * Created by Julio on 26/11/2017.
- * HomeActivity.class
+ * HomeFragment.class
  */
 
-public class HomeActivity extends DrawerActivity {
+public class HomeFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -27,21 +31,46 @@ public class HomeActivity extends DrawerActivity {
 
     private FirebaseFirestore mFirebaseFirestore;
 
+    private DrawerActivity mActivity;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof DrawerActivity) {
+            mActivity = (DrawerActivity) context;
+        }
+    }
+
+    //Create objects obj = new obj()
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.content_home, super.mViewBinding.contentFrame);
-        mViewBinding = DataBindingUtil.setContentView(this, R.layout.content_home);
+    }
+
+    //Inflate view
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mViewBinding = ContentHomeBinding.inflate(inflater, container, false);
+        return mViewBinding.getRoot();
+    }
+
+    //View setup, same as onCreate
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mActivity.setTitle(R.string.fragment_home);
+
+
         mFirebaseFirestore = FirebaseFirestore.getInstance();
 
-        Log.d(TAG, "Start HomeActivity");
+        Log.d(TAG, "Start HomeFragment");
         mViewBinding.floatingButtonNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 testData();
             }
         });
-
     }
 
     private void testData() {

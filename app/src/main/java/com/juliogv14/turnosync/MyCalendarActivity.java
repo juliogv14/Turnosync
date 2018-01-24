@@ -19,7 +19,7 @@ public class MyCalendarActivity extends DrawerActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.content_mycalendar, super.mViewBinding.contentFrame);
+        //getLayoutInflater().inflate(R.layout.content_mycalendar, super.mViewBinding.contentFrame);
 
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         Log.d(TAG, "Start MyCalendarActivity");
