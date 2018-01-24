@@ -30,7 +30,8 @@ import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.settings.SettingsActivity;
 
 public class DrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private static final int RC_SIGN_IN = 1;
@@ -64,21 +65,6 @@ public class DrawerActivity extends AppCompatActivity
                 R.string.a11y_navigation_drawer_close);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-
-
-        //TODO: decide to remove or not
-        //Increase slide margin from edge
-        /*try {
-            Field mDragger = mDrawerLayout.getClass().getDeclaredField("mLeftDragger");
-            mDragger.setAccessible(true);
-            ViewDragHelper dragHelper = (ViewDragHelper) mDragger.get(mDrawerLayout);
-            Field mEdgeSize = dragHelper.getClass().getDeclaredField("mEdgeSize");
-            mEdgeSize.setAccessible(true);
-            int edge = mEdgeSize.getInt((dragHelper));
-            mEdgeSize.setInt(dragHelper, edge * 8);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }*/
 
         mDrawerToggle.syncState();
         mViewBinding.viewNav.setNavigationItemSelectedListener(this);
@@ -255,6 +241,7 @@ public class DrawerActivity extends AppCompatActivity
         switch (itemId) {
             case R.id.nav_item_home:
                 fragment = new HomeFragment();
+                setTitle(R.string.fragment_home);
                 break;
             case R.id.nav_item_calendar:
                 //fragment = new Menu2();

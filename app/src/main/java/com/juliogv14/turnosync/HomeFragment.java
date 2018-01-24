@@ -31,13 +31,13 @@ public class HomeFragment extends Fragment {
 
     private FirebaseFirestore mFirebaseFirestore;
 
-    private DrawerActivity mActivity;
+    private OnFragmentInteractionListener mListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof DrawerActivity) {
-            mActivity = (DrawerActivity) context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         }
     }
 
@@ -59,9 +59,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mActivity.setTitle(R.string.fragment_home);
-
-
         mFirebaseFirestore = FirebaseFirestore.getInstance();
 
         Log.d(TAG, "Start HomeFragment");
@@ -89,6 +86,5 @@ public class HomeFragment extends Fragment {
             Log.d(TAG, "testData floating button");
         }
     }
-
 
 }
