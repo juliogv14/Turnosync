@@ -181,7 +181,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     alltasks.addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Intent startMainIntent = new Intent(RegisterActivity.this, HomeFragment.class);
+                                            Intent startMainIntent = new Intent(RegisterActivity.this, DrawerActivity.class);
                                             startMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                             startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(startMainIntent);
