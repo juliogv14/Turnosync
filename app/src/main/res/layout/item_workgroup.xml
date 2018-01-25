@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="@drawable/background_group_item"
+        android:orientation="vertical"
+        android:gravity="center"
+        tools:showIn="@layout/content_home"
+        android:padding="8dp">
 
             <TextView
-                android:id="@+id/textView_"
+                android:id="@+id/textView_group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 tools:text="Group name" />
 
-        </android.support.constraint.ConstraintLayout>
-    </FrameLayout>
+        <TextView
+            android:id="@+id/textView_group_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Level: master" />
+
+        <TextView
+            android:id="@+id/textView_group_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="groupdID" />
+
+    </LinearLayout>
 </layout>

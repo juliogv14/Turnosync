@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
+        <!--<include
             android:id="@+id/testlayout"
-            layout="@layout/item_workgroup" />
+            layout="@layout/item_workgroup" />-->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floatingButton_new_group"
@@ -18,6 +19,19 @@
             android:layout_margin="@dimen/home_fab_margin"
             android:tint="@android:color/white"
             app:srcCompat="@android:drawable/ic_input_add" />
+
+        <GridView
+            android:id="@+id/gridView_group_display"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="140dp"
+            android:gravity="center"
+            android:horizontalSpacing="10dp"
+            android:numColumns="auto_fit"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp"
+            tools:listitem="@layout/item_workgroup" />
 
     </FrameLayout>
 </layout>

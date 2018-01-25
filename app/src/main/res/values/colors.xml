@@ -2,6 +2,7 @@
 <resources>
     <!--APP COLORS-->
     <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryLight">#5b74ff</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#338A3E</color>
 
@@ -12,5 +13,7 @@
     <!--NAV DRAWER ITEM COLORS-->
     <color name="statecolor_checked">#EEDDDDDD</color>
     <color name="statecolor_pressed">#DDDDDD</color>
+
+    <!--HOME ITEM BACKGROUND COLORS-->
 
 </resources>
