@@ -14,11 +14,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -116,45 +118,43 @@ public class HomeFragment extends Fragment {
     }
 
     private void attatchWorkgroupsListener() {
-        /*final ArrayList<Workgroup> workgroupsList = new ArrayList<>();
-        final Map<String, String> workgroupsMap = new HashMap<>();
-        String userID = mFirebaseUser.getUid();
-        CollectionReference userGroupsRef =  mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                .collection(getString(R.string.data_ref_workgroups));*/
+        CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
+                .collection(getString(R.string.data_ref_workgroups));
 
 
-
-        /*userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mWorkgroupListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                for(DocumentSnapshot doc : documentSnapshots){
-                    doc.getId()
+                if (documentSnapshots != null) {
+                    CollectionReference workGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
+                    final HashMap<String, DocumentChange.Type> docChanges = new HashMap<>();
 
-                }
-            }
-        });*/
+                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
 
-        CollectionReference workGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
+                        docChanges.put(dc.getDocument().getId(), dc.getType());
+                        workGroupsRef.document(dc.getDocument().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    DocumentChange.Type type = docChanges.get(documentSnapshot.getId());
+                                    Workgroup workgroup = documentSnapshot.toObject(Workgroup.class);
 
-        mWorkgroupListener = workGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-
-                    Workgroup workgroup = dc.getDocument().toObject(Workgroup.class);
-
-                    switch (dc.getType()) {
-                        case ADDED:
-                            mWorkgroupsList.add(workgroup);
-                            break;
-                        case REMOVED:
-                            //TODO: look for workgroup reference in arraylist
-                            break;
-                        case MODIFIED:
-                            //TODO: handle modifed workgroup
-                            break;
+                                    switch (type) {
+                                        case ADDED:
+                                            mWorkgroupsList.add(workgroup);
+                                            break;
+                                        case REMOVED:
+                                            //TODO: look for workgroup reference in arraylist
+                                            break;
+                                        case MODIFIED:
+                                            //TODO: handle modifed workgroup
+                                            break;
+                                    }
+                                    mGridAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        });
                     }
-                    mGridAdapter.notifyDataSetChanged();
                 }
             }
         });

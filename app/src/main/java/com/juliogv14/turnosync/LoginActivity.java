@@ -153,8 +153,10 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
-                                    setResult(RESULT_OK);
-                                    finish();
+                                    Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
+                                    signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(signCompleteIntent);
                                 } else {
                                     Log.d(TAG, "login failed: " + task.getException().getMessage());
                                     Toast.makeText(LoginActivity.this,
@@ -214,7 +216,12 @@ public class LoginActivity extends AppCompatActivity {
                             FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
-                                setResult(RESULT_OK);
+                                Toast.makeText(LoginActivity.this,
+                                        R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
+                                Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
+                                signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(signCompleteIntent);
                                 finish();
                             } else {
                                 Toast.makeText(LoginActivity.this,
@@ -229,5 +236,12 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(LoginActivity.this,
+                R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
+        super.onBackPressed();
     }
 }

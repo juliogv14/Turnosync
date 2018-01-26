@@ -34,7 +34,6 @@ public class DrawerActivity extends AppCompatActivity
         SharedPreferences.OnSharedPreferenceChangeListener, OnFragmentInteractionListener {
 
     private final String TAG = this.getClass().getSimpleName();
-    private static final int RC_SIGN_IN = 1;
 
     //Activity views
     protected ActivityDrawerBinding mViewBinding;
@@ -48,11 +47,23 @@ public class DrawerActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private HeaderDrawerBinding mHeaderBinding;
 
+    //SavedInstanceState
+    private String CURRENT_FRAGMENT_KEY = "currentFragment";
+    private int mCurrentFragmentID;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
+
+        if (savedInstanceState != null) {
+            mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
+        } else {
+            mCurrentFragmentID = R.id.nav_item_home;
+        }
+
+
 
         /*------DRAWER-----*/
         Toolbar toolbar = mViewBinding.toolbar;
@@ -90,24 +101,19 @@ public class DrawerActivity extends AppCompatActivity
                     Intent signInIntent = new Intent(getBaseContext(), LoginActivity.class);
                     signInIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivityForResult(signInIntent, RC_SIGN_IN);
+                    startActivity(signInIntent);
                 }
             }
         };
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
-        displaySelectedScreen(R.id.nav_item_home);
-        this.setTitle(R.string.fragment_home);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            onSignedInInitialize(currentUser);
-        }
+
         Log.d(TAG, "AddAuthStateListener");
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
@@ -127,6 +133,13 @@ public class DrawerActivity extends AppCompatActivity
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //TODO: key to strings.xml
+        outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentID);
     }
 
     @Override
@@ -162,21 +175,6 @@ public class DrawerActivity extends AppCompatActivity
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "Signed in successfully");
-                Toast.makeText(this, R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                Log.d(TAG, "Signed in canceled");
-                Toast.makeText(this, R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
     }
 
     @Override
@@ -228,6 +226,8 @@ public class DrawerActivity extends AppCompatActivity
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
 
+        displaySelectedScreen(mCurrentFragmentID);
+
     }
 
     private void onSignedOutCleanup() {
@@ -237,6 +237,7 @@ public class DrawerActivity extends AppCompatActivity
 
     private void displaySelectedScreen(int itemId) {
 
+        mCurrentFragmentID = itemId;
         //creating fragment object
         Fragment fragment = null;
 
@@ -244,9 +245,11 @@ public class DrawerActivity extends AppCompatActivity
         switch (itemId) {
             case R.id.nav_item_home:
                 fragment = new HomeFragment();
+                this.setTitle(R.string.fragment_home);
                 break;
             case R.id.nav_item_calendar:
                 fragment = new MyCalendarFragment();
+                this.setTitle(R.string.fragment_mycalendar);
                 break;
         }
 
@@ -263,9 +266,11 @@ public class DrawerActivity extends AppCompatActivity
         switch (itemid) {
             case R.id.nav_item_home:
                 this.setTitle(R.string.fragment_home);
+                mViewBinding.viewNav.setCheckedItem(R.id.nav_item_home);
                 break;
             case R.id.nav_item_calendar:
                 this.setTitle(R.string.fragment_mycalendar);
+                mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
                 break;
         }
     }
