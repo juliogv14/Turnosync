@@ -161,7 +161,6 @@ public class RegisterActivity extends AppCompatActivity {
                                                 }
                                             });
 
-                                    //TODO: change string reference
                                     CollectionReference usersReference = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users));
                                     User user = new User(firebaseUser.getEmail(), mDisplayName);
 
