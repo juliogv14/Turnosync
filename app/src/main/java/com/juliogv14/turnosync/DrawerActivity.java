@@ -25,13 +25,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.settings.SettingsActivity;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SharedPreferences.OnSharedPreferenceChangeListener, OnFragmentInteractionListener {
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        HomeFragment.OnHomeFragmentInteractionListener {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -48,8 +50,10 @@ public class DrawerActivity extends AppCompatActivity
     private HeaderDrawerBinding mHeaderBinding;
 
     //SavedInstanceState
-    private String CURRENT_FRAGMENT_KEY = "currentFragment";
+    private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
     private int mCurrentFragmentID;
+    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    private Workgroup mCurrentWorkgroup;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,6 +106,7 @@ public class DrawerActivity extends AppCompatActivity
                     signInIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(signInIntent);
+                    finish();
                 }
             }
         };
@@ -138,7 +143,6 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //TODO: key to strings.xml
         outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentID);
     }
 
@@ -274,4 +278,12 @@ public class DrawerActivity extends AppCompatActivity
                 break;
         }
     }
+
+    @Override
+    public void onWorkgroupSelected(Workgroup workgroup) {
+        Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupID(), Toast.LENGTH_SHORT).show();
+        mCurrentWorkgroup = workgroup;
+    }
+
+
 }

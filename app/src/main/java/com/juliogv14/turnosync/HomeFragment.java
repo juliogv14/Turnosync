@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
@@ -48,19 +49,19 @@ public class HomeFragment extends Fragment {
 
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    ListenerRegistration mWorkgroupListener;
+    private ListenerRegistration mWorkgroupsListener;
 
     private GroupItemsAdapter mGridAdapter;
-    ArrayList<Workgroup> mWorkgroupsList;
+    private ArrayList<Workgroup> mWorkgroupsList;
 
-    private OnFragmentInteractionListener mListener;
+    private OnHomeFragmentInteractionListener mListener;
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+            mListener = (OnHomeFragmentInteractionListener) context;
         }
     }
 
@@ -97,6 +98,16 @@ public class HomeFragment extends Fragment {
                 testData();
             }
         });
+
+        mViewBinding.gridViewGroupDisplay.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Workgroup wk = mWorkgroupsList.get(i);
+                mListener.onWorkgroupSelected(wk);
+                //Toast.makeText(getContext(), "WK: uid: " + wk.getWorkgroupID(), Toast.LENGTH_SHORT).show();
+            }
+        });
         attatchWorkgroupsListener();
     }
 
@@ -109,7 +120,7 @@ public class HomeFragment extends Fragment {
             leveldata.put("level", "master");
             DocumentReference workgroupRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document();
             String workgroupID = workgroupRef.getId();
-            Workgroup newGroup = new Workgroup(workgroupID, "trabajo");
+            Workgroup newGroup = new Workgroup(workgroupID, "trabajo", "");
             workgroupRef.set(newGroup);
             mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
                     .collection(getString(R.string.data_ref_workgroups)).document(workgroupID).set(leveldata);
@@ -122,7 +133,7 @@ public class HomeFragment extends Fragment {
                 .collection(getString(R.string.data_ref_workgroups));
 
 
-        mWorkgroupListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 if (documentSnapshots != null) {
@@ -165,7 +176,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mWorkgroupListener.remove();
+        mWorkgroupsListener.remove();
     }
 
     private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {
@@ -177,7 +188,6 @@ public class HomeFragment extends Fragment {
         GroupItemsAdapter(@NonNull Context context, int resource, @NonNull List<Workgroup> objects) {
             super(context, resource, objects);
         }
-
 
         @NonNull
         @Override
@@ -199,5 +209,8 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
+        void onWorkgroupSelected(Workgroup workgroup);
+    }
 
 }
