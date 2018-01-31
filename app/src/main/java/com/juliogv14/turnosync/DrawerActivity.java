@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
@@ -33,7 +34,8 @@ import com.juliogv14.turnosync.settings.SettingsActivity;
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        HomeFragment.OnHomeFragmentInteractionListener {
+        HomeFragment.OnHomeFragmentInteractionListener,
+        MyCalendarFragment.OnCalendarFragmentInteractionListener {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -249,11 +251,9 @@ public class DrawerActivity extends AppCompatActivity
         switch (itemId) {
             case R.id.nav_item_home:
                 fragment = new HomeFragment();
-                this.setTitle(R.string.fragment_home);
                 break;
             case R.id.nav_item_calendar:
-                fragment = new MyCalendarFragment();
-                this.setTitle(R.string.fragment_mycalendar);
+                fragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
                 break;
         }
 
@@ -265,8 +265,9 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+
     @Override
-    public void onDrawerItemSelected(int itemid) {
+    public void onFragmentCreated(int itemid) {
         switch (itemid) {
             case R.id.nav_item_home:
                 this.setTitle(R.string.fragment_home);
@@ -283,7 +284,13 @@ public class DrawerActivity extends AppCompatActivity
     public void onWorkgroupSelected(Workgroup workgroup) {
         Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupID(), Toast.LENGTH_SHORT).show();
         mCurrentWorkgroup = workgroup;
+        displaySelectedScreen(R.id.nav_item_calendar);
+
     }
 
 
+    @Override
+    public void onShiftSelected(Shift shift) {
+
+    }
 }

@@ -6,5 +6,5 @@ package com.juliogv14.turnosync;
  */
 
 public interface OnFragmentInteractionListener {
-    void onDrawerItemSelected(int itemid);
+    void onFragmentCreated(int itemid);
 }

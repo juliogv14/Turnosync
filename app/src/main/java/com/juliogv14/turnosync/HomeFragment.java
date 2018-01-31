@@ -60,7 +60,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        if (context instanceof OnHomeFragmentInteractionListener) {
             mListener = (OnHomeFragmentInteractionListener) context;
         }
     }
@@ -76,7 +76,6 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = ContentHomeBinding.inflate(inflater, container, false);
-        mListener.onDrawerItemSelected(R.id.nav_item_home);
         return mViewBinding.getRoot();
     }
 
@@ -90,8 +89,10 @@ public class HomeFragment extends Fragment {
         mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.content_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
+        mListener.onFragmentCreated(R.id.nav_item_home);
+        attatchWorkgroupsListener();
 
-        Log.d(TAG, "Start HomeFragment");
+
         mViewBinding.floatingButtonNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,10 +106,20 @@ public class HomeFragment extends Fragment {
 
                 Workgroup wk = mWorkgroupsList.get(i);
                 mListener.onWorkgroupSelected(wk);
-                //Toast.makeText(getContext(), "WK: uid: " + wk.getWorkgroupID(), Toast.LENGTH_SHORT).show();
             }
         });
-        attatchWorkgroupsListener();
+        //Inicilize workgroup selected
+        if (mWorkgroupsList.size() > 0) {
+
+        }
+
+        Log.d(TAG, "Start HomeFragment");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mWorkgroupsListener.remove();
     }
 
     private void testData() {
@@ -171,12 +182,6 @@ public class HomeFragment extends Fragment {
         });
 
 
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mWorkgroupsListener.remove();
     }
 
     private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {

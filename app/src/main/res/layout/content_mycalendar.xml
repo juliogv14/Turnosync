@@ -17,7 +17,20 @@
                     tools:listitem="@layout/item_shift" />
         -->
 
-        <include layout="@layout/item_shift" />
+        <TextView
+            android:id="@+id/textView_workgroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_horizontal"
+            tools:text="Workgroup" />
+
+        <include
+            android:id="@+id/include"
+            layout="@layout/item_shift" />
+
 
     </RelativeLayout>
 </layout>
