@@ -7,10 +7,11 @@ package com.juliogv14.turnosync.data;
 
 public class Shift {
     //JSON database
-    private String workgroupID;
-    private String userID;
-
     private String type;
+
+    private int year;
+    private int month;
+    private int day;
     private String start;
     private String end;
 
