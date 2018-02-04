@@ -47,10 +47,12 @@ public class HomeFragment extends Fragment {
 
     protected ContentHomeBinding mViewBinding;
 
+    //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
     private ListenerRegistration mWorkgroupsListener;
 
+    //GridAdapter
     private GroupItemsAdapter mGridAdapter;
     private ArrayList<Workgroup> mWorkgroupsList;
 
@@ -69,6 +71,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mWorkgroupsList = new ArrayList<>();
     }
 
     //Inflate view
@@ -85,7 +88,6 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        mWorkgroupsList = new ArrayList<>();
         mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.content_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
@@ -109,10 +111,6 @@ public class HomeFragment extends Fragment {
             }
         });
         //Inicilize workgroup selected
-        if (mWorkgroupsList.size() > 0) {
-
-        }
-
         Log.d(TAG, "Start HomeFragment");
     }
 
