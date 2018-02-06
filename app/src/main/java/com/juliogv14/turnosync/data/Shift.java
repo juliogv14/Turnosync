@@ -8,6 +8,7 @@ package com.juliogv14.turnosync.data;
 public class Shift {
     //JSON database
     private String type;
+    private String userID;
 
     private int year;
     private int month;
@@ -15,9 +16,15 @@ public class Shift {
     private String start;
     private String end;
 
+    public Shift() {
+    }
 
-    public Shift(String type, String start, String end) {
+    public Shift(String type, String userID, int year, int month, int day, String start, String end) {
         this.type = type;
+        this.userID = userID;
+        this.year = year;
+        this.month = month;
+        this.day = day;
         this.start = start;
         this.end = end;
     }
@@ -28,6 +35,14 @@ public class Shift {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public int getYear() {

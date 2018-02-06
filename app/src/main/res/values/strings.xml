@@ -70,9 +70,10 @@
     <string name="a11y_navigation_drawer_open">Open navigation drawer</string>
     <string name="a11y_navigation_drawer_close">Close navigation drawer</string>
 
-    <!--CLOUD FIREBASE REFERENCES-->
+    <!--CLOUD FIRESTORE REFERENCES-->
     <string name="data_ref_users">users</string>
     <string name="data_ref_workgroups">workgroups</string>
+    <string name="data_ref_shifts">shifts</string>
 
     <item name="visible" type="id" />
     <item name="masked" type="id" />

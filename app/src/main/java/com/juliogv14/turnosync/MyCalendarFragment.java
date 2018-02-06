@@ -13,7 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ContentMycalendarBinding;
@@ -35,6 +43,9 @@ public class MyCalendarFragment extends Fragment {
 
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
+    private FirebaseUser mFirebaseUser;
+    private ListenerRegistration mShiftsListener;
+
     private OnCalendarFragmentInteractionListener mListener;
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
@@ -85,11 +96,12 @@ public class MyCalendarFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mListener.onFragmentCreated(R.id.nav_item_calendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
+        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
 
         mGridAdapter = new ShiftItemsAdapter((Activity) mListener, R.layout.content_mycalendar, mShiftList);
         mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-
+        attatchShiftsListener();
         mViewBinding.buttonTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,19 +109,54 @@ public class MyCalendarFragment extends Fragment {
             }
         });
 
+
         Log.d(TAG, "Start MyCalendarFragment");
+
+
     }
+
+    private void attatchShiftsListener() {
+        String userID = mFirebaseUser.getUid();
+        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                .collection(getString(R.string.data_ref_shifts));
+        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
+                    if (dc != null) {
+                        Shift shift = dc.getDocument().toObject(Shift.class);
+
+                        switch (dc.getType()) {
+                            case ADDED:
+                                mShiftList.add(shift);
+                                mGridAdapter.notifyDataSetChanged();
+                                break;
+                            case MODIFIED:
+                                //TODO shift modified
+                                break;
+                            case REMOVED:
+                                //TODO shift removed
+                                break;
+                        }
+                    }
+                }
+            }
+
+        });
+
+    }
+
 
     private void testData() {
 
-        Shift shift = new Shift("M", "6:00", "11:00");
-        mShiftList.add(shift);
-        mGridAdapter.notifyDataSetChanged();
+        Shift shift = new Shift("M", mFirebaseUser.getUid(), 2018, 2, 8, "6:00", "11:00");
+
+        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                .collection(getString(R.string.data_ref_shifts));
+
+        shiftsReference.add(shift);
     }
 
-    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onShiftSelected(Shift shift);
-    }
 
     private class ShiftItemsAdapter extends ArrayAdapter<Shift> {
 
@@ -137,6 +184,11 @@ public class MyCalendarFragment extends Fragment {
             }
             return convertView;
         }
+
+    }
+
+    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
+        void onShiftSelected(Shift shift);
     }
 
 }
