@@ -65,6 +65,7 @@ public class DrawerActivity extends AppCompatActivity
 
         if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
+            mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
         } else {
             mCurrentFragmentID = R.id.nav_item_home;
         }
@@ -146,6 +147,7 @@ public class DrawerActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentID);
+        outState.putParcelable(CURRENT_WORKGROUP_KEY, mCurrentWorkgroup);
     }
 
     @Override

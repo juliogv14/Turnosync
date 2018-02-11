@@ -185,7 +185,7 @@ public class HomeFragment extends Fragment {
     private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {
 
         private ArrayList<Workgroup> data;
-        ItemWorkgroupBinding itemBinding;
+        private ItemWorkgroupBinding itemBinding;
 
 
         GroupItemsAdapter(@NonNull Context context, int resource, @NonNull List<Workgroup> objects) {

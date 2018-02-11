@@ -6,20 +6,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
+        android:gravity="center_horizontal"
         android:padding="4dp"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView_day_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="1" />
 
         <TextView
             android:id="@+id/textView_shift_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Mañana" />
-
-        <TextView
-            android:id="@+id/textView_shift_interval"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="6:00 - 14:00" />
 
     </LinearLayout>
 </layout>

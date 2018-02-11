@@ -75,6 +75,17 @@
     <string name="data_ref_workgroups">workgroups</string>
     <string name="data_ref_shifts">shifts</string>
 
+    <!--CALENDAR STRINGS-->
+    <string-array name="calendar_days_of_week">
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>Th</item>
+        <item>F</item>
+        <item>Sa</item>
+        <item>Su</item>
+    </string-array>
+
     <item name="visible" type="id" />
     <item name="masked" type="id" />
 </resources>

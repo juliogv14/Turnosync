@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -22,12 +24,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.juliogv14.turnosync.calendar.MonthAdapter;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ContentMycalendarBinding;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -52,7 +57,7 @@ public class MyCalendarFragment extends Fragment {
     private Workgroup mWorkgroup;
 
     //GridAdapter
-    private ShiftItemsAdapter mGridAdapter;
+    private MonthAdapter mGridAdapter;
     private ArrayList<Shift> mShiftList;
 
 
@@ -94,14 +99,24 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         mListener.onFragmentCreated(R.id.nav_item_calendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
 
-        mGridAdapter = new ShiftItemsAdapter((Activity) mListener, R.layout.content_mycalendar, mShiftList);
-        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-        attatchShiftsListener();
+
+
+        /*mGridAdapter = new ShiftItemsAdapter((Activity) mListener, R.layout.content_mycalendar, mShiftList);
+        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);*/
+
+
+        //attatchShiftsListener();
+
+        displayMonth();
+
+
         mViewBinding.buttonTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,11 +130,39 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
-    private void attatchShiftsListener() {
+    private void displayMonth() {
         String userID = mFirebaseUser.getUid();
+        Calendar cal = new GregorianCalendar();
+        final int month = cal.get(Calendar.MONTH) + 1;
+        final int year = cal.get(Calendar.YEAR);
+        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+
         CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                 .collection(getString(R.string.data_ref_shifts));
-        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        shiftsReference.whereEqualTo("userID", userID).whereEqualTo("month", month).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot documentSnapshots) {
+                        List<Shift> shifts = documentSnapshots.toObjects(Shift.class);
+                        mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) shifts);
+                        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
+                    }
+                });
+
+    }
+
+
+    private void attatchShiftsListener() {
+        String userID = mFirebaseUser.getUid();
+        Calendar cal = new GregorianCalendar();
+        int month = cal.get(Calendar.MONTH) + 1;
+        int year = cal.get(Calendar.YEAR);
+        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                .collection(getString(R.string.data_ref_shifts));
+        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).whereEqualTo("month", month)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
@@ -144,6 +187,10 @@ public class MyCalendarFragment extends Fragment {
 
         });
 
+
+        mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, mShiftList);
+        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
+
     }
 
 
@@ -156,7 +203,6 @@ public class MyCalendarFragment extends Fragment {
 
         shiftsReference.add(shift);
     }
-
 
     private class ShiftItemsAdapter extends ArrayAdapter<Shift> {
 
@@ -180,7 +226,7 @@ public class MyCalendarFragment extends Fragment {
             Shift shift = getItem(position);
             if (shift != null) {
                 itemBinding.textViewShiftType.setText(shift.getType());
-                itemBinding.textViewShiftInterval.setText(shift.getFormattedInterval());
+                itemBinding.textViewDayMonth.setText(shift.getFormattedInterval());
             }
             return convertView;
         }
