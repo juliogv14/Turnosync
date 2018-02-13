@@ -14,7 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.calendar.MonthAdapter;
 import com.juliogv14.turnosync.data.Shift;
@@ -139,13 +141,17 @@ public class MyCalendarFragment extends Fragment {
 
         CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                 .collection(getString(R.string.data_ref_shifts));
-        shiftsReference.whereEqualTo("userID", userID).whereEqualTo("month", month).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        shiftsReference.whereEqualTo("userID", userID).whereEqualTo("year", year).whereEqualTo("month", month).orderBy("day", Query.Direction.ASCENDING).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot documentSnapshots) {
-                        List<Shift> shifts = documentSnapshots.toObjects(Shift.class);
-                        mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) shifts);
-                        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<Shift> shifts = task.getResult().toObjects(Shift.class);
+                            mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) shifts);
+                            mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
+                        } else {
+                            Log.e(TAG, task.getException().getMessage());
+                        }
                     }
                 });
 
