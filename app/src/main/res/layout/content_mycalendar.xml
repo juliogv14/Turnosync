@@ -9,37 +9,20 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin">
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin">
 
 
-        <TextView
-            android:id="@+id/textView_workgroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Workgroup" />
-
-
-        <GridView
-            android:id="@+id/gridView_calendar"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager_months"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
-            android:gravity="center"
-            android:horizontalSpacing="2dp"
-            android:numColumns="7"
-            android:stretchMode="columnWidth"
-            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            android:layout_alignBottom="@id/guideline"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_workgroup"
-            tools:listitem="@layout/item_shift" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline"
@@ -48,15 +31,16 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.7" />
 
-        <Button
+        <TextView
             android:id="@+id/button_test"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Button"
+            android:gravity="center"
+            android:text="WIP"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

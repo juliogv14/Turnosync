@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.juliogv14.turnosync.calendar.MonthPageFragment;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
@@ -35,7 +36,7 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
         HomeFragment.OnHomeFragmentInteractionListener,
-        MyCalendarFragment.OnCalendarFragmentInteractionListener {
+        MonthPageFragment.OnCalendarFragmentInteractionListener {
 
     private final String TAG = this.getClass().getSimpleName();
 

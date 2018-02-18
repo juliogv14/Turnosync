@@ -199,7 +199,7 @@ public class MonthAdapter extends BaseAdapter {
         int itemType = getItemViewType(position);
         //Needs inflation
         if (convertView == null) {
-            int dayCellHeight = (parent.getHeight() - mTitleHeight) / 5;
+            int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 5;
 
             //If its a day type view
             int date[] = getDate(position);
@@ -214,10 +214,11 @@ public class MonthAdapter extends BaseAdapter {
                 int dayInMonth = Integer.parseInt(stringDayInMonth);
                 if (!mShiftsList.isEmpty()) {
                     Shift shift = mShiftsList.get(0);
-                    if (dayInMonth == shift.getDay()) {
+                    if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1) {
                         mShiftsList.remove(shift);
                         mItemShiftBinding.textViewShiftType.setText(shift.getType());
-                        convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimaryLight));
+                        //TODO color cells from settings and type
+                        convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
                     }
                 }
 

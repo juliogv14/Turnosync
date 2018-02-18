@@ -1,41 +1,26 @@
 package com.juliogv14.turnosync;
 
-import android.app.Activity;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.juliogv14.turnosync.calendar.MonthAdapter;
-import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.calendar.MonthPageFragment;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ContentMycalendarBinding;
-import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 /**
  * Created by Julio on 20/01/2018.
@@ -46,22 +31,15 @@ public class MyCalendarFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    protected ContentMycalendarBinding mViewBinding;
-
-    //Firebase
-    private FirebaseFirestore mFirebaseFirestore;
-    private FirebaseUser mFirebaseUser;
-    private ListenerRegistration mShiftsListener;
-
-    private OnCalendarFragmentInteractionListener mListener;
+    private AppCompatActivity mActivity;
+    private ContentMycalendarBinding mViewBinding;
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private Workgroup mWorkgroup;
 
-    //GridAdapter
-    private MonthAdapter mGridAdapter;
-    private ArrayList<Shift> mShiftList;
-
+    //ViewPager
+    private ViewPager mViewPager;
+    private PagerAdapter mPagerAdapter;
 
     public static MyCalendarFragment newInstance(Workgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
@@ -75,8 +53,8 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnCalendarFragmentInteractionListener) {
-            mListener = (OnCalendarFragmentInteractionListener) context;
+        if (context instanceof AppCompatActivity) {
+            mActivity = (AppCompatActivity) context;
         }
     }
 
@@ -87,7 +65,6 @@ public class MyCalendarFragment extends Fragment {
         if (args != null) {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
         }
-        mShiftList = new ArrayList<>();
     }
 
     //Inflate view
@@ -101,146 +78,46 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mListener.onFragmentCreated(R.id.nav_item_calendar);
-        mFirebaseFirestore = FirebaseFirestore.getInstance();
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
-
-
-
-        /*mGridAdapter = new ShiftItemsAdapter((Activity) mListener, R.layout.content_mycalendar, mShiftList);
-        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);*/
-
-
-        //attatchShiftsListener();
-
-        displayMonth();
-
-
-        mViewBinding.buttonTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                testData();
-            }
-        });
-
+        Calendar cal = new GregorianCalendar();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        mPagerAdapter = new MonthSlidePagerAdapter(mActivity.getSupportFragmentManager(), year, month);
+        mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
+        mViewBinding.viewPagerMonths.setCurrentItem(month);
 
         Log.d(TAG, "Start MyCalendarFragment");
 
 
     }
 
-    private void displayMonth() {
-        String userID = mFirebaseUser.getUid();
-        Calendar cal = new GregorianCalendar();
-        final int month = cal.get(Calendar.MONTH) + 1;
-        final int year = cal.get(Calendar.YEAR);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+    private class MonthSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-        shiftsReference.whereEqualTo("userID", userID).whereEqualTo("year", year).whereEqualTo("month", month).orderBy("day", Query.Direction.ASCENDING).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<Shift> shifts = task.getResult().toObjects(Shift.class);
-                            mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) shifts);
-                            mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-                        } else {
-                            Log.e(TAG, task.getException().getMessage());
-                        }
-                    }
-                });
+        private int year, month;
 
-    }
+        MonthSlidePagerAdapter(FragmentManager fm, int year, int month) {
+            super(fm);
+            this.year = year;
+            this.month = month;
 
-
-    private void attatchShiftsListener() {
-        String userID = mFirebaseUser.getUid();
-        Calendar cal = new GregorianCalendar();
-        int month = cal.get(Calendar.MONTH) + 1;
-        int year = cal.get(Calendar.YEAR);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).whereEqualTo("month", month)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                    if (dc != null) {
-                        Shift shift = dc.getDocument().toObject(Shift.class);
-
-                        switch (dc.getType()) {
-                            case ADDED:
-                                mShiftList.add(shift);
-                                mGridAdapter.notifyDataSetChanged();
-                                break;
-                            case MODIFIED:
-                                //TODO shift modified
-                                break;
-                            case REMOVED:
-                                //TODO shift removed
-                                break;
-                        }
-                    }
-                }
-            }
-
-        });
-
-
-        mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, mShiftList);
-        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-
-    }
-
-
-    private void testData() {
-
-        Shift shift = new Shift("M", mFirebaseUser.getUid(), 2018, 2, 8, "6:00", "11:00");
-
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-
-        shiftsReference.add(shift);
-    }
-
-    private class ShiftItemsAdapter extends ArrayAdapter<Shift> {
-
-        private ArrayList<Shift> data;
-        ItemShiftBinding itemBinding;
-
-
-        ShiftItemsAdapter(@NonNull Context context, int resource, @NonNull List<Shift> objects) {
-            super(context, resource, objects);
         }
 
-        @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
-            if (convertView == null) {
-                convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_shift, parent, false);
+        public Fragment getItem(int position) {
+            int offMonth = month + position - 5;
+            int offYear = year;
+            if (offMonth < 0) {
+                offYear = offYear - 1;
+                offMonth = 12 - Math.abs(offMonth);
             }
-            itemBinding = DataBindingUtil.bind(convertView);
 
-            Shift shift = getItem(position);
-            if (shift != null) {
-                itemBinding.textViewShiftType.setText(shift.getType());
-                itemBinding.textViewDayMonth.setText(shift.getFormattedInterval());
-            }
-            return convertView;
+            return MonthPageFragment.newInstance(mWorkgroup, offYear, offMonth);
         }
 
+        @Override
+        public int getCount() {
+            return 12;
+        }
     }
 
-    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onShiftSelected(Shift shift);
-    }
 
 }
