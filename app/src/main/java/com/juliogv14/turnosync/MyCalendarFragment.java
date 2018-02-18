@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,10 +35,6 @@ public class MyCalendarFragment extends Fragment {
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private Workgroup mWorkgroup;
-
-    //ViewPager
-    private ViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
 
     public static MyCalendarFragment newInstance(Workgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
@@ -81,7 +76,7 @@ public class MyCalendarFragment extends Fragment {
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        mPagerAdapter = new MonthSlidePagerAdapter(mActivity.getSupportFragmentManager(), year, month);
+        PagerAdapter mPagerAdapter = new MonthSlidePagerAdapter(mActivity.getSupportFragmentManager(), year, month);
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(month);
 

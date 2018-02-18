@@ -85,7 +85,4 @@ public class Shift {
         this.end = end;
     }
 
-    public String getFormattedInterval() {
-        return String.format("%s - %s", this.start, this.end);
-    }
 }

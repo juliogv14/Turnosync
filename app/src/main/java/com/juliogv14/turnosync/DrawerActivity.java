@@ -215,7 +215,9 @@ public class DrawerActivity extends AppCompatActivity
                                 if (task.isSuccessful()) {
                                     Toast.makeText(getApplicationContext().getApplicationContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    if (task.getException() != null) {
+                                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
                             }
@@ -226,7 +228,6 @@ public class DrawerActivity extends AppCompatActivity
 
     private void onSignedInInitialize(FirebaseUser user) {
         mUsername = user.getDisplayName();
-        String displaytext = mUsername + ":" + user.getUid();
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = shrPreferences.edit();
         editor.putString(getString(R.string.pref_displayname_key), user.getDisplayName());

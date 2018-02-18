@@ -18,7 +18,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
@@ -44,7 +43,7 @@ public class MonthPageFragment extends Fragment {
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    private ListenerRegistration mShiftsListener;
+    //private ListenerRegistration mShiftsListener;
 
     private OnCalendarFragmentInteractionListener mListener;
 
@@ -136,7 +135,9 @@ public class MonthPageFragment extends Fragment {
                             mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) mShiftList);
                             mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
                         } else {
-                            Log.e(TAG, task.getException().getMessage());
+                            if (task.getException() != null) {
+                                Log.e(TAG, task.getException().getMessage());
+                            }
                         }
                     }
                 });

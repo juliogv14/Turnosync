@@ -57,17 +57,6 @@ public class MonthAdapter extends BaseAdapter {
         populateMonth();
     }
 
-    /**
-     * @param date     - null if day title (0 - dd / 1 - mm / 2 - yy)
-     * @param position - position in item list
-     * @param item     - view for date
-     */
-    private void onDate(int[] date, int position, View item) {
-
-    }
-
-    ;
-
     private void populateMonth() {
         mItems = new ArrayList<>();
         for (String day : mDays) {
@@ -152,12 +141,9 @@ public class MonthAdapter extends BaseAdapter {
     }
 
     private boolean isToday(int day, int month, int year) {
-        if (mCalendarToday.get(Calendar.MONTH) == month
+        return (mCalendarToday.get(Calendar.MONTH) == month
                 && mCalendarToday.get(Calendar.YEAR) == year
-                && mCalendarToday.get(Calendar.DAY_OF_MONTH) == day) {
-            return true;
-        }
-        return false;
+                && mCalendarToday.get(Calendar.DAY_OF_MONTH) == day);
     }
 
     private int[] getDate(int position) {
