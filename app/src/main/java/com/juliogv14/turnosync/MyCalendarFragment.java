@@ -78,7 +78,7 @@ public class MyCalendarFragment extends Fragment {
         int month = cal.get(Calendar.MONTH);
         PagerAdapter mPagerAdapter = new MonthSlidePagerAdapter(mActivity.getSupportFragmentManager(), year, month);
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
-        mViewBinding.viewPagerMonths.setCurrentItem(month);
+        mViewBinding.viewPagerMonths.setCurrentItem(5);
 
         Log.d(TAG, "Start MyCalendarFragment");
 

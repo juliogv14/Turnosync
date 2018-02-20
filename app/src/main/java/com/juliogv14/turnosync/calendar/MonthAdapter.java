@@ -185,7 +185,7 @@ public class MonthAdapter extends BaseAdapter {
         int itemType = getItemViewType(position);
         //Needs inflation
         if (convertView == null) {
-            int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 5;
+            int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 6;
 
             //If its a day type view
             int date[] = getDate(position);
@@ -199,8 +199,13 @@ public class MonthAdapter extends BaseAdapter {
                 mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
                 int dayInMonth = Integer.parseInt(stringDayInMonth);
                 if (!mShiftsList.isEmpty()) {
+
                     Shift shift = mShiftsList.get(0);
-                    if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1) {
+                    int firstDayPosition = mDays.length + mDaysLastMonth;
+                    int lastDayPosition = mDaysShown - mDaysNextMonth;
+                    if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1
+                            && position >= firstDayPosition && position <= lastDayPosition) {
+
                         mShiftsList.remove(shift);
                         mItemShiftBinding.textViewShiftType.setText(shift.getType());
                         //TODO color cells from settings and type
