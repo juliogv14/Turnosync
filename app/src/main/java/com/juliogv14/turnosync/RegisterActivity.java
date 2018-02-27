@@ -89,7 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
         /*Check for a valid email address.*/
         if (TextUtils.isEmpty(mEmail)) {
             mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_field_required));
+                    .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
         } else if (!FormUtils.isEmailValid(mEmail)) {
@@ -102,12 +102,12 @@ public class RegisterActivity extends AppCompatActivity {
         /*Check for a valid displayName*/
         if (TextUtils.isEmpty(mDisplayName)) {
             mViewBinding.editTextLayoutName
-                    .setError(getString(R.string.login_error_field_required));
+                    .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextName;
             cancel = true;
         } else if (!FormUtils.isDisplayNameValid(mDisplayName)) {
             mViewBinding.editTextLayoutName
-                    .setError(getString(R.string.register_error_name));
+                    .setError(getString(R.string.form_error_name));
             focusView = mViewBinding.editTextName;
             cancel = true;
         }
@@ -115,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
         /*Check for a valid password.*/
         if (TextUtils.isEmpty(mPassword)) {
             mViewBinding.editTextLayoutPassword
-                    .setError(getString(R.string.login_error_field_required));
+                    .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
         } else if (!FormUtils.isRegisterPasswordValid(mPassword)) {

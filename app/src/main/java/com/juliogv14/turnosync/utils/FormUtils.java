@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 
 public class FormUtils {
 
+    //
+
     public static boolean isEmailValid(String email) {
 
         //Regex to check if the string contains '@' and '.' as in an email.
@@ -38,7 +40,7 @@ public class FormUtils {
     }
 
     public static boolean isDisplayNameValid(String displayName) {
-        String regEx = "^[\\p{L}-' 0-9]+$";
+        String regEx = "^[\\p{L}\\p{N}-' ]+$";
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
 
@@ -55,6 +57,16 @@ public class FormUtils {
                 (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (focusView != null && imm != null) {
             imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean openKeyboard(Context context, View focusView) {
+        InputMethodManager imm =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (focusView != null && imm != null) {
+            imm.showSoftInput(focusView, InputMethodManager.SHOW_FORCED);
             return true;
         }
         return false;

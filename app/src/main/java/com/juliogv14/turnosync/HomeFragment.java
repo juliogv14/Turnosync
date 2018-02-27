@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +42,8 @@ import java.util.Map;
  * HomeFragment.class
  */
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment
+        implements CreateWorkgroupDialog.CreateWorkgroupListener {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -98,7 +100,10 @@ public class HomeFragment extends Fragment {
         mViewBinding.floatingButtonNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                testData();
+                //testData();
+                CreateWorkgroupDialog dialog = new CreateWorkgroupDialog();
+                dialog.setTargetFragment(HomeFragment.this, 1);
+                dialog.show(((AppCompatActivity) mListener).getSupportFragmentManager(), "cwk");
             }
         });
 
@@ -147,27 +152,37 @@ public class HomeFragment extends Fragment {
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 if (documentSnapshots != null) {
                     CollectionReference workGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
-                    final HashMap<String, DocumentChange.Type> docChanges = new HashMap<>();
+                    final HashMap<String, DocumentChange> docChanges = new HashMap<>();
 
                     for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
 
-                        docChanges.put(dc.getDocument().getId(), dc.getType());
+                        docChanges.put(dc.getDocument().getId(), dc);
                         workGroupsRef.document(dc.getDocument().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 if (documentSnapshot.exists()) {
-                                    DocumentChange.Type type = docChanges.get(documentSnapshot.getId());
+                                    DocumentChange change = docChanges.get(documentSnapshot.getId());
                                     Workgroup workgroup = documentSnapshot.toObject(Workgroup.class);
 
-                                    switch (type) {
+                                    switch (change.getType()) {
                                         case ADDED:
-                                            mWorkgroupsList.add(workgroup);
-                                            break;
-                                        case REMOVED:
-                                            //TODO: look for workgroup reference in arraylist
+                                            //Added
+                                            mWorkgroupsList.add(change.getNewIndex(), workgroup);
                                             break;
                                         case MODIFIED:
-                                            //TODO: handle modifed workgroup
+                                            if (change.getOldIndex() == change.getNewIndex()) {
+                                                //Modified, same position
+                                                mWorkgroupsList.set(change.getOldIndex(), workgroup);
+                                            } else {
+                                                //Modified, differnt position
+                                                mWorkgroupsList.remove(change.getOldIndex());
+                                                mWorkgroupsList.add(change.getNewIndex(), workgroup);
+                                            }
+                                            break;
+                                        case REMOVED:
+                                            //Removed
+                                            mWorkgroupsList.remove(change.getOldIndex());
+
                                             break;
                                     }
                                     mGridAdapter.notifyDataSetChanged();
@@ -180,6 +195,22 @@ public class HomeFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onDialogPositiveClick(String name, String description) {
+        if (mFirebaseUser != null) {
+
+            Map<String, Object> leveldata = new HashMap<>();
+            leveldata.put("level", "master");
+            DocumentReference workgroupRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document();
+            String workgroupID = workgroupRef.getId();
+            Workgroup newGroup = new Workgroup(workgroupID, name, description);
+            workgroupRef.set(newGroup);
+            mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
+                    .collection(getString(R.string.data_ref_workgroups)).document(workgroupID).set(leveldata);
+            Log.d(TAG, "Create workgroup dialog return");
+        }
     }
 
     private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {

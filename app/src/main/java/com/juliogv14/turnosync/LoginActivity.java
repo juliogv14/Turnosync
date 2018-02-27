@@ -183,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
         /*Check for a valid email address.*/
         if (TextUtils.isEmpty(email)) {
             mViewBinding.editTextLayoutEmail.
-                    setError(getString(R.string.login_error_field_required));
+                    setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
         } else if (!FormUtils.isEmailValid(email)) {

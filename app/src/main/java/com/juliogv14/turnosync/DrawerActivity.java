@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -51,6 +52,7 @@ public class DrawerActivity extends AppCompatActivity
     //drawer
     private DrawerLayout mDrawerLayout;
     private HeaderDrawerBinding mHeaderBinding;
+    private ActionBar mToolbar;
 
     //SavedInstanceState
     private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
@@ -76,6 +78,7 @@ public class DrawerActivity extends AppCompatActivity
         /*------DRAWER-----*/
         Toolbar toolbar = mViewBinding.toolbar;
         setSupportActionBar(toolbar);
+        mToolbar = getSupportActionBar();
 
 
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
@@ -274,11 +277,11 @@ public class DrawerActivity extends AppCompatActivity
     public void onFragmentCreated(int itemid) {
         switch (itemid) {
             case R.id.nav_item_home:
-                this.setTitle(R.string.fragment_home);
+                mToolbar.setTitle(R.string.fragment_home);
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_home);
                 break;
             case R.id.nav_item_calendar:
-                this.setTitle(R.string.fragment_mycalendar);
+                mToolbar.setTitle(mCurrentWorkgroup.getDisplayname());
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
                 break;
         }

@@ -63,7 +63,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(email)) {
             mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_field_required));
+                    .setError(getString(R.string.form_error_field_required));
             cancel = true;
         } else if (!FormUtils.isEmailValid(email)) {
             mViewBinding.editTextLayoutEmail
