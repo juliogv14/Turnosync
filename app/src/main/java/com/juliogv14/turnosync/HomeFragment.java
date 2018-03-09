@@ -163,11 +163,12 @@ public class HomeFragment extends Fragment
                                 if (documentSnapshot.exists()) {
                                     DocumentChange change = docChanges.get(documentSnapshot.getId());
                                     Workgroup workgroup = documentSnapshot.toObject(Workgroup.class);
+                                    mListener.initilizeWorkgroup(workgroup);
 
                                     switch (change.getType()) {
                                         case ADDED:
                                             //Added
-                                            mWorkgroupsList.add(change.getNewIndex(), workgroup);
+                                            mWorkgroupsList.add(workgroup);
                                             break;
                                         case MODIFIED:
                                             if (change.getOldIndex() == change.getNewIndex()) {
@@ -245,6 +246,8 @@ public class HomeFragment extends Fragment
 
     public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
         void onWorkgroupSelected(Workgroup workgroup);
+
+        void initilizeWorkgroup(Workgroup workgroup);
     }
 
 }

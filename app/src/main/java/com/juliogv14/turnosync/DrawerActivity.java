@@ -160,7 +160,12 @@ public class DrawerActivity extends AppCompatActivity
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (mCurrentFragmentID == R.id.nav_item_calendar) {
+                displaySelectedScreen(R.id.nav_item_home);
+            } else {
+                super.onBackPressed();
+            }
+
         }
     }
 
@@ -295,6 +300,12 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void initilizeWorkgroup(Workgroup workgroup) {
+        if (mCurrentWorkgroup == null) {
+            mCurrentWorkgroup = workgroup;
+        }
+    }
 
     @Override
     public void onShiftSelected(Shift shift) {

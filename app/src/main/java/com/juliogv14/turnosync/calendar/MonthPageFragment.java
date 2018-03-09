@@ -103,8 +103,6 @@ public class MonthPageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        mListener.onFragmentCreated(R.id.nav_item_calendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -143,48 +141,6 @@ public class MonthPageFragment extends Fragment {
                 });
 
     }
-
-
-    /*private void attatchShiftsListener() {
-        String userID = mFirebaseUser.getUid();
-        Calendar cal = new GregorianCalendar();
-        int mMonth = cal.get(Calendar.MONTH) + 1;
-        int mYear = cal.get(Calendar.YEAR);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).whereEqualTo("mMonth", mMonth)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                            if (dc != null) {
-                                Shift shift = dc.getDocument().toObject(Shift.class);
-
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        mShiftList.add(shift);
-                                        mGridAdapter.notifyDataSetChanged();
-                                        break;
-                                    case MODIFIED:
-                                        //TODO shift modified
-                                        break;
-                                    case REMOVED:
-                                        //TODO shift removed
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                });
-
-
-        mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, mShiftList);
-        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-
-    }*/
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
         void onShiftSelected(Shift shift);

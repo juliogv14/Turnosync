@@ -30,7 +30,7 @@ public class MyCalendarFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    private AppCompatActivity mActivity;
+    private OnFragmentInteractionListener mListener;
     private ContentMycalendarBinding mViewBinding;
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
@@ -48,8 +48,8 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof AppCompatActivity) {
-            mActivity = (AppCompatActivity) context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         }
     }
 
@@ -73,10 +73,11 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mListener.onFragmentCreated(R.id.nav_item_calendar);
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        PagerAdapter mPagerAdapter = new MonthSlidePagerAdapter(mActivity.getSupportFragmentManager(), year, month);
+        PagerAdapter mPagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager(), year, month);
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(5);
 
