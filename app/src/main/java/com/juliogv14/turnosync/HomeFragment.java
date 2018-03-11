@@ -8,13 +8,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,6 +61,7 @@ public class HomeFragment extends Fragment
     //GridAdapter
     private GroupItemsAdapter mGridAdapter;
     private ArrayList<Workgroup> mWorkgroupsList;
+    private ActionMode mActionMode;
 
     private OnHomeFragmentInteractionListener mListener;
 
@@ -109,13 +114,26 @@ public class HomeFragment extends Fragment
 
         mViewBinding.gridViewGroupDisplay.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-                Workgroup wk = mWorkgroupsList.get(i);
-                mListener.onWorkgroupSelected(wk);
+                Workgroup wk = mWorkgroupsList.get(position);
+                if (wk.isSelected()) {
+                    wk.setSelected(false);
+                } else {
+                    mListener.onWorkgroupSelected(wk);
+                }
+
             }
         });
-        //Inicilize workgroup selected
+
+        mViewBinding.gridViewGroupDisplay.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Workgroup wk = mWorkgroupsList.get(position);
+                handleSelectedWorkgroup(wk);
+                return false;
+            }
+        });
         Log.d(TAG, "Start HomeFragment");
     }
 
@@ -125,20 +143,19 @@ public class HomeFragment extends Fragment
         mWorkgroupsListener.remove();
     }
 
-    private void testData() {
-
-
+    @Override
+    public void onDialogPositiveClick(String name, String description) {
         if (mFirebaseUser != null) {
 
             Map<String, Object> leveldata = new HashMap<>();
-            leveldata.put("level", "master");
+            leveldata.put("level", 0);
             DocumentReference workgroupRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document();
             String workgroupID = workgroupRef.getId();
-            Workgroup newGroup = new Workgroup(workgroupID, "trabajo", "");
+            Workgroup newGroup = new Workgroup(workgroupID, name, description);
             workgroupRef.set(newGroup);
             mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
                     .collection(getString(R.string.data_ref_workgroups)).document(workgroupID).set(leveldata);
-            Log.d(TAG, "testData floating button");
+            Log.d(TAG, "Create workgroup dialog return");
         }
     }
 
@@ -152,17 +169,23 @@ public class HomeFragment extends Fragment
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 if (documentSnapshots != null) {
                     CollectionReference workGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
+
                     final HashMap<String, DocumentChange> docChanges = new HashMap<>();
+                    final HashMap<String, Integer> docChangesLevel = new HashMap<>();
 
-                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
+                    for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
+                        DocumentSnapshot doc = docChange.getDocument();
+                        String docID = doc.getId();
+                        docChanges.put(docID, docChange);
+                        docChangesLevel.put(docID, Integer.parseInt(doc.get("level").toString()));
 
-                        docChanges.put(dc.getDocument().getId(), dc);
-                        workGroupsRef.document(dc.getDocument().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        workGroupsRef.document(docChange.getDocument().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 if (documentSnapshot.exists()) {
                                     DocumentChange change = docChanges.get(documentSnapshot.getId());
                                     Workgroup workgroup = documentSnapshot.toObject(Workgroup.class);
+                                    workgroup.setLevel(docChangesLevel.get(documentSnapshot.getId()));
                                     mListener.initilizeWorkgroup(workgroup);
 
                                     switch (change.getType()) {
@@ -194,23 +217,16 @@ public class HomeFragment extends Fragment
                 }
             }
         });
-
-
     }
 
-    @Override
-    public void onDialogPositiveClick(String name, String description) {
-        if (mFirebaseUser != null) {
+    private void handleSelectedWorkgroup(Workgroup workgroup) {
 
-            Map<String, Object> leveldata = new HashMap<>();
-            leveldata.put("level", "master");
-            DocumentReference workgroupRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document();
-            String workgroupID = workgroupRef.getId();
-            Workgroup newGroup = new Workgroup(workgroupID, name, description);
-            workgroupRef.set(newGroup);
-            mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                    .collection(getString(R.string.data_ref_workgroups)).document(workgroupID).set(leveldata);
-            Log.d(TAG, "Create workgroup dialog return");
+        workgroup.setSelected(true);
+
+        if (mActionMode == null) {
+            mActionMode = ((AppCompatActivity) mListener)
+                    .startSupportActionMode(new ToolbarActionModeCallback((Context) mListener, mGridAdapter, workgroup));
+            mActionMode.setTitle(workgroup.getDisplayname() + " selected");
         }
     }
 
@@ -237,10 +253,57 @@ public class HomeFragment extends Fragment
 
             Workgroup workgroup = getItem(position);
             if (workgroup != null) {
-                itemBinding.textViewGroupName.setText(workgroup.getDisplayname());
+                //TODO temp level display
+                String display = workgroup.getDisplayname() + "-" + workgroup.getLevel();
+                itemBinding.textViewGroupName.setText(display);
                 itemBinding.textViewGroupId.setText(workgroup.getWorkgroupID());
             }
             return convertView;
+        }
+    }
+
+    public class ToolbarActionModeCallback implements ActionMode.Callback {
+
+        private Context mContext;
+        private GroupItemsAdapter mGroupsAdapter;
+
+        Workgroup mWorkgroup;
+
+        ToolbarActionModeCallback(Context mContext, GroupItemsAdapter mGroupsAdapter, Workgroup workgroup) {
+            this.mContext = mContext;
+            this.mGroupsAdapter = mGroupsAdapter;
+            this.mWorkgroup = workgroup;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_home, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            //TODO add more options
+            menu.findItem(R.id.action_home_view).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_home_view:
+                    Toast.makeText(mContext, "wk:" + mWorkgroup.getWorkgroupID() + ": INFO BUTTON", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    break;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            if (mActionMode != null) {
+                mActionMode = null;
+            }
         }
     }
 

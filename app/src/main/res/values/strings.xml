@@ -95,6 +95,8 @@
     <string name="dialog_workgroup_button_create">Create</string>
     <string name="dialog_workgroup_button_cancel">Cancel</string>
 
+    <!--HOME MENU OPTIONS-->
+    <string name="menu_home_info">Info</string>
 
     <!--reference errors-->
     <item name="visible" type="id" />

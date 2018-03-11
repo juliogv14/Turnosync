@@ -13,6 +13,9 @@ public class Workgroup implements Parcelable {
     private String displayname;
     private String info;
 
+    private int level;
+    private boolean selected;
+
     public Workgroup() {
     }
 
@@ -44,6 +47,22 @@ public class Workgroup implements Parcelable {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     //Parcelable implementation
