@@ -97,6 +97,7 @@
 
     <!--HOME MENU OPTIONS-->
     <string name="menu_home_info">Info</string>
+    <string name="menu_home_settings">Settings</string>
 
     <!--reference errors-->
     <item name="visible" type="id" />

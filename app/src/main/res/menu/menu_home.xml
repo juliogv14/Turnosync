@@ -4,7 +4,12 @@
     <!--TODO more options-->
     <item
         android:id="@+id/action_home_view"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_info_outline_black_24dp"
         android:title="@string/menu_home_info"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_home_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/menu_home_settings"
+        android:enabled="false" />
 </menu>
