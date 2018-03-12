@@ -3,6 +3,9 @@ package com.juliogv14.turnosync;
 import android.app.Activity;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -62,6 +65,8 @@ public class HomeFragment extends Fragment
     private GroupItemsAdapter mGridAdapter;
     private ArrayList<Workgroup> mWorkgroupsList;
     private ActionMode mActionMode;
+    private Workgroup mSelectedWorkgroup;
+    ToolbarActionModeCallback tb;
 
     private OnHomeFragmentInteractionListener mListener;
 
@@ -118,10 +123,11 @@ public class HomeFragment extends Fragment
 
                 Workgroup wk = mWorkgroupsList.get(position);
                 if (wk.isSelected()) {
-                    wk.setSelected(false);
+                    handleSelectedWorkgroup(wk);
                 } else {
                     mListener.onWorkgroupSelected(wk);
                 }
+
 
             }
         });
@@ -131,7 +137,7 @@ public class HomeFragment extends Fragment
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Workgroup wk = mWorkgroupsList.get(position);
                 handleSelectedWorkgroup(wk);
-                return false;
+                return true;
             }
         });
         Log.d(TAG, "Start HomeFragment");
@@ -221,18 +227,28 @@ public class HomeFragment extends Fragment
 
     private void handleSelectedWorkgroup(Workgroup workgroup) {
 
-        workgroup.setSelected(true);
+        if (!workgroup.isSelected()) {
+            if (mSelectedWorkgroup != null) {
+                mSelectedWorkgroup.setSelected(false);
+            }
+            mSelectedWorkgroup = workgroup;
+            mSelectedWorkgroup.setSelected(true);
 
-        if (mActionMode == null) {
-            mActionMode = ((AppCompatActivity) mListener)
-                    .startSupportActionMode(new ToolbarActionModeCallback((Context) mListener, mGridAdapter, workgroup));
+            tb = new ToolbarActionModeCallback((Context) mListener, mGridAdapter, mSelectedWorkgroup);
+            if (mActionMode == null) {
+                mActionMode = ((AppCompatActivity) mListener)
+                        .startSupportActionMode(tb);
+            }
             mActionMode.setTitle(workgroup.getDisplayname() + " selected");
+
+
+        } else {
+            mActionMode.finish();
         }
     }
 
     private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {
 
-        private ArrayList<Workgroup> data;
         private ItemWorkgroupBinding itemBinding;
 
 
@@ -275,6 +291,10 @@ public class HomeFragment extends Fragment
             this.mWorkgroup = workgroup;
         }
 
+        public void setmWorkgroup(Workgroup mWorkgroup) {
+            this.mWorkgroup = mWorkgroup;
+        }
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.menu_home, menu);
@@ -284,8 +304,21 @@ public class HomeFragment extends Fragment
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             //TODO add more options
+            for (int i = 0; i < menu.size(); i++) {
+                Drawable icon = menu.getItem(i).getIcon();
+                if (icon != null) {
+                    icon.mutate();
+                    icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+
             menu.findItem(R.id.action_home_view).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            return false;
+            if (mWorkgroup.getLevel() == 0) {
+                menu.findItem(R.id.action_home_settings).setEnabled(true);
+                menu.findItem(R.id.action_home_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+
+            return true;
         }
 
         @Override
@@ -295,14 +328,18 @@ public class HomeFragment extends Fragment
                     Toast.makeText(mContext, "wk:" + mWorkgroup.getWorkgroupID() + ": INFO BUTTON", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     break;
+                default:
+                    return false;
             }
-            return false;
+            return true;
         }
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (mActionMode != null) {
                 mActionMode = null;
+                mWorkgroup.setSelected(false);
+                mSelectedWorkgroup = null;
             }
         }
     }
