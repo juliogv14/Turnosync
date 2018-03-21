@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,12 +26,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.juliogv14.turnosync.calendar.MonthPageFragment;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
-import com.juliogv14.turnosync.settings.SettingsActivity;
+import com.juliogv14.turnosync.ui.account.LoginActivity;
+import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
+import com.juliogv14.turnosync.ui.settings.SettingsActivity;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,

@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.calendar;
+package com.juliogv14.turnosync.ui.mycalendar;
 
 import android.app.Activity;
 import android.content.Context;

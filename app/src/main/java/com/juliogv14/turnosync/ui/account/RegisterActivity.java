@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.account;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -25,8 +25,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
+import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 public class RegisterActivity extends AppCompatActivity {

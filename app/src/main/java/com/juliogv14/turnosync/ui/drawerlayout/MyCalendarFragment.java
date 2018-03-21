@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,9 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.juliogv14.turnosync.calendar.MonthPageFragment;
+import com.juliogv14.turnosync.OnFragmentInteractionListener;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Workgroup;
 import com.juliogv14.turnosync.databinding.ContentMycalendarBinding;
+import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.settings;
+package com.juliogv14.turnosync.ui.settings;
 
 
 import android.content.SharedPreferences;

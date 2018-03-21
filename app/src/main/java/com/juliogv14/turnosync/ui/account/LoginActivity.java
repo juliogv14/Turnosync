@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.account;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -33,7 +33,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
+import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
