@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Workgroup;
-import com.juliogv14.turnosync.databinding.ContentMycalendarBinding;
+import com.juliogv14.turnosync.databinding.FragmentMycalendarBinding;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 
 import java.util.Calendar;
@@ -37,7 +37,7 @@ public class MyCalendarFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
 
     private OnFragmentInteractionListener mListener;
-    private ContentMycalendarBinding mViewBinding;
+    private FragmentMycalendarBinding mViewBinding;
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private Workgroup mWorkgroup;
@@ -72,7 +72,7 @@ public class MyCalendarFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = ContentMycalendarBinding.inflate(inflater, container, false);
+        mViewBinding = FragmentMycalendarBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 

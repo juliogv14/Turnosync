@@ -39,7 +39,7 @@ import com.juliogv14.turnosync.CreateWorkgroupDialog;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Workgroup;
-import com.juliogv14.turnosync.databinding.ContentHomeBinding;
+import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
 import com.juliogv14.turnosync.databinding.ItemWorkgroupBinding;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment
 
     private final String TAG = this.getClass().getSimpleName();
 
-    protected ContentHomeBinding mViewBinding;
+    protected FragmentHomeBinding mViewBinding;
 
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = ContentHomeBinding.inflate(inflater, container, false);
+        mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 
@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.content_home, mWorkgroupsList);
+        mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.fragment_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
         mListener.onFragmentCreated(R.id.nav_item_home);
