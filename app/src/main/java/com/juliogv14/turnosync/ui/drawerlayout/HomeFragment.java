@@ -294,10 +294,6 @@ public class HomeFragment extends Fragment
             this.mWorkgroup = workgroup;
         }
 
-        public void setmWorkgroup(Workgroup mWorkgroup) {
-            this.mWorkgroup = mWorkgroup;
-        }
-
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.menu_home, menu);
@@ -313,12 +309,6 @@ public class HomeFragment extends Fragment
                     icon.mutate();
                     icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                 }
-            }
-
-            menu.findItem(R.id.action_home_view).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            if (mWorkgroup.getLevel() == 0) {
-                menu.findItem(R.id.action_home_settings).setEnabled(true);
-                menu.findItem(R.id.action_home_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
             return true;

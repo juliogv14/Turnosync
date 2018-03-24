@@ -11,8 +11,12 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
@@ -84,8 +88,19 @@ public class MyCalendarFragment extends Fragment {
         mViewBinding.viewPagerMonths.setCurrentItem(5);
 
         Log.d(TAG, "Start MyCalendarFragment");
+    }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_mycalendar, menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_mycalendar_schedule) {
+            Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
+        }
+        return true;
     }
 
     private class MonthSlidePagerAdapter extends FragmentStatePagerAdapter {
