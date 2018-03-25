@@ -23,7 +23,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.Workgroup;
+import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class MonthPageFragment extends Fragment {
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_YEAR_KEY = "currentYear";
     private static final String CURRENT_MONTH_KEY = "currentMonth";
-    private Workgroup mWorkgroup;
+    private UserWorkgroup mWorkgroup;
 
     //Month
     private int mYear;
@@ -61,7 +61,7 @@ public class MonthPageFragment extends Fragment {
     private List<Shift> mShiftList;
 
 
-    public static MonthPageFragment newInstance(Workgroup workgroup, int year, int month) {
+    public static MonthPageFragment newInstance(UserWorkgroup workgroup, int year, int month) {
         MonthPageFragment f = new MonthPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();

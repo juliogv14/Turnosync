@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.data.Workgroup;
+import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentMycalendarBinding;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 
@@ -40,9 +40,9 @@ public class MyCalendarFragment extends Fragment {
     private FragmentMycalendarBinding mViewBinding;
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private Workgroup mWorkgroup;
+    private UserWorkgroup mWorkgroup;
 
-    public static MyCalendarFragment newInstance(Workgroup workgroup) {
+    public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();

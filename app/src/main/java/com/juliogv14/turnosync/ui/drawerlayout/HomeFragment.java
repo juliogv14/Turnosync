@@ -23,22 +23,17 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.CreateWorkgroupDialog;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.data.Workgroup;
+import com.juliogv14.turnosync.data.UserLevels;
+import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
 import com.juliogv14.turnosync.databinding.ItemWorkgroupBinding;
 
@@ -54,9 +49,13 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment
         implements CreateWorkgroupDialog.CreateWorkgroupListener {
-
+    //Log TAG
     private final String TAG = this.getClass().getSimpleName();
 
+    //Key constants
+    private static final String WORKGROUP_LIST_KEY = "workgroupList";
+
+    //Data binding
     protected FragmentHomeBinding mViewBinding;
 
     //Firebase
@@ -64,15 +63,24 @@ public class HomeFragment extends Fragment
     private FirebaseUser mFirebaseUser;
     private ListenerRegistration mWorkgroupsListener;
 
+
     //GridAdapter
     private GroupItemsAdapter mGridAdapter;
-    private ArrayList<Workgroup> mWorkgroupsList;
+    private ArrayList<UserWorkgroup> mWorkgroupsList;
     private ActionMode mActionMode;
-    private Workgroup mSelectedWorkgroup;
+    private UserWorkgroup mSelectedWorkgroup;
     ToolbarActionModeCallback tb;
 
     private OnHomeFragmentInteractionListener mListener;
 
+    public static HomeFragment newInstance(ArrayList<UserWorkgroup> workgroupList) {
+        HomeFragment f = new HomeFragment();
+        // Supply index input as an argument.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(WORKGROUP_LIST_KEY, workgroupList);
+        f.setArguments(args);
+        return f;
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -86,7 +94,11 @@ public class HomeFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mWorkgroupsList = new ArrayList<>();
+        Bundle args = getArguments();
+        if (args != null) {
+            mWorkgroupsList = args.getParcelableArrayList(WORKGROUP_LIST_KEY);
+        }
+
     }
 
     //Inflate view
@@ -103,11 +115,12 @@ public class HomeFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.fragment_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
         mListener.onFragmentCreated(R.id.nav_item_home);
-        attatchWorkgroupsListener();
+        //attatchWorkgroupsListener();
 
 
         mViewBinding.floatingButtonNewGroup.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +137,7 @@ public class HomeFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-                Workgroup wk = mWorkgroupsList.get(position);
+                UserWorkgroup wk = mWorkgroupsList.get(position);
                 if (wk.isSelected()) {
                     handleSelectedWorkgroup(wk);
                 } else {
@@ -138,7 +151,7 @@ public class HomeFragment extends Fragment
         mViewBinding.gridViewGroupDisplay.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Workgroup wk = mWorkgroupsList.get(position);
+                UserWorkgroup wk = mWorkgroupsList.get(position);
                 handleSelectedWorkgroup(wk);
                 return true;
             }
@@ -147,28 +160,43 @@ public class HomeFragment extends Fragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mGridAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mWorkgroupsListener.remove();
     }
 
     @Override
     public void onDialogPositiveClick(String name, String description) {
         if (mFirebaseUser != null) {
+            //Database References
+            String userUID = mFirebaseUser.getUid();
+            CollectionReference globalWorkgroupsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
+            CollectionReference userWorkgroupsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users))
+                    .document(userUID).collection(getString(R.string.data_ref_workgroups));
 
-            Map<String, Object> leveldata = new HashMap<>();
-            leveldata.put("level", 0);
-            DocumentReference workgroupRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document();
-            String workgroupID = workgroupRef.getId();
-            Workgroup newGroup = new Workgroup(workgroupID, name, description);
-            workgroupRef.set(newGroup);
-            mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                    .collection(getString(R.string.data_ref_workgroups)).document(workgroupID).set(leveldata);
+            //Global workgroup list
+            DocumentReference globalWorkgroupRef = globalWorkgroupsColl.document();
+            Map<String, String> workgroupData = new HashMap<>();
+            workgroupData.put("workgroupID", globalWorkgroupRef.getId());
+            workgroupData.put("displayname", name);
+            workgroupData.put("info", description);
+            globalWorkgroupRef.set(workgroupData);
+
+            //Personal workgroup list
+            DocumentReference userWorkgroupRef = userWorkgroupsColl.document(globalWorkgroupRef.getId());
+            UserWorkgroup userWorkgroup = new UserWorkgroup(globalWorkgroupRef.getId(), name, description, UserLevels.MANAGER.toString());
+            userWorkgroupRef.set(userWorkgroup);
+
             Log.d(TAG, "Create workgroup dialog return");
         }
     }
 
-    private void attatchWorkgroupsListener() {
+    /*private void attatchWorkgroupsListener() {
         CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
                 .collection(getString(R.string.data_ref_workgroups));
 
@@ -226,9 +254,9 @@ public class HomeFragment extends Fragment
                 }
             }
         });
-    }
+    }*/
 
-    private void handleSelectedWorkgroup(Workgroup workgroup) {
+    private void handleSelectedWorkgroup(UserWorkgroup workgroup) {
 
         if (!workgroup.isSelected()) {
             if (mSelectedWorkgroup != null) {
@@ -250,12 +278,18 @@ public class HomeFragment extends Fragment
         }
     }
 
-    private class GroupItemsAdapter extends ArrayAdapter<Workgroup> {
+    public void notifyGridDataSetChanged() {
+        if (mGridAdapter != null) {
+            mGridAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private class GroupItemsAdapter extends ArrayAdapter<UserWorkgroup> {
 
         private ItemWorkgroupBinding itemBinding;
 
 
-        GroupItemsAdapter(@NonNull Context context, int resource, @NonNull List<Workgroup> objects) {
+        GroupItemsAdapter(@NonNull Context context, int resource, @NonNull List<UserWorkgroup> objects) {
             super(context, resource, objects);
         }
 
@@ -270,10 +304,10 @@ public class HomeFragment extends Fragment
             int size = mViewBinding.gridViewGroupDisplay.getRequestedColumnWidth();
             convertView.setLayoutParams(new GridView.LayoutParams(size, size));
 
-            Workgroup workgroup = getItem(position);
+            UserWorkgroup workgroup = getItem(position);
             if (workgroup != null) {
                 //TODO temp level display
-                String display = workgroup.getDisplayname() + "-" + workgroup.getLevel();
+                String display = workgroup.getDisplayname() + "-" + workgroup.getRole();
                 itemBinding.textViewGroupName.setText(display);
                 itemBinding.textViewGroupId.setText(workgroup.getWorkgroupID());
             }
@@ -286,9 +320,9 @@ public class HomeFragment extends Fragment
         private Context mContext;
         private GroupItemsAdapter mGroupsAdapter;
 
-        Workgroup mWorkgroup;
+        UserWorkgroup mWorkgroup;
 
-        ToolbarActionModeCallback(Context mContext, GroupItemsAdapter mGroupsAdapter, Workgroup workgroup) {
+        ToolbarActionModeCallback(Context mContext, GroupItemsAdapter mGroupsAdapter, UserWorkgroup workgroup) {
             this.mContext = mContext;
             this.mGroupsAdapter = mGroupsAdapter;
             this.mWorkgroup = workgroup;
@@ -338,9 +372,7 @@ public class HomeFragment extends Fragment
     }
 
     public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onWorkgroupSelected(Workgroup workgroup);
-
-        void initilizeWorkgroup(Workgroup workgroup);
+        void onWorkgroupSelected(UserWorkgroup workgroup);
     }
 
 }

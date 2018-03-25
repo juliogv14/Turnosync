@@ -26,14 +26,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.Workgroup;
+import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -41,15 +52,23 @@ public class DrawerActivity extends AppCompatActivity
         HomeFragment.OnHomeFragmentInteractionListener,
         MonthPageFragment.OnCalendarFragmentInteractionListener {
 
+    //Log TAG
     private final String TAG = this.getClass().getSimpleName();
 
     //Activity views
     protected ActivityDrawerBinding mViewBinding;
 
-    //Auth
+    //Firebase Auth
     private String mUsername;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseUser mFirebaseUser;
+
+    //Firebase Firestore
+    private FirebaseFirestore mFirebaseFirestore;
+    private ListenerRegistration mWorkgroupsListener;
+    private ArrayList<UserWorkgroup> mWorkgroupsList;
+    private HomeFragment mHomeFragment;
 
     //drawer
     private DrawerLayout mDrawerLayout;
@@ -60,13 +79,14 @@ public class DrawerActivity extends AppCompatActivity
     private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
     private int mCurrentFragmentID;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private Workgroup mCurrentWorkgroup;
+    private UserWorkgroup mCurrentWorkgroup;
+
+    //
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
 
         if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
@@ -75,7 +95,8 @@ public class DrawerActivity extends AppCompatActivity
             mCurrentFragmentID = R.id.nav_item_home;
         }
 
-
+        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
+        mFirebaseFirestore = FirebaseFirestore.getInstance();
 
         /*------DRAWER-----*/
         Toolbar toolbar = mViewBinding.toolbar;
@@ -101,11 +122,11 @@ public class DrawerActivity extends AppCompatActivity
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    Log.d(TAG, "Authlistener: logged in user " + user.getDisplayName());
-                    //User logged in
-                    onSignedInInitialize(user);
+                mFirebaseUser = firebaseAuth.getCurrentUser();
+                if (mFirebaseUser != null) {
+                    Log.d(TAG, "Authlistener: logged in user " + mFirebaseUser.getDisplayName());
+                    //USER logged in
+                    onSignedInInitialize(mFirebaseUser);
 
                 } else {
                     Log.d(TAG, "Authlistener: logged out");
@@ -119,6 +140,9 @@ public class DrawerActivity extends AppCompatActivity
                 }
             }
         };
+
+        mWorkgroupsList = new ArrayList<>();
+
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
@@ -144,6 +168,9 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mWorkgroupsListener != null) {
+            mWorkgroupsListener.remove();
+        }
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
@@ -202,10 +229,10 @@ public class DrawerActivity extends AppCompatActivity
 
         /*Update Firebase with new settings*/
         if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
-            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+            mFirebaseUser = mFirebaseAuth.getCurrentUser();
             String displayName = sharedPreferences.getString(key, "");
-            if (user != null && !TextUtils.equals(user.getEmail(), displayName)) {
-                user.updateProfile(new UserProfileChangeRequest.Builder()
+            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), displayName)) {
+                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder()
                         .setDisplayName(sharedPreferences.getString(key, "")).build())
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -215,10 +242,10 @@ public class DrawerActivity extends AppCompatActivity
                         });
             }
         } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
-            FirebaseUser user = mFirebaseAuth.getCurrentUser();
+            mFirebaseUser = mFirebaseAuth.getCurrentUser();
             String email = sharedPreferences.getString(key, "");
-            if (user != null && !TextUtils.equals(user.getEmail(), email)) {
-                user.updateEmail(email)
+            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), email)) {
+                mFirebaseUser.updateEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -246,6 +273,8 @@ public class DrawerActivity extends AppCompatActivity
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
 
+        attatchWorkgroupsListener();
+
         displaySelectedScreen(mCurrentFragmentID);
 
     }
@@ -264,7 +293,9 @@ public class DrawerActivity extends AppCompatActivity
         //initializing the fragment object which is selected
         switch (itemId) {
             case R.id.nav_item_home:
-                fragment = new HomeFragment();
+                mHomeFragment = HomeFragment.newInstance(mWorkgroupsList);
+                fragment = mHomeFragment;
+
                 break;
             case R.id.nav_item_calendar:
                 fragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
@@ -279,6 +310,55 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    private void attatchWorkgroupsListener() {
+
+        CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
+                .collection(getString(R.string.data_ref_workgroups));
+
+        mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+
+                for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
+                    DocumentSnapshot document = docChange.getDocument();
+                    //TODO Hash key to values/string.xml
+                    if (document.exists()) {
+                        Map<String, Object> data = document.getData();
+                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get("workgroupID").toString(), data.get("displayname").toString(),
+                                data.get("info").toString(), data.get("role").toString());
+
+                        if (mCurrentWorkgroup == null) {
+                            mCurrentWorkgroup = userWorkgroup;
+                        }
+
+                        switch (docChange.getType()) {
+                            case ADDED:
+                                //Added
+                                mWorkgroupsList.add(userWorkgroup);
+                                break;
+                            case MODIFIED:
+                                if (docChange.getOldIndex() == docChange.getNewIndex()) {
+                                    //Modified, same position
+                                    mWorkgroupsList.set(docChange.getOldIndex(), userWorkgroup);
+                                } else {
+                                    //Modified, differnt position
+                                    mWorkgroupsList.remove(docChange.getOldIndex());
+                                    mWorkgroupsList.add(docChange.getNewIndex(), userWorkgroup);
+                                }
+                                break;
+                            case REMOVED:
+                                //Removed
+                                mWorkgroupsList.remove(docChange.getOldIndex());
+                                break;
+                        }
+                        mHomeFragment.notifyGridDataSetChanged();
+                    }
+                }
+            }
+        });
+    }
+
+    //Interfaces implementation
 
     @Override
     public void onFragmentCreated(int itemid) {
@@ -295,18 +375,11 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWorkgroupSelected(Workgroup workgroup) {
+    public void onWorkgroupSelected(UserWorkgroup workgroup) {
         Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupID(), Toast.LENGTH_SHORT).show();
         mCurrentWorkgroup = workgroup;
         displaySelectedScreen(R.id.nav_item_calendar);
 
-    }
-
-    @Override
-    public void initilizeWorkgroup(Workgroup workgroup) {
-        if (mCurrentWorkgroup == null) {
-            mCurrentWorkgroup = workgroup;
-        }
     }
 
     @Override

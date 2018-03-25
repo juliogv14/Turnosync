@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Created by Julio on 21/01/2018.
- * User.java
+ * USER.java
  */
 
 public class User {
