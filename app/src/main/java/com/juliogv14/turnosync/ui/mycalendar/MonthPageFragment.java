@@ -51,6 +51,7 @@ public class MonthPageFragment extends Fragment {
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_YEAR_KEY = "currentYear";
     private static final String CURRENT_MONTH_KEY = "currentMonth";
+    private static final String MONTH_SHIFT_LIST_KEY = "shiftList";
     private UserWorkgroup mWorkgroup;
 
     //Month
@@ -68,6 +69,7 @@ public class MonthPageFragment extends Fragment {
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putInt(CURRENT_YEAR_KEY, year);
         args.putInt(CURRENT_MONTH_KEY, month);
+        //args.putParcelableArrayList(MONTH_SHIFT_LIST_KEY, shiftArrayList);
         f.setArguments(args);
         return f;
     }
@@ -88,6 +90,7 @@ public class MonthPageFragment extends Fragment {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mYear = args.getInt(CURRENT_YEAR_KEY);
             mMonth = args.getInt(CURRENT_MONTH_KEY);
+            //mShiftList = args.getParcelableArrayList(MONTH_SHIFT_LIST_KEY);
         }
     }
 
@@ -109,7 +112,9 @@ public class MonthPageFragment extends Fragment {
         mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
 
         displayMonth();
-
+        //DisplayMetrics metrics = getResources().getDisplayMetrics();
+        //mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, (ArrayList<Shift>) mShiftList);
+        //mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
         Log.d(TAG, "Start Page");
 
 
@@ -139,7 +144,6 @@ public class MonthPageFragment extends Fragment {
                         }
                     }
                 });
-
     }
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {

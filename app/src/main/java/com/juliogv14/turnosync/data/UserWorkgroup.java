@@ -70,11 +70,11 @@ public class UserWorkgroup implements Parcelable {
 
     //Parcelable implementation
     private UserWorkgroup(Parcel in) {
-        workgroupID = in.readString();
-        displayname = in.readString();
-        info = in.readString();
-        role = in.readString();
-        selected = in.readByte() != 0;
+        this.workgroupID = in.readString();
+        this.displayname = in.readString();
+        this.info = in.readString();
+        this.role = in.readString();
+        this.selected = in.readByte() != 0;
     }
 
     @Exclude

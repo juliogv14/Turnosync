@@ -1,11 +1,14 @@
 package com.juliogv14.turnosync.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Julio on 20/01/2018.
  * Shift.java
  */
 
-public class Shift {
+public class Shift implements Parcelable {
     //JSON database
     private String type;
     private String userID;
@@ -85,4 +88,43 @@ public class Shift {
         this.end = end;
     }
 
+
+    //Parcelable implementation
+    private Shift(Parcel in) {
+        this.type = in.readString();
+        this.userID = in.readString();
+        this.year = in.readInt();
+        this.month = in.readInt();
+        this.day = in.readInt();
+        this.start = in.readString();
+        this.end = in.readString();
+    }
+
+    public static final Creator<Shift> CREATOR = new Creator<Shift>() {
+        @Override
+        public Shift createFromParcel(Parcel in) {
+            return new Shift(in);
+        }
+
+        @Override
+        public Shift[] newArray(int size) {
+            return new Shift[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int i) {
+        out.writeString(type);
+        out.writeString(userID);
+        out.writeInt(year);
+        out.writeInt(month);
+        out.writeInt(day);
+        out.writeString(start);
+        out.writeString(end);
+    }
 }
