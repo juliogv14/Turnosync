@@ -196,66 +196,6 @@ public class HomeFragment extends Fragment
         }
     }
 
-    /*private void attatchWorkgroupsListener() {
-        CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                .collection(getString(R.string.data_ref_workgroups));
-
-
-        mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                if (documentSnapshots != null) {
-                    CollectionReference workGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups));
-
-                    final HashMap<String, DocumentChange> docChanges = new HashMap<>();
-                    final HashMap<String, Integer> docChangesLevel = new HashMap<>();
-
-                    for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
-                        DocumentSnapshot doc = docChange.getDocument();
-                        String docID = doc.getId();
-                        docChanges.put(docID, docChange);
-                        docChangesLevel.put(docID, Integer.parseInt(doc.get("level").toString()));
-
-                        workGroupsRef.document(docChange.getDocument().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    DocumentChange change = docChanges.get(documentSnapshot.getId());
-                                    Workgroup workgroup = documentSnapshot.toObject(Workgroup.class);
-                                    workgroup.setLevel(docChangesLevel.get(documentSnapshot.getId()));
-                                    mListener.initilizeWorkgroup(workgroup);
-
-                                    switch (change.getType()) {
-                                        case ADDED:
-                                            //Added
-                                            mWorkgroupsList.add(workgroup);
-                                            break;
-                                        case MODIFIED:
-                                            if (change.getOldIndex() == change.getNewIndex()) {
-                                                //Modified, same position
-                                                mWorkgroupsList.set(change.getOldIndex(), workgroup);
-                                            } else {
-                                                //Modified, differnt position
-                                                mWorkgroupsList.remove(change.getOldIndex());
-                                                mWorkgroupsList.add(change.getNewIndex(), workgroup);
-                                            }
-                                            break;
-                                        case REMOVED:
-                                            //Removed
-                                            mWorkgroupsList.remove(change.getOldIndex());
-
-                                            break;
-                                    }
-                                    mGridAdapter.notifyDataSetChanged();
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
-    }*/
-
     private void handleSelectedWorkgroup(UserWorkgroup workgroup) {
 
         if (!workgroup.isSelected()) {

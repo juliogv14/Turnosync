@@ -1,6 +1,9 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -99,6 +102,7 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = FragmentMycalendarBinding.inflate(inflater, container, false);
+        setHasOptionsMenu(true);
         return mViewBinding.getRoot();
     }
 
@@ -127,9 +131,28 @@ public class MyCalendarFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            Drawable icon = menu.getItem(i).getIcon();
+            if (icon != null) {
+                icon.mutate();
+                icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_mycalendar_schedule) {
             Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
+
+
+            FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
+            Shift shift = new Shift("M", currentUser.getUid(), 2018, 4, 12, "18:00", "20:00");
+            mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(currentUser.getUid())
+                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                    .collection(getString(R.string.data_ref_shifts)).add(shift);
+
         }
         return true;
     }
@@ -149,7 +172,7 @@ public class MyCalendarFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
 
-            int offMonth = month - QUERY_MONTH_NUMBER / 2 - 1 + position;
+            int offMonth = month - (QUERY_MONTH_NUMBER / 2 - 1) + position;
             int offYear = year;
             if (offMonth < 0) {
                 offYear = offYear - 1;

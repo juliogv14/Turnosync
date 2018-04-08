@@ -109,7 +109,7 @@ public class MonthPageFragment extends Fragment {
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
+        mViewBinding.textViewWorkgroup.setText("" + (mMonth + 1));
 
         displayMonth();
         //DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -127,7 +127,8 @@ public class MonthPageFragment extends Fragment {
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
 
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                 .collection(getString(R.string.data_ref_shifts));
         shiftsReference.whereEqualTo("userID", userID).whereEqualTo("year", year).whereEqualTo("month", month + 1).orderBy("day", Query.Direction.ASCENDING).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
