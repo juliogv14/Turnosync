@@ -41,6 +41,7 @@ import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
+import com.juliogv14.turnosync.ui.mycalendar.ScheduleFragment;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -50,7 +51,8 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
         HomeFragment.OnHomeFragmentInteractionListener,
-        MonthPageFragment.OnCalendarFragmentInteractionListener {
+        MyCalendarFragment.OnCalendarFragmentInteractionListener,
+        MonthPageFragment.OnMonthFragmentInteractionListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -92,7 +94,7 @@ public class DrawerActivity extends AppCompatActivity
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
             mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
         } else {
-            mCurrentFragmentID = R.id.nav_item_home;
+            mCurrentFragmentID = R.string.fragment_home;
         }
 
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
@@ -189,79 +191,17 @@ public class DrawerActivity extends AppCompatActivity
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            if (mCurrentFragmentID == R.id.nav_item_calendar) {
-                displaySelectedScreen(R.id.nav_item_home);
-            } else {
+            if (mCurrentFragmentID == R.string.fragment_home) {
                 super.onBackPressed();
-            }
-
-        }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.nav_item_home:
+            } else {
                 displaySelectedScreen(R.id.nav_item_home);
-                break;
-            case R.id.nav_item_calendar:
-                displaySelectedScreen(R.id.nav_item_calendar);
-                break;
-            case R.id.nav_item_signout:
-                mFirebaseAuth.signOut();
-                break;
-            case R.id.nav_item_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(settingsIntent);
-                break;
-        }
 
-
-        mDrawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-
-        /*Update Firebase with new settings*/
-        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
-            mFirebaseUser = mFirebaseAuth.getCurrentUser();
-            String displayName = sharedPreferences.getString(key, "");
-            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), displayName)) {
-                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder()
-                        .setDisplayName(sharedPreferences.getString(key, "")).build())
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(getApplicationContext(), R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
-                            }
-                        });
             }
-        } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
-            mFirebaseUser = mFirebaseAuth.getCurrentUser();
-            String email = sharedPreferences.getString(key, "");
-            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), email)) {
-                mFirebaseUser.updateEmail(email)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext().getApplicationContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    if (task.getException() != null) {
-                                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
 
-                            }
-                        });
-            }
         }
     }
+
+
 
     private void onSignedInInitialize(FirebaseUser user) {
         mUsername = user.getDisplayName();
@@ -292,13 +232,16 @@ public class DrawerActivity extends AppCompatActivity
 
         //initializing the fragment object which is selected
         switch (itemId) {
-            case R.id.nav_item_home:
+            case R.string.fragment_home:
                 mHomeFragment = HomeFragment.newInstance(mWorkgroupsList);
                 fragment = mHomeFragment;
 
                 break;
-            case R.id.nav_item_calendar:
+            case R.string.fragment_mycalendar:
                 fragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                break;
+            case R.string.fragment_schedule:
+                fragment = ScheduleFragment.newInstance(mCurrentWorkgroup);
                 break;
         }
 
@@ -360,6 +303,74 @@ public class DrawerActivity extends AppCompatActivity
 
     //Interfaces implementation
 
+    //OnNavigationItemSelectedListener
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.nav_item_home:
+                displaySelectedScreen(R.string.fragment_home);
+                break;
+            case R.id.nav_item_calendar:
+                displaySelectedScreen(R.string.fragment_mycalendar);
+                break;
+            case R.id.nav_item_signout:
+                mFirebaseAuth.signOut();
+                break;
+            case R.id.nav_item_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(settingsIntent);
+                break;
+        }
+
+
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    //OnSharedPreferenceChangeListener
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+
+        /*Update Firebase with new settings*/
+        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
+            mFirebaseUser = mFirebaseAuth.getCurrentUser();
+            String displayName = sharedPreferences.getString(key, "");
+            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), displayName)) {
+                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder()
+                        .setDisplayName(sharedPreferences.getString(key, "")).build())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(getApplicationContext(), R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
+            mFirebaseUser = mFirebaseAuth.getCurrentUser();
+            String email = sharedPreferences.getString(key, "");
+            if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), email)) {
+                mFirebaseUser.updateEmail(email)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getApplicationContext().getApplicationContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    if (task.getException() != null) {
+                                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                            }
+                        });
+            }
+        }
+    }
+
+    //OnFragmentInteractionListener
     @Override
     public void onFragmentCreated(int itemid) {
         switch (itemid) {
@@ -374,14 +385,23 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    //OnHomeFragmentInteractionListener
     @Override
     public void onWorkgroupSelected(UserWorkgroup workgroup) {
         Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupID(), Toast.LENGTH_SHORT).show();
         mCurrentWorkgroup = workgroup;
-        displaySelectedScreen(R.id.nav_item_calendar);
+        displaySelectedScreen(R.string.fragment_mycalendar);
 
     }
 
+    //OnCalendarFragmentInteractionListener
+    @Override
+    public void onScheduleMenuItemSelected() {
+        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupID());
+        displaySelectedScreen(R.string.fragment_schedule);
+    }
+
+    //OnMonthFragmentInteractionListener
     @Override
     public void onShiftSelected(Shift shift) {
 

@@ -18,9 +18,11 @@
     <string name="activity_register">Register</string>
     <string name="activity_reset_password">Reset password</string>
     <string name="activity_settings">Settings</string>
+
     <!--DRAWER FRAGMENTS LABELS-->
     <string name="fragment_home">Home</string>
     <string name="fragment_mycalendar">My Calendar</string>
+    <string name="fragment_schedule">Schedule</string>
 
     <!--FORM ERROR STRINGS-->
     <string name="form_error_field_required">This field is required</string>
@@ -99,7 +101,11 @@
     <string name="menu_home_info">Info</string>
     <string name="menu_home_settings">Settings</string>
 
+
     <!--reference errors-->
     <item name="visible" type="id" />
     <item name="masked" type="id" />
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

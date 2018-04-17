@@ -87,6 +87,9 @@ public class HomeFragment extends Fragment
         super.onAttach(context);
         if (context instanceof OnHomeFragmentInteractionListener) {
             mListener = (OnHomeFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnHomeFragmentInteractionListener");
         }
     }
 

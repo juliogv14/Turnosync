@@ -23,6 +23,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 
@@ -34,7 +35,7 @@ import java.util.List;
  * MonthPageFragment
  */
 
-public class MonthPageFragment extends Fragment {
+public class ScheduleWeekPageFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -43,16 +44,16 @@ public class MonthPageFragment extends Fragment {
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    //private ListenerRegistration mShiftsListener;
 
-    private OnMonthFragmentInteractionListener mListener;
+    private OnScheduleFragmentInteractionListener mListener;
 
     //Workgroup
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_YEAR_KEY = "currentYear";
     private static final String CURRENT_MONTH_KEY = "currentMonth";
-    private static final String MONTH_SHIFT_LIST_KEY = "shiftList";
+    private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private UserWorkgroup mWorkgroup;
+    private ArrayList<User> mWorkgroupUsers;
 
     //Month
     private int mYear;
@@ -62,14 +63,14 @@ public class MonthPageFragment extends Fragment {
     private List<Shift> mShiftList;
 
 
-    public static MonthPageFragment newInstance(UserWorkgroup workgroup, int year, int month) {
-        MonthPageFragment f = new MonthPageFragment();
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<User> workgroupUsers, int year, int month) {
+        ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putInt(CURRENT_YEAR_KEY, year);
         args.putInt(CURRENT_MONTH_KEY, month);
-        //args.putParcelableArrayList(MONTH_SHIFT_LIST_KEY, shiftArrayList);
+        args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         f.setArguments(args);
         return f;
     }
@@ -77,11 +78,11 @@ public class MonthPageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMonthFragmentInteractionListener) {
-            mListener = (OnMonthFragmentInteractionListener) context;
+        if (context instanceof OnScheduleFragmentInteractionListener) {
+            mListener = (OnScheduleFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnMonthFragmentInteractionListener");
+                    + " must implement OnScheduleFragmentInteractionListener");
         }
     }
 
@@ -93,7 +94,7 @@ public class MonthPageFragment extends Fragment {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mYear = args.getInt(CURRENT_YEAR_KEY);
             mMonth = args.getInt(CURRENT_MONTH_KEY);
-            //mShiftList = args.getParcelableArrayList(MONTH_SHIFT_LIST_KEY);
+            mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
         }
     }
 
@@ -150,7 +151,7 @@ public class MonthPageFragment extends Fragment {
                 });
     }
 
-    public interface OnMonthFragmentInteractionListener extends OnFragmentInteractionListener {
+    public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
         void onShiftSelected(Shift shift);
     }
 

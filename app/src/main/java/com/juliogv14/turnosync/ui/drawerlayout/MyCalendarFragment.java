@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,14 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
@@ -56,7 +49,7 @@ public class MyCalendarFragment extends Fragment {
     private final int QUERY_MONTH_NUMBER = 12;
 
     //Listener DrawerActivity
-    private OnFragmentInteractionListener mListener;
+    private OnCalendarFragmentInteractionListener mListener;
     //Binding
     private FragmentMycalendarBinding mViewBinding;
 
@@ -82,8 +75,11 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnCalendarFragmentInteractionListener) {
+            mListener = (OnCalendarFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnCalendarFragmentInteractionListener");
         }
     }
 
@@ -146,12 +142,14 @@ public class MyCalendarFragment extends Fragment {
         if (item.getItemId() == R.id.action_mycalendar_schedule) {
             Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
 
+            mListener.onScheduleMenuItemSelected();
 
-            FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
+            /*FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
             Shift shift = new Shift("M", currentUser.getUid(), 2018, 4, 12, "18:00", "20:00");
             mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(currentUser.getUid())
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                    .collection(getString(R.string.data_ref_shifts)).add(shift);
+                    .collection(getString(R.string.data_ref_shifts)).add(shift);*/
+
 
         }
         return true;
@@ -192,8 +190,13 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
+    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
+        void onScheduleMenuItemSelected();
+    }
+
+
     //TODO pre query shifts before displaying
-    public void queryShiftData(int year, int month) {
+    /*public void queryShiftData(int year, int month) {
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
         final List<List<Shift>> data = new ArrayList<>();
         if (user != null) {
@@ -229,10 +232,7 @@ public class MyCalendarFragment extends Fragment {
                         });
 
             }
-
-
         }
-    }
-
+    }*/
 
 }
