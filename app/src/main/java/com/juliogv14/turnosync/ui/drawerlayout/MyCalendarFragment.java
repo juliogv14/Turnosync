@@ -185,7 +185,7 @@ public class MyCalendarFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 12;
+            return QUERY_MONTH_NUMBER;
         }
 
     }

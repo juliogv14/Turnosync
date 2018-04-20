@@ -113,6 +113,7 @@ public class ScheduleWeekPageFragment extends Fragment {
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        //TODO set month name
         mViewBinding.textViewWorkgroup.setText("" + (mMonth + 1));
 
         displayMonth();
