@@ -101,6 +101,15 @@
     <string name="menu_home_info">Info</string>
     <string name="menu_home_settings">Settings</string>
 
+    <!--MYCALENDAR MENU OPTIONS-->
+    <string name="menu_mycalendar_switch">Schedule</string>
+    <string name="menu_mycalendar_settings">Settings</string>
+
+    <!--SCHEDULE MENU OPTIONS-->
+    <string name="menu_schedule_edit">Edit</string>
+    <string name="menu_schedule_switch">My calendar</string>
+    <string name="menu_schedule_settings">Settings</string>
+
 
     <!--reference errors-->
     <item name="visible" type="id" />

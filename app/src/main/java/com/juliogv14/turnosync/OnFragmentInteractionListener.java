@@ -7,4 +7,5 @@ package com.juliogv14.turnosync;
 
 public interface OnFragmentInteractionListener {
     void onFragmentCreated(int itemid);
+    void onFragmentSwapped(int fragmentId);
 }

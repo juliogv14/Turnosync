@@ -59,7 +59,6 @@ public class MyCalendarFragment extends Fragment {
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
 
-
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private UserWorkgroup mWorkgroup;
 
@@ -105,7 +104,7 @@ public class MyCalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mListener.onFragmentCreated(R.id.nav_item_calendar);
+        mListener.onFragmentCreated(R.string.fragment_mycalendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -139,16 +138,19 @@ public class MyCalendarFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_mycalendar_schedule) {
-            Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_mycalendar_switch) {
 
-            mListener.onScheduleMenuItemSelected();
-
+            mListener.onFragmentSwapped(R.string.fragment_schedule);
             /*FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
             Shift shift = new Shift("M", currentUser.getUid(), 2018, 4, 12, "18:00", "20:00");
             mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(currentUser.getUid())
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                     .collection(getString(R.string.data_ref_shifts)).add(shift);*/
+            return true;
+
+        } else if (itemId == R.id.action_mycalendar_settings) {
+            Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
 
 
         }
@@ -191,7 +193,7 @@ public class MyCalendarFragment extends Fragment {
     }
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onScheduleMenuItemSelected();
+
     }
 
 

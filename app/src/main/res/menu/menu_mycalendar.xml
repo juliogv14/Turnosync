@@ -2,8 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_mycalendar_schedule"
+        android:id="@+id/action_mycalendar_switch"
+        android:icon="@drawable/ic_schedule_black_24dp"
+        android:title="@string/menu_mycalendar_switch"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_mycalendar_settings"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/menu_home_info"
-        app:showAsAction="always" />
+        android:title="@string/menu_mycalendar_settings"
+        app:showAsAction="ifRoom" />
 </menu>

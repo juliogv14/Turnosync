@@ -49,28 +49,22 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment
         implements CreateWorkgroupDialog.CreateWorkgroupListener {
-    //Log TAG
-    private final String TAG = this.getClass().getSimpleName();
-
     //Key constants
     private static final String WORKGROUP_LIST_KEY = "workgroupList";
-
+    //Log TAG
+    private final String TAG = this.getClass().getSimpleName();
     //Data binding
     protected FragmentHomeBinding mViewBinding;
-
+    ToolbarActionModeCallback tb;
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
     private ListenerRegistration mWorkgroupsListener;
-
-
     //GridAdapter
     private GroupItemsAdapter mGridAdapter;
     private ArrayList<UserWorkgroup> mWorkgroupsList;
     private ActionMode mActionMode;
     private UserWorkgroup mSelectedWorkgroup;
-    ToolbarActionModeCallback tb;
-
     private OnHomeFragmentInteractionListener mListener;
 
     public static HomeFragment newInstance(ArrayList<UserWorkgroup> workgroupList) {
@@ -122,7 +116,7 @@ public class HomeFragment extends Fragment
         mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.fragment_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
-        mListener.onFragmentCreated(R.id.nav_item_home);
+        mListener.onFragmentCreated(R.string.fragment_home);
         //attatchWorkgroupsListener();
 
 
@@ -227,6 +221,10 @@ public class HomeFragment extends Fragment
         }
     }
 
+    public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
+        void onWorkgroupSelected(UserWorkgroup workgroup);
+    }
+
     private class GroupItemsAdapter extends ArrayAdapter<UserWorkgroup> {
 
         private ItemWorkgroupBinding itemBinding;
@@ -260,10 +258,9 @@ public class HomeFragment extends Fragment
 
     public class ToolbarActionModeCallback implements ActionMode.Callback {
 
+        UserWorkgroup mWorkgroup;
         private Context mContext;
         private GroupItemsAdapter mGroupsAdapter;
-
-        UserWorkgroup mWorkgroup;
 
         ToolbarActionModeCallback(Context mContext, GroupItemsAdapter mGroupsAdapter, UserWorkgroup workgroup) {
             this.mContext = mContext;
@@ -312,10 +309,6 @@ public class HomeFragment extends Fragment
                 mSelectedWorkgroup = null;
             }
         }
-    }
-
-    public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onWorkgroupSelected(UserWorkgroup workgroup);
     }
 
 }

@@ -41,7 +41,6 @@ import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
-import com.juliogv14.turnosync.ui.mycalendar.ScheduleFragment;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -61,7 +60,6 @@ public class DrawerActivity extends AppCompatActivity
     protected ActivityDrawerBinding mViewBinding;
 
     //Firebase Auth
-    private String mUsername;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseUser mFirebaseUser;
@@ -204,7 +202,6 @@ public class DrawerActivity extends AppCompatActivity
 
 
     private void onSignedInInitialize(FirebaseUser user) {
-        mUsername = user.getDisplayName();
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = shrPreferences.edit();
         editor.putString(getString(R.string.pref_displayname_key), user.getDisplayName());
@@ -220,7 +217,6 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     private void onSignedOutCleanup() {
-        mUsername = "";
         mHeaderBinding.textViewDisplayName.setText("");
     }
 
@@ -372,17 +368,23 @@ public class DrawerActivity extends AppCompatActivity
 
     //OnFragmentInteractionListener
     @Override
-    public void onFragmentCreated(int itemid) {
-        switch (itemid) {
-            case R.id.nav_item_home:
+    public void onFragmentCreated(int fragmentId) {
+        switch (fragmentId) {
+            case R.string.fragment_home:
                 mToolbar.setTitle(R.string.fragment_home);
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_home);
                 break;
-            case R.id.nav_item_calendar:
+            case R.string.fragment_mycalendar:
                 mToolbar.setTitle(mCurrentWorkgroup.getDisplayname());
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
                 break;
         }
+    }
+
+    @Override
+    public void onFragmentSwapped(int fragmentId) {
+        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupID());
+        displaySelectedScreen(fragmentId);
     }
 
     //OnHomeFragmentInteractionListener
@@ -395,11 +397,7 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     //OnCalendarFragmentInteractionListener
-    @Override
-    public void onScheduleMenuItemSelected() {
-        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupID());
-        displaySelectedScreen(R.string.fragment_schedule);
-    }
+
 
     //OnMonthFragmentInteractionListener
     @Override
