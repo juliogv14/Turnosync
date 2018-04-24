@@ -18,9 +18,15 @@
     <string name="activity_register">Register</string>
     <string name="activity_reset_password">Reset password</string>
     <string name="activity_settings">Settings</string>
+
     <!--DRAWER FRAGMENTS LABELS-->
     <string name="fragment_home">Home</string>
     <string name="fragment_mycalendar">My Calendar</string>
+    <string name="fragment_schedule">Schedule</string>
+
+    <!--FORM ERROR STRINGS-->
+    <string name="form_error_field_required">This field is required</string>
+    <string name="form_error_name">This name is invalid. Only "-" symbol is allowed.</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
@@ -34,14 +40,12 @@
     <string name="login_error_invalid_email">This email address is invalid</string>
     <string name="login_error_invalid_password">This password is too short</string>
     <string name="login_error_incorrect_password">This password is incorrect</string>
-    <string name="login_error_field_required">This field is required</string>
     <string name="login_error_auth_failed">Authentication failed</string>
 
     <!--REGISTER STRINGS-->
     <string name="register_name">Display name</string>
     <string name="register_password_repeat">Repeat password</string>
     <!--REGISTER ERROR STRINGS-->
-    <string name="register_error_name">This name is invalid. Symbols and numbers not allowed.</string>
     <string name="register_error_password">This password is too weak. Need at least one uppercase, one lowercase and one number.</string>
     <string name="register_error_repeat">Passwords doesn\'t match</string>
 
@@ -86,6 +90,31 @@
         <item>Su</item>
     </string-array>
 
+    <!--WORKGROUP DIALOG STRINGS-->
+    <string name="dialog_workgroup_title">Create new workgroup</string>
+    <string name="dialog_workgroup_name">Name</string>
+    <string name="dialog_workgroup_desc">Description (optional)</string>
+    <string name="dialog_workgroup_button_create">Create</string>
+    <string name="dialog_workgroup_button_cancel">Cancel</string>
+
+    <!--HOME MENU OPTIONS-->
+    <string name="menu_home_info">Info</string>
+    <string name="menu_home_settings">Settings</string>
+
+    <!--MYCALENDAR MENU OPTIONS-->
+    <string name="menu_mycalendar_switch">Schedule</string>
+    <string name="menu_mycalendar_settings">Settings</string>
+
+    <!--SCHEDULE MENU OPTIONS-->
+    <string name="menu_schedule_edit">Edit</string>
+    <string name="menu_schedule_switch">My calendar</string>
+    <string name="menu_schedule_settings">Settings</string>
+
+
+    <!--reference errors-->
     <item name="visible" type="id" />
     <item name="masked" type="id" />
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

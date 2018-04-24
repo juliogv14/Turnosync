@@ -1,7 +1,7 @@
-package com.juliogv14.turnosync.settings;
+package com.juliogv14.turnosync.ui.settings;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.juliogv14.turnosync.R;

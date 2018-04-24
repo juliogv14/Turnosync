@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".DrawerActivity"
+            android:name=".ui.drawerlayout.DrawerActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -23,29 +23,29 @@
         </activity>
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.account.LoginActivity"
             android:label="@string/activity_signin"
             android:theme="@style/AppTheme.LoginOptionsMenu" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.account.RegisterActivity"
             android:label="@string/activity_register"
-            android:parentActivityName=".LoginActivity">
+            android:parentActivityName=".ui.account.LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LoginActivity" />
+                android:value=".ui.account.LoginActivity" />
         </activity>
 
         <activity
-            android:name=".ResetPasswordActivity"
+            android:name=".ui.account.ResetPasswordActivity"
             android:label="@string/activity_reset_password"
-            android:parentActivityName=".LoginActivity">
+            android:parentActivityName=".ui.account.LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LoginActivity" />
+                android:value=".ui.account.LoginActivity" />
         </activity>
 
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:label="@string/activity_settings" />
 
 

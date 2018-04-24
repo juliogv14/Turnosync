@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.account;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityResetPasswordBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
@@ -63,7 +64,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(email)) {
             mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_field_required));
+                    .setError(getString(R.string.form_error_field_required));
             cancel = true;
         } else if (!FormUtils.isEmailValid(email)) {
             mViewBinding.editTextLayoutEmail

@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.calendar;
+package com.juliogv14.turnosync.ui.mycalendar;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,7 +23,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.Workgroup;
+import com.juliogv14.turnosync.data.User;
+import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import java.util.List;
  * MonthPageFragment
  */
 
-public class MonthPageFragment extends Fragment {
+public class ScheduleWeekPageFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -43,15 +44,16 @@ public class MonthPageFragment extends Fragment {
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    //private ListenerRegistration mShiftsListener;
 
-    private OnCalendarFragmentInteractionListener mListener;
+    private OnScheduleFragmentInteractionListener mListener;
 
     //Workgroup
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_YEAR_KEY = "currentYear";
     private static final String CURRENT_MONTH_KEY = "currentMonth";
-    private Workgroup mWorkgroup;
+    private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
+    private UserWorkgroup mWorkgroup;
+    private ArrayList<User> mWorkgroupUsers;
 
     //Month
     private int mYear;
@@ -61,13 +63,14 @@ public class MonthPageFragment extends Fragment {
     private List<Shift> mShiftList;
 
 
-    public static MonthPageFragment newInstance(Workgroup workgroup, int year, int month) {
-        MonthPageFragment f = new MonthPageFragment();
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<User> workgroupUsers, int year, int month) {
+        ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putInt(CURRENT_YEAR_KEY, year);
         args.putInt(CURRENT_MONTH_KEY, month);
+        args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         f.setArguments(args);
         return f;
     }
@@ -75,8 +78,11 @@ public class MonthPageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnCalendarFragmentInteractionListener) {
-            mListener = (OnCalendarFragmentInteractionListener) context;
+        if (context instanceof OnScheduleFragmentInteractionListener) {
+            mListener = (OnScheduleFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnScheduleFragmentInteractionListener");
         }
     }
 
@@ -88,6 +94,7 @@ public class MonthPageFragment extends Fragment {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mYear = args.getInt(CURRENT_YEAR_KEY);
             mMonth = args.getInt(CURRENT_MONTH_KEY);
+            mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
         }
     }
 
@@ -103,15 +110,16 @@ public class MonthPageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        mListener.onFragmentCreated(R.id.nav_item_calendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        mViewBinding.textViewWorkgroup.setText(mWorkgroup.getDisplayname());
+        //TODO set month name
+        mViewBinding.textViewWorkgroup.setText("" + (mMonth + 1));
 
         displayMonth();
-
+        //DisplayMetrics metrics = getResources().getDisplayMetrics();
+        //mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, (ArrayList<Shift>) mShiftList);
+        //mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
         Log.d(TAG, "Start Page");
 
 
@@ -124,7 +132,8 @@ public class MonthPageFragment extends Fragment {
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
 
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                 .collection(getString(R.string.data_ref_shifts));
         shiftsReference.whereEqualTo("userID", userID).whereEqualTo("year", year).whereEqualTo("month", month + 1).orderBy("day", Query.Direction.ASCENDING).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -141,52 +150,9 @@ public class MonthPageFragment extends Fragment {
                         }
                     }
                 });
-
     }
 
-
-    /*private void attatchShiftsListener() {
-        String userID = mFirebaseUser.getUid();
-        Calendar cal = new GregorianCalendar();
-        int mMonth = cal.get(Calendar.MONTH) + 1;
-        int mYear = cal.get(Calendar.YEAR);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-        mShiftsListener = shiftsReference.whereEqualTo("userID", userID).whereEqualTo("mMonth", mMonth)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                            if (dc != null) {
-                                Shift shift = dc.getDocument().toObject(Shift.class);
-
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        mShiftList.add(shift);
-                                        mGridAdapter.notifyDataSetChanged();
-                                        break;
-                                    case MODIFIED:
-                                        //TODO shift modified
-                                        break;
-                                    case REMOVED:
-                                        //TODO shift removed
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                });
-
-
-        mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, mShiftList);
-        mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-
-    }*/
-
-    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
+    public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
         void onShiftSelected(Shift shift);
     }
 

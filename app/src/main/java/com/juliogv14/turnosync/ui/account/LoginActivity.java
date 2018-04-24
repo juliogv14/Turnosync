@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.account;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -33,7 +33,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
+import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
@@ -183,7 +185,7 @@ public class LoginActivity extends AppCompatActivity {
         /*Check for a valid email address.*/
         if (TextUtils.isEmpty(email)) {
             mViewBinding.editTextLayoutEmail.
-                    setError(getString(R.string.login_error_field_required));
+                    setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
         } else if (!FormUtils.isEmailValid(email)) {

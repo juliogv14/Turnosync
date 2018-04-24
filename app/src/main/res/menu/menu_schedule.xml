@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_schdeule_edit"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:title="@string/menu_schedule_edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_schedule_switch"
+        android:icon="@drawable/ic_mycalendar_black_24dp"
+        android:title="@string/menu_schedule_switch"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_schedule_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/menu_schedule_settings"
+        app:showAsAction="ifRoom" />
+</menu>
