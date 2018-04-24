@@ -1,0 +1,49 @@
+Cloud firestore
+
+users {
+	userID {
+		displayname: "name"
+		email: "email"
+		info:"personal info"
+
+		workgroups{
+			groupID{
+				level: "[0:master,1:user,2:guest]"
+			}
+			.
+			. 
+		}
+	}
+	.
+	.
+
+}
+
+workgroups {
+	groupID{
+		workgroupID: "id"
+		displayname:"name"
+		info:"group info"
+
+		shifts{
+			userID{
+				shiftID{
+					year: "year"
+					month: "month"
+					day: "day"
+					start: "6:00"
+					end: "14:00"
+
+					type: "type"
+					info "extra info"
+				}
+				.
+				.
+			}
+			.
+			.
+		}
+	}
+	.
+	.
+}
