@@ -164,7 +164,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             });
 
                                     CollectionReference usersReference = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users));
-                                    User user = new User(firebaseUser.getEmail(), mDisplayName);
+                                    User user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), mDisplayName);
 
                                     //Add user to database
                                     Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)

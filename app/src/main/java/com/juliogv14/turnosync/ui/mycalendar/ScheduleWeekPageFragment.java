@@ -117,9 +117,7 @@ public class ScheduleWeekPageFragment extends Fragment {
         mViewBinding.textViewWorkgroup.setText("" + (mMonth + 1));
 
         displayMonth();
-        //DisplayMetrics metrics = getResources().getDisplayMetrics();
-        //mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, (ArrayList<Shift>) mShiftList);
-        //mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
+
         Log.d(TAG, "Start Page");
 
 
@@ -131,25 +129,13 @@ public class ScheduleWeekPageFragment extends Fragment {
         final int month = mMonth;
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
+        for (User user : mWorkgroupUsers) {
+            CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid())
+                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                    .collection(getString(R.string.data_ref_shifts));
+        }
 
-        CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_shifts));
-        shiftsReference.whereEqualTo("userID", userID).whereEqualTo("year", year).whereEqualTo("month", month + 1).orderBy("day", Query.Direction.ASCENDING).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            mShiftList = task.getResult().toObjects(Shift.class);
-                            mGridAdapter = new MonthAdapter((Activity) mListener, month, year, metrics, (ArrayList<Shift>) mShiftList);
-                            mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
-                        } else {
-                            if (task.getException() != null) {
-                                Log.e(TAG, task.getException().getMessage());
-                            }
-                        }
-                    }
-                });
+
     }
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {

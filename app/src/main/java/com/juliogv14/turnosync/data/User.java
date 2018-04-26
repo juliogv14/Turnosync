@@ -12,17 +12,28 @@ import com.google.firebase.firestore.Exclude;
  */
 
 public class User implements Parcelable {
+    private String uid;
     private String email;
     private String displayname;
 
-    public User(String email, String displayname) {
+    public User(String uid, String email, String displayname) {
+        this.uid = uid;
         this.email = email;
         this.displayname = displayname;
     }
 
     public User(FirebaseUser user) {
+        this.uid = user.getUid();
         this.email = user.getEmail();
         this.displayname = user.getDisplayName();
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getEmail() {
@@ -43,6 +54,7 @@ public class User implements Parcelable {
 
     //Parcelable implementation
     private User(Parcel in) {
+        this.uid = in.readString();
         this.email = in.readString();
         this.displayname = in.readString();
     }
@@ -67,6 +79,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
+        out.writeString(uid);
         out.writeString(email);
         out.writeString(displayname);
     }
