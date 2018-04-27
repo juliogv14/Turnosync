@@ -50,6 +50,9 @@ public class ScheduleFragment extends Fragment {
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
 
+    //Constants
+    private final int QUERY_MONTH_NUMBER = 12;
+
     //Binding
     private FragmentScheduleBinding mViewBinding;
 
@@ -118,8 +121,7 @@ public class ScheduleFragment extends Fragment {
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        PagerAdapter mPagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager(), year, month);
-        mViewBinding.viewPagerWeekSchedule.setAdapter(mPagerAdapter);
+
 
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                 .collection(getString(R.string.data_ref_users));
@@ -127,6 +129,7 @@ public class ScheduleFragment extends Fragment {
         mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
+                PagerAdapter pagerAdapter = mViewBinding.viewPagerWeekSchedule.getAdapter();
                 for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()){
                     DocumentSnapshot doc = docChange.getDocument();
                     if(doc.exists()){
@@ -152,15 +155,23 @@ public class ScheduleFragment extends Fragment {
                                 mGroupUsers.remove(docChange.getOldIndex());
                                 break;
                         }
-
+                        pagerAdapter.notifyDataSetChanged();
                     }
                 }
             }
         });
 
+        PagerAdapter mPagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager(), year, month);
+        mViewBinding.viewPagerWeekSchedule.setAdapter(mPagerAdapter);
+    }
 
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mGroupUsersListener != null){
+            mGroupUsersListener.remove();
+        }
     }
 
     @Override
@@ -168,6 +179,7 @@ public class ScheduleFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -224,7 +236,7 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 0;
+            return QUERY_MONTH_NUMBER;
         }
 
     }

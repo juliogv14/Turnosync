@@ -17,7 +17,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
@@ -28,6 +33,7 @@ import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,6 +50,8 @@ public class ScheduleWeekPageFragment extends Fragment {
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
+    private ArrayList<ListenerRegistration> mUserShiftsListeners;
+
 
     private OnScheduleFragmentInteractionListener mListener;
 
@@ -123,20 +131,45 @@ public class ScheduleWeekPageFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for (Iterator<ListenerRegistration> iterator = mUserShiftsListeners.iterator(); iterator.hasNext(); ) {
+            ListenerRegistration userShiftListener= iterator.next();
+            if(userShiftListener != null){
+                userShiftListener.remove();
+            }
+            iterator.remove();
+        }
+    }
+
     private void displayMonth() {
         String userID = mFirebaseUser.getUid();
         final int year = mYear;
         final int month = mMonth;
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mUserShiftsListeners = new ArrayList<>();
         for (User user : mWorkgroupUsers) {
-            CollectionReference shiftsReference = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid())
+            CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid())
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                     .collection(getString(R.string.data_ref_shifts));
+
+            ListenerRegistration userShiftListener = userShiftsColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
+                    for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()){
+                        DocumentSnapshot doc = dc.getDocument();
+
+                    }
+                }
+            });
+            mUserShiftsListeners.add(userShiftListener);
         }
 
 
     }
+
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
         void onShiftSelected(Shift shift);

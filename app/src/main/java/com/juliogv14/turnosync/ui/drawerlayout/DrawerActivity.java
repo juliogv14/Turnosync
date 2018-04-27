@@ -41,6 +41,7 @@ import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
+import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -51,7 +52,8 @@ public class DrawerActivity extends AppCompatActivity
         SharedPreferences.OnSharedPreferenceChangeListener,
         HomeFragment.OnHomeFragmentInteractionListener,
         MyCalendarFragment.OnCalendarFragmentInteractionListener,
-        MonthPageFragment.OnMonthFragmentInteractionListener {
+        MonthPageFragment.OnMonthFragmentInteractionListener,
+        ScheduleWeekPageFragment.OnScheduleFragmentInteractionListener{
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -198,8 +200,6 @@ public class DrawerActivity extends AppCompatActivity
 
         }
     }
-
-
 
     private void onSignedInInitialize(FirebaseUser user) {
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
