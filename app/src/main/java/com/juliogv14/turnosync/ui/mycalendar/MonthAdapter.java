@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
+import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +40,6 @@ public class MonthAdapter extends BaseAdapter {
     private int mDaysNextMonth;
     private int mTitleHeight, mDayHeight;
     private String[] mDays;
-    private final int[] mDaysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     private ArrayList<Shift> mShiftsList;
 
@@ -64,19 +64,19 @@ public class MonthAdapter extends BaseAdapter {
             mDaysShown++;
         }
 
-        int firstDay = getDay(mCalendar.get(Calendar.DAY_OF_WEEK));
+        int firstDay = CalendarUtils.getDay(mCalendar.get(Calendar.DAY_OF_WEEK));
         int prevDay;
         if (mMonth == 0)
-            prevDay = daysInMonth(11) - firstDay + 1;
+            prevDay = CalendarUtils.daysInMonth(mCalendar, mYear, 11) - firstDay + 1;
         else
-            prevDay = daysInMonth(mMonth - 1) - firstDay + 1;
+            prevDay = CalendarUtils.daysInMonth(mCalendar, mYear, mMonth - 1) - firstDay + 1;
         for (int i = 0; i < firstDay; i++) {
             mItems.add(String.valueOf(prevDay + i));
             mDaysLastMonth++;
             mDaysShown++;
         }
 
-        int daysInMonth = daysInMonth(mMonth);
+        int daysInMonth = CalendarUtils.daysInMonth(mCalendar, mYear, mMonth);
         for (int i = 1; i <= daysInMonth; i++) {
             mItems.add(String.valueOf(i));
             mDaysShown++;
@@ -90,60 +90,7 @@ public class MonthAdapter extends BaseAdapter {
         }
 
 
-        mTitleHeight = getLabelHeight();
-    }
-
-    private int daysInMonth(int month) {
-        int daysInMonth = mDaysInMonth[month];
-        if (month == 1 && mCalendar.isLeapYear(mYear))
-            daysInMonth++;
-        return daysInMonth;
-    }
-
-    private int getLabelHeight() {
-        int densityDpi = mDisplayMetrics.densityDpi;
-        if (densityDpi > DisplayMetrics.DENSITY_LOW && densityDpi < DisplayMetrics.DENSITY_MEDIUM) {
-            return 24;
-        } else if (densityDpi > DisplayMetrics.DENSITY_LOW && densityDpi < DisplayMetrics.DENSITY_MEDIUM) {
-            return 32;
-        } else if (densityDpi > DisplayMetrics.DENSITY_MEDIUM && densityDpi < DisplayMetrics.DENSITY_HIGH) {
-            return 48;
-        } else if (densityDpi > DisplayMetrics.DENSITY_HIGH && densityDpi < DisplayMetrics.DENSITY_XHIGH) {
-            return 54;
-        } else if (densityDpi > DisplayMetrics.DENSITY_XHIGH && densityDpi < DisplayMetrics.DENSITY_XXHIGH) {
-            return 68;
-        } else if (densityDpi > DisplayMetrics.DENSITY_XXHIGH && densityDpi < DisplayMetrics.DENSITY_XXXHIGH) {
-            return 80;
-        } else {
-            return 54;
-        }
-    }
-
-    private int getDay(int day) {
-        switch (day) {
-            case Calendar.MONDAY:
-                return 0;
-            case Calendar.TUESDAY:
-                return 1;
-            case Calendar.WEDNESDAY:
-                return 2;
-            case Calendar.THURSDAY:
-                return 3;
-            case Calendar.FRIDAY:
-                return 4;
-            case Calendar.SATURDAY:
-                return 5;
-            case Calendar.SUNDAY:
-                return 6;
-            default:
-                return 0;
-        }
-    }
-
-    private boolean isToday(int day, int month, int year) {
-        return (mCalendarToday.get(Calendar.MONTH) == month
-                && mCalendarToday.get(Calendar.YEAR) == year
-                && mCalendarToday.get(Calendar.DAY_OF_MONTH) == day);
+        mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
     }
 
     private int[] getDate(int position) {
@@ -184,65 +131,65 @@ public class MonthAdapter extends BaseAdapter {
 
         int itemType = getItemViewType(position);
         //Needs inflation
-        if (convertView == null) {
-            int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 6;
 
-            //If its a day type view
-            int date[] = getDate(position);
-            if (itemType == 0 && date != null) {
+        //int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 6;
+        int dayCellHeight = CalendarUtils.getDayCellHeight(mDisplayMetrics);
 
+        //If its a day type view
+        int date[] = getDate(position);
+        if (itemType == 0 && date != null) {
+            if (convertView == null) {
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.item_shift, parent, false);
-                ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
+            }
+            ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
 
-                convertView.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, dayCellHeight));
-                String stringDayInMonth = mItems.get(position);
-                mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
-                int dayInMonth = Integer.parseInt(stringDayInMonth);
-                if (!mShiftsList.isEmpty()) {
+            convertView.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, dayCellHeight));
+            String stringDayInMonth = mItems.get(position);
+            mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
+            int dayInMonth = Integer.parseInt(stringDayInMonth);
+            if (!mShiftsList.isEmpty()) {
 
-                    Shift shift = mShiftsList.get(0);
-                    int firstDayPosition = mDays.length + mDaysLastMonth;
-                    int lastDayPosition = mDaysShown - mDaysNextMonth;
-                    if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1
-                            && position >= firstDayPosition && position <= lastDayPosition) {
+                Shift shift = mShiftsList.get(0);
+                int firstDayPosition = mDays.length + mDaysLastMonth;
+                int lastDayPosition = mDaysShown - mDaysNextMonth;
+                if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1
+                        && position >= firstDayPosition && position <= lastDayPosition) {
 
-                        mShiftsList.remove(shift);
-                        mItemShiftBinding.textViewShiftType.setText(shift.getType());
-                        //TODO color cells from settings and type
-                        convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
-                    }
+                    mShiftsList.remove(shift);
+                    mItemShiftBinding.textViewShiftType.setText(shift.getType());
+                    //TODO color cells from settings and type
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
                 }
-
-
-                //Day number color
-                if (date[1] != mMonth) {
-                    // previous or next month
-                    mItemShiftBinding.textViewDayMonth.setTextColor(Color.GRAY);
-
-                } else {
-                    // current month
-                    if (isToday(date[0], date[1], date[2])) {
-                        //Today
-                        mItemShiftBinding.textViewDayMonth.setTextColor(Color.RED);
-                    } else {
-                        //Other day
-                        mItemShiftBinding.textViewDayMonth.setTextColor(Color.BLACK);
-                    }
-                }
-
-                return convertView;
-            } else {
-                TextView textView = new TextView(mContext);
-                textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                textView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, mTitleHeight));
-                textView.setText(mItems.get(position));
-
-                return textView;
-
             }
 
+
+            //Day number color
+            if (date[1] != mMonth) {
+                // previous or next month
+                mItemShiftBinding.textViewDayMonth.setTextColor(Color.GRAY);
+
+            } else {
+                // current month
+                if (CalendarUtils.isToday(mCalendarToday, date[0], date[1], date[2])) {
+                    //Today
+                    mItemShiftBinding.textViewDayMonth.setTextColor(Color.RED);
+                } else {
+                    //Other day
+                    mItemShiftBinding.textViewDayMonth.setTextColor(Color.BLACK);
+                }
+            }
+
+            return convertView;
+        } else {
+            TextView textView = new TextView(mContext);
+            textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+            textView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, mTitleHeight));
+            textView.setText(mItems.get(position));
+
+            return textView;
+
         }
-        return convertView;
+
     }
 
     @Override

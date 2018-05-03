@@ -10,17 +10,12 @@
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin">
 
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager_week_schedule"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_alignBottom="@id/guideline"
-            app:layout_constraintBottom_toBottomOf="@id/guideline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager_week"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

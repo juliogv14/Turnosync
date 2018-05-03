@@ -31,10 +31,12 @@ import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
+import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Julio on 18/02/2018.
@@ -52,7 +54,6 @@ public class ScheduleWeekPageFragment extends Fragment {
     private FirebaseUser mFirebaseUser;
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
 
-
     private OnScheduleFragmentInteractionListener mListener;
 
     //Workgroup
@@ -61,7 +62,9 @@ public class ScheduleWeekPageFragment extends Fragment {
     private static final String CURRENT_MONTH_KEY = "currentMonth";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private UserWorkgroup mWorkgroup;
-    private ArrayList<User> mWorkgroupUsers;
+
+    private ArrayList<Map<String,String>> mWorkgroupUsers;
+    private ArrayList<ArrayList<Shift>> mUsersShiftList;
 
     //Month
     private int mYear;
@@ -71,14 +74,14 @@ public class ScheduleWeekPageFragment extends Fragment {
     private List<Shift> mShiftList;
 
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<User> workgroupUsers, int year, int month) {
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<Map<String, Object>> workgroupUsers, int year, int month) {
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putInt(CURRENT_YEAR_KEY, year);
         args.putInt(CURRENT_MONTH_KEY, month);
-        args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
+        args.putSerializable(WORKGROUP_USERS_KEY, workgroupUsers);
         f.setArguments(args);
         return f;
     }
@@ -95,6 +98,7 @@ public class ScheduleWeekPageFragment extends Fragment {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
@@ -102,7 +106,7 @@ public class ScheduleWeekPageFragment extends Fragment {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mYear = args.getInt(CURRENT_YEAR_KEY);
             mMonth = args.getInt(CURRENT_MONTH_KEY);
-            mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
+            mWorkgroupUsers = (ArrayList<Map<String, String>>) args.getSerializable(WORKGROUP_USERS_KEY);
         }
     }
 
@@ -122,9 +126,9 @@ public class ScheduleWeekPageFragment extends Fragment {
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //TODO set month name
-        mViewBinding.textViewWorkgroup.setText("" + (mMonth + 1));
+        mViewBinding.textViewMonth.setText(CalendarUtils.getMonthString((Context) mListener, mMonth));
 
-        displayMonth();
+        queryShiftLists();
 
         Log.d(TAG, "Start Page");
 
@@ -143,33 +147,58 @@ public class ScheduleWeekPageFragment extends Fragment {
         }
     }
 
-    private void displayMonth() {
-        String userID = mFirebaseUser.getUid();
+    private void queryShiftLists() {
         final int year = mYear;
         final int month = mMonth;
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
         mUserShiftsListeners = new ArrayList<>();
-        for (User user : mWorkgroupUsers) {
-            CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid())
+        for (Map<String, String> userUid: mWorkgroupUsers) {
+            final ArrayList<Shift> userShifts = new ArrayList<>();
+            mUsersShiftList.add(userShifts);
+
+            CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(userUid.get("uid"))
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
                     .collection(getString(R.string.data_ref_shifts));
 
-            ListenerRegistration userShiftListener = userShiftsColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            ListenerRegistration userShiftListener = userShiftsColl.whereEqualTo("year", year)
+                    .whereEqualTo("month", month + 1)
+                    .orderBy("day", Query.Direction.ASCENDING)
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-                    for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()){
-                        DocumentSnapshot doc = dc.getDocument();
+                    for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()){
+                        DocumentSnapshot doc = docChange.getDocument();
+                        if (doc.exists()) {
+                            Shift shift = doc.toObject(Shift.class);
 
+                            switch (docChange.getType()) {
+                                case ADDED:
+                                    //Added
+                                    userShifts.add(shift);
+                                    break;
+                                case MODIFIED:
+                                    if (docChange.getOldIndex() == docChange.getNewIndex()) {
+                                        //Modified, same position
+                                        userShifts.set(docChange.getOldIndex(), shift);
+                                    } else {
+                                        //Modified, differnt position
+                                        userShifts.remove(docChange.getOldIndex());
+                                        userShifts.add(docChange.getNewIndex(), shift);
+                                    }
+                                    break;
+                                case REMOVED:
+                                    //Removed
+                                    userShifts.remove(docChange.getOldIndex());
+                                    break;
+                            }
+                        }
                     }
                 }
             });
             mUserShiftsListeners.add(userShiftListener);
         }
-
-
     }
-
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
         void onShiftSelected(Shift shift);

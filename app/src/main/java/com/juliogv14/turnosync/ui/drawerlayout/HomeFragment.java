@@ -103,6 +103,7 @@ public class HomeFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
+        mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 
@@ -183,6 +184,11 @@ public class HomeFragment extends Fragment
             workgroupData.put("displayname", name);
             workgroupData.put("info", description);
             globalWorkgroupRef.set(workgroupData);
+
+            Map<String, String> userData = new HashMap<>();
+            userData.put("uid", mFirebaseUser.getUid());
+            globalWorkgroupRef.collection(getString(R.string.data_ref_users))
+                    .document(mFirebaseUser.getUid()).set(userData);
 
             //Personal workgroup list
             DocumentReference userWorkgroupRef = userWorkgroupsColl.document(globalWorkgroupRef.getId());

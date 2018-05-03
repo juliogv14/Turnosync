@@ -75,9 +75,9 @@
     <string name="a11y_navigation_drawer_close">Close navigation drawer</string>
 
     <!--CLOUD FIRESTORE REFERENCES-->
-    <string name="data_ref_users">users</string>
-    <string name="data_ref_workgroups">workgroups</string>
-    <string name="data_ref_shifts">shifts</string>
+    <string translatable="false" name="data_ref_users">users</string>
+    <string translatable="false" name="data_ref_workgroups">workgroups</string>
+    <string translatable="false" name="data_ref_shifts">shifts</string>
 
     <!--CALENDAR STRINGS-->
     <string-array name="calendar_days_of_week">
@@ -88,6 +88,21 @@
         <item>F</item>
         <item>Sa</item>
         <item>Su</item>
+    </string-array>
+
+    <string-array name="calendar_months_of_year">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
     </string-array>
 
     <!--WORKGROUP DIALOG STRINGS-->
@@ -115,6 +130,4 @@
     <item name="visible" type="id" />
     <item name="masked" type="id" />
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

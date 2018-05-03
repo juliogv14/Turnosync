@@ -194,7 +194,7 @@ public class DrawerActivity extends AppCompatActivity
             if (mCurrentFragmentID == R.string.fragment_home) {
                 super.onBackPressed();
             } else {
-                displaySelectedScreen(R.id.nav_item_home);
+                displaySelectedScreen(R.string.fragment_home);
 
             }
 
@@ -235,9 +235,6 @@ public class DrawerActivity extends AppCompatActivity
                 break;
             case R.string.fragment_mycalendar:
                 fragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
-                break;
-            case R.string.fragment_schedule:
-                fragment = ScheduleFragment.newInstance(mCurrentWorkgroup);
                 break;
         }
 
@@ -290,7 +287,10 @@ public class DrawerActivity extends AppCompatActivity
                                 mWorkgroupsList.remove(docChange.getOldIndex());
                                 break;
                         }
-                        mHomeFragment.notifyGridDataSetChanged();
+                        if(mHomeFragment != null){
+                            mHomeFragment.notifyGridDataSetChanged();
+                        }
+
                     }
                 }
             }
