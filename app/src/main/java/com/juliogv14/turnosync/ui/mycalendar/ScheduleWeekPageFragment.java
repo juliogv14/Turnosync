@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.SupportActivity;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,6 +34,7 @@ import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
+import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
@@ -47,12 +51,11 @@ public class ScheduleWeekPageFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    protected PageMonthBinding mViewBinding;
+    protected PageWeekBinding mViewBinding;
 
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    private ArrayList<ListenerRegistration> mUserShiftsListeners;
 
     private OnScheduleFragmentInteractionListener mListener;
 
@@ -70,7 +73,7 @@ public class ScheduleWeekPageFragment extends Fragment {
     private int mYear;
     private int mMonth;
     //GridAdapter
-    private MonthAdapter mGridAdapter;
+    private BaseAdapter mGridAdapter;
     private List<Shift> mShiftList;
 
 
@@ -114,7 +117,7 @@ public class ScheduleWeekPageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = PageMonthBinding.inflate(inflater, container, false);
+        mViewBinding = PageWeekBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 
@@ -125,10 +128,13 @@ public class ScheduleWeekPageFragment extends Fragment {
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        //TODO set month name
-        mViewBinding.textViewMonth.setText(CalendarUtils.getMonthString((Context) mListener, mMonth));
+        String week = CalendarUtils.getMonthString((Context) mListener, mMonth) + " week 1";
+        mViewBinding.textViewWeek.setText(week);
 
-        queryShiftLists();
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mGridAdapter = new WeekAdapter((SupportActivity) mListener, mMonth, mYear, 0, metrics, mWorkgroupUsers);
+
+        mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
         Log.d(TAG, "Start Page");
 
@@ -138,66 +144,11 @@ public class ScheduleWeekPageFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        for (Iterator<ListenerRegistration> iterator = mUserShiftsListeners.iterator(); iterator.hasNext(); ) {
-            ListenerRegistration userShiftListener= iterator.next();
-            if(userShiftListener != null){
-                userShiftListener.remove();
-            }
-            iterator.remove();
-        }
+
     }
 
-    private void queryShiftLists() {
-        final int year = mYear;
-        final int month = mMonth;
-
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mUserShiftsListeners = new ArrayList<>();
-        for (Map<String, String> userUid: mWorkgroupUsers) {
-            final ArrayList<Shift> userShifts = new ArrayList<>();
-            mUsersShiftList.add(userShifts);
-
-            CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(userUid.get("uid"))
-                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
-                    .collection(getString(R.string.data_ref_shifts));
-
-            ListenerRegistration userShiftListener = userShiftsColl.whereEqualTo("year", year)
-                    .whereEqualTo("month", month + 1)
-                    .orderBy("day", Query.Direction.ASCENDING)
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-                    for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()){
-                        DocumentSnapshot doc = docChange.getDocument();
-                        if (doc.exists()) {
-                            Shift shift = doc.toObject(Shift.class);
-
-                            switch (docChange.getType()) {
-                                case ADDED:
-                                    //Added
-                                    userShifts.add(shift);
-                                    break;
-                                case MODIFIED:
-                                    if (docChange.getOldIndex() == docChange.getNewIndex()) {
-                                        //Modified, same position
-                                        userShifts.set(docChange.getOldIndex(), shift);
-                                    } else {
-                                        //Modified, differnt position
-                                        userShifts.remove(docChange.getOldIndex());
-                                        userShifts.add(docChange.getNewIndex(), shift);
-                                    }
-                                    break;
-                                case REMOVED:
-                                    //Removed
-                                    userShifts.remove(docChange.getOldIndex());
-                                    break;
-                            }
-                        }
-                    }
-                }
-            });
-            mUserShiftsListeners.add(userShiftListener);
-        }
+    public void notifyGridDataSetChanged(){
+        mGridAdapter.notifyDataSetChanged();
     }
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {

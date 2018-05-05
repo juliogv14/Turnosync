@@ -38,13 +38,13 @@ public class MonthAdapter extends BaseAdapter {
     private int mDaysShown;
     private int mDaysLastMonth;
     private int mDaysNextMonth;
-    private int mTitleHeight, mDayHeight;
+    private int mTitleHeight;
     private String[] mDays;
 
     private ArrayList<Shift> mShiftsList;
 
 
-    public MonthAdapter(Context c, int month, int year, DisplayMetrics metrics, ArrayList<Shift> shifts) {
+    public MonthAdapter(Context c, int year, int month, DisplayMetrics metrics, ArrayList<Shift> shifts) {
         mContext = c;
         mMonth = month;
         mYear = year;
@@ -89,7 +89,6 @@ public class MonthAdapter extends BaseAdapter {
             mDaysNextMonth++;
         }
 
-
         mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
     }
 
@@ -130,7 +129,6 @@ public class MonthAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         int itemType = getItemViewType(position);
-        //Needs inflation
 
         //int dayCellHeight = (parent.getMeasuredHeight() - mTitleHeight) / 6;
         int dayCellHeight = CalendarUtils.getDayCellHeight(mDisplayMetrics);
@@ -138,6 +136,7 @@ public class MonthAdapter extends BaseAdapter {
         //If its a day type view
         int date[] = getDate(position);
         if (itemType == 0 && date != null) {
+            //Needs inflation
             if (convertView == null) {
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.item_shift, parent, false);
             }

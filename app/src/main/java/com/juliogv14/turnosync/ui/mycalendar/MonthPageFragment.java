@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.SupportActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -59,7 +61,7 @@ public class MonthPageFragment extends Fragment {
     private int mYear;
     private int mMonth;
     //GridAdapter
-    private MonthAdapter mGridAdapter;
+    private BaseAdapter mGridAdapter;
     private ArrayList<Shift> mShiftList;
 
 
@@ -117,7 +119,7 @@ public class MonthPageFragment extends Fragment {
 
         //displayMonth();
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new MonthAdapter((Activity) mListener, mMonth, mYear, metrics, mShiftList);
+        mGridAdapter = new MonthAdapter((SupportActivity) mListener, mYear, mMonth, metrics, mShiftList);
         mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
         Log.d(TAG, "Start Page");
 
