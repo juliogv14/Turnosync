@@ -38,6 +38,8 @@ import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,42 +51,39 @@ import java.util.Map;
 
 public class ScheduleWeekPageFragment extends Fragment {
 
+    //Workgroup
+    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
+    /*private static final String CURRENT_YEAR_KEY = "currentYear";
+    private static final String CURRENT_MONTH_KEY = "currentMonth";
+    private static final String CURRENT_WEEK_KEY = "currentWeek";*/
+    private static final String CURRENT_CALENDAR_KEY = "currentCalendar";
     private final String TAG = this.getClass().getSimpleName();
-
     protected PageWeekBinding mViewBinding;
-
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-
     private OnScheduleFragmentInteractionListener mListener;
-
-    //Workgroup
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private static final String CURRENT_YEAR_KEY = "currentYear";
-    private static final String CURRENT_MONTH_KEY = "currentMonth";
-    private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private UserWorkgroup mWorkgroup;
 
-    private ArrayList<Map<String,String>> mWorkgroupUsers;
+    private ArrayList<Map<String, String>> mWorkgroupUsers;
     private ArrayList<ArrayList<Shift>> mUsersShiftList;
 
     //Month
-    private int mYear;
-    private int mMonth;
+
+    private Calendar mCalendar;
     //GridAdapter
     private BaseAdapter mGridAdapter;
     private List<Shift> mShiftList;
 
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<Map<String, Object>> workgroupUsers, int year, int month) {
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, ArrayList<Map<String, Object>> workgroupUsers, Calendar calendar) {
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
-        args.putInt(CURRENT_YEAR_KEY, year);
-        args.putInt(CURRENT_MONTH_KEY, month);
         args.putSerializable(WORKGROUP_USERS_KEY, workgroupUsers);
+        args.putSerializable(CURRENT_CALENDAR_KEY,calendar);
         f.setArguments(args);
         return f;
     }
@@ -107,9 +106,9 @@ public class ScheduleWeekPageFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
-            mYear = args.getInt(CURRENT_YEAR_KEY);
-            mMonth = args.getInt(CURRENT_MONTH_KEY);
             mWorkgroupUsers = (ArrayList<Map<String, String>>) args.getSerializable(WORKGROUP_USERS_KEY);
+            mCalendar = (Calendar) args.getSerializable(CURRENT_CALENDAR_KEY);
+
         }
     }
 
@@ -128,11 +127,14 @@ public class ScheduleWeekPageFragment extends Fragment {
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        String week = CalendarUtils.getMonthString((Context) mListener, mMonth) + " week 1";
+
+        //TODO get both month for first and last week
+        //String week = CalendarUtils.getMonthString((Context) mListener, mMonth) + cal.getTime();
+        String week = ""+mCalendar.getTime()+ "m: " +CalendarUtils.getMonthString((Context) mListener, mCalendar.get(Calendar.MONTH));
         mViewBinding.textViewWeek.setText(week);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new WeekAdapter((SupportActivity) mListener, mMonth, mYear, 0, metrics, mWorkgroupUsers);
+        mGridAdapter = new WeekAdapter((SupportActivity) mListener, mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.YEAR), 0, metrics, mWorkgroupUsers);
 
         mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
@@ -147,7 +149,7 @@ public class ScheduleWeekPageFragment extends Fragment {
 
     }
 
-    public void notifyGridDataSetChanged(){
+    public void notifyGridDataSetChanged() {
         mGridAdapter.notifyDataSetChanged();
     }
 
