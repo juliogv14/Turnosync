@@ -32,6 +32,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
@@ -162,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     Log.d(TAG, "login failed: " + task.getException().getMessage());
                                     Toast.makeText(LoginActivity.this,
-                                            R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
+                                            R.string.toast_sign_in_failed, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -226,15 +229,30 @@ public class LoginActivity extends AppCompatActivity {
                                 startActivity(signCompleteIntent);
                                 finish();
                             } else {
-                                Toast.makeText(LoginActivity.this,
-                                        R.string.login_error_auth_failed, Toast.LENGTH_SHORT).show();
-                                mViewBinding.editTextLayoutPassword.
-                                        setError(getString(R.string.login_error_incorrect_password));
-                                mViewBinding.editTextPassword.requestFocus();
 
+                                if (task.getException() != null) {
+                                    try {
+                                        throw task.getException();
+                                    } catch (FirebaseAuthInvalidUserException e) {
+                                        Log.d(TAG, "Register failed: " + e.getMessage());
+                                        Toast.makeText(LoginActivity.this,
+                                                R.string.toast_sign_in_failed, Toast.LENGTH_SHORT).show();
+                                        mViewBinding.editTextLayoutEmail.
+                                                setError(getString(R.string.login_error_incorrect_email));
+                                        mViewBinding.editTextPassword.requestFocus();
+                                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                                        Log.d(TAG, "Register failed: " + e.getMessage());
+                                        Toast.makeText(LoginActivity.this,
+                                                R.string.toast_sign_in_failed, Toast.LENGTH_SHORT).show();
+                                        mViewBinding.editTextLayoutPassword.
+                                                setError(getString(R.string.login_error_incorrect_password));
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "Exception error: " + e.getMessage());
+                                        Toast.makeText(LoginActivity.this,
+                                                R.string.toast_generic_error + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
                             }
-
-
                         }
                     });
         }
