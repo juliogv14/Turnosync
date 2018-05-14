@@ -204,8 +204,8 @@ public class DrawerActivity extends AppCompatActivity
     private void onSignedInInitialize(FirebaseUser user) {
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = shrPreferences.edit();
-        editor.putString(getString(R.string.pref_displayname_key), user.getDisplayName());
-        editor.putString(getString(R.string.pref_email_key), user.getEmail());
+        editor.putString(getString(R.string.data_key_displayname), user.getDisplayName());
+        editor.putString(getString(R.string.data_key_email), user.getEmail());
         editor.apply();
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
@@ -260,7 +260,9 @@ public class DrawerActivity extends AppCompatActivity
                     //TODO Hash key to values/string.xml
                     if (document.exists()) {
                         Map<String, Object> data = document.getData();
-                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get("workgroupID").toString(), data.get("displayname").toString(),
+                        data.get("workgroupId").toString();
+                        data.get("displayName").toString();
+                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get("workgroupId").toString(), data.get("displayName").toString(),
                                 data.get("info").toString(), data.get("role").toString());
 
                         if (mCurrentWorkgroup == null) {
@@ -331,7 +333,7 @@ public class DrawerActivity extends AppCompatActivity
 
 
         /*Update Firebase with new settings*/
-        if (TextUtils.equals(key, getString(R.string.pref_displayname_key))) {
+        if (TextUtils.equals(key, getString(R.string.data_key_displayname))) {
             mFirebaseUser = mFirebaseAuth.getCurrentUser();
             String displayName = sharedPreferences.getString(key, "");
             if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), displayName)) {
@@ -344,7 +346,7 @@ public class DrawerActivity extends AppCompatActivity
                             }
                         });
             }
-        } else if (TextUtils.equals(key, getString(R.string.pref_email_key))) {
+        } else if (TextUtils.equals(key, getString(R.string.data_key_email))) {
             mFirebaseUser = mFirebaseAuth.getCurrentUser();
             String email = sharedPreferences.getString(key, "");
             if (mFirebaseUser != null && !TextUtils.equals(mFirebaseUser.getEmail(), email)) {
@@ -375,7 +377,7 @@ public class DrawerActivity extends AppCompatActivity
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_home);
                 break;
             case R.string.fragment_mycalendar:
-                mToolbar.setTitle(mCurrentWorkgroup.getDisplayname());
+                mToolbar.setTitle(mCurrentWorkgroup.getDisplayName());
                 mViewBinding.viewNav.setCheckedItem(R.id.nav_item_calendar);
                 break;
         }
@@ -383,14 +385,14 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public void onFragmentSwapped(int fragmentId) {
-        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupID());
+        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupId());
         displaySelectedScreen(fragmentId);
     }
 
     //OnHomeFragmentInteractionListener
     @Override
     public void onWorkgroupSelected(UserWorkgroup workgroup) {
-        Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupID(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupId(), Toast.LENGTH_SHORT).show();
         mCurrentWorkgroup = workgroup;
         displaySelectedScreen(R.string.fragment_mycalendar);
 

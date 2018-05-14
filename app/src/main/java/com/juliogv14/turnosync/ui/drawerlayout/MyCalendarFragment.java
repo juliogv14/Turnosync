@@ -37,7 +37,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.User;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentMycalendarBinding;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
@@ -214,11 +214,16 @@ public class MyCalendarFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
             MenuItem menuItem = menu.getItem(i);
-            if (menuItem.getItemId() == R.id.action_mycalendar_switch) {
+            int itemId = menuItem.getItemId();
+            if (itemId == R.id.action_mycalendar_switch) {
                 if (mPersonalSchedule) {
                     menuItem.setIcon(R.drawable.ic_schedule_black_24dp);
                 } else {
                     menuItem.setIcon(R.drawable.ic_mycalendar_black_24dp);
+                }
+            } else if (itemId == R.id.action_mycalendar_edit) {
+                if(!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString()) ){
+                    menuItem.setVisible(false);
                 }
             }
             Drawable icon = menuItem.getIcon();
@@ -235,7 +240,7 @@ public class MyCalendarFragment extends Fragment {
         switch (itemId) {
             case R.id.action_mycalendar_edit:
 
-                loadTestData();
+
 
                 return true;
             case R.id.action_mycalendar_switch:
@@ -284,8 +289,8 @@ public class MyCalendarFragment extends Fragment {
 
                 return true;
             case R.id.action_mycalendar_settings:
-
-                Toast.makeText((Context) mListener, "Schedule", Toast.LENGTH_SHORT).show();
+                loadTestData();
+                Toast.makeText((Context) mListener, "Test data", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return false;
@@ -294,14 +299,14 @@ public class MyCalendarFragment extends Fragment {
     }
 
     private void loadTestData() {
-
+/*
         Shift shift1 = new Shift("M", mFirebaseUser.getUid(), 2018, 4, 5, "", "");
         Shift shift2 = new Shift("M", mFirebaseUser.getUid(), 2018, 4, 12, "", "");
         Shift shift3 = new Shift("M", mFirebaseUser.getUid(), 2018, 4, 30, "", "");
 
         CollectionReference shiftsColl = mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shifts));
 
         shiftsColl.document("testshift1").set(shift1);
@@ -309,10 +314,9 @@ public class MyCalendarFragment extends Fragment {
         shiftsColl.document("testshift3").set(shift3);
 
 
-        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
-        CollectionReference usersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mWorkgroup.getWorkgroupID())
-                .collection(getString(R.string.data_ref_users));
+        CollectionReference usersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users));
 
         List<HashMap<String, String>> testUsers = new ArrayList<>();
 
@@ -326,7 +330,7 @@ public class MyCalendarFragment extends Fragment {
 
             shiftsColl = mFirebaseFirestore
                     .collection(getString(R.string.data_ref_users)).document(user.getUid())
-                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                     .collection(getString(R.string.data_ref_shifts));
 
             Shift[] testShifts = new Shift[3];
@@ -338,12 +342,20 @@ public class MyCalendarFragment extends Fragment {
             for (int j = 0; j < testShifts.length; j++) {
                 shiftsColl.document("testusershift" + j * i).set(testShifts[j]);
             }
-        }
+        }*/
+
+        CollectionReference usersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users));
+        Map<String,String> data = new HashMap<>();
+        data.put("displayName", "test1");
+        data.put("info", "");
+        data.put("role", "USER");
+        data.put("workgroupId", "VOBMWlT3iP0t9x5fq37X");
+        usersColl.document(mFirebaseUser.getUid()).collection(getString(R.string.data_ref_workgroups)).document("VOBMWlT3iP0t9x5fq37X").set(data);
 
     }
 
     private void queryWorkgroupUsers() {
-        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
 
         mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -399,17 +411,10 @@ public class MyCalendarFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
 
-
-            int offMonth = month - (QUERY_MONTH_NUMBER / 2 - 1) + position;
-            int offYear = year;
-            if (offMonth < 0) {
-                offYear = offYear - 1;
-                offMonth = QUERY_MONTH_NUMBER - Math.abs(offMonth);
-            }
             Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             cal.add(Calendar.MONTH, position);
-            offMonth = cal.get(Calendar.MONTH);
-            offYear = cal.get(Calendar.YEAR);
+            int offMonth = cal.get(Calendar.MONTH);
+            int offYear = cal.get(Calendar.YEAR);
             final ArrayList<Shift> shiftList = new ArrayList<>();
 
             MonthPageFragment pageFragment = MonthPageFragment.newInstance(mWorkgroup, offYear, offMonth, shiftList);
@@ -428,7 +433,7 @@ public class MyCalendarFragment extends Fragment {
             if (mFirebaseUser != null) {
                 CollectionReference shiftsColl = mFirebaseFirestore
                         .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                        .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                        .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                         .collection(getString(R.string.data_ref_shifts));
 
                 shiftsColl.whereEqualTo("year", year).whereEqualTo("month", month + 1).orderBy("day", Query.Direction.ASCENDING).get()
@@ -468,9 +473,10 @@ public class MyCalendarFragment extends Fragment {
             int offYear = cal.get(Calendar.YEAR);
             int offMonth = cal.get(Calendar.MONTH);
             final Map<String, ArrayList<Shift>> shiftListMap = new HashMap<>();
-            //TODO pass map shifst
+
             ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, mGroupUsersUids, cal);
-            queryScheduleData(pageFragment, cal, shiftListMap);
+            //TODO query shifts
+            //queryScheduleData(pageFragment, cal, shiftListMap);
             return pageFragment;
         }
 
@@ -483,10 +489,10 @@ public class MyCalendarFragment extends Fragment {
 
             for (Map<String, Object> userUid : mGroupUsersUids) {
                 final ArrayList<Shift> userShifts = new ArrayList<>();
-                shiftListMap.put((String) userUid.get("uid"), userShifts);
+                shiftListMap.put((String) userUid.get(getString(R.string.data_key_uid)), userShifts);
 
                 CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document((String) userUid.get("uid"))
-                        .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupID())
+                        .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                         .collection(getString(R.string.data_ref_shifts));
 
                 calendar.set(Calendar.DATE, calendar.getFirstDayOfWeek());

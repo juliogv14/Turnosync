@@ -20,6 +20,8 @@
     <string name="activity_reset_password">Reset password</string>
     <string name="activity_settings">Settings</string>
 
+    <!--KEY STRINGS-->
+
     <!--DRAWER FRAGMENTS LABELS-->
     <string name="fragment_home">Home</string>
     <string name="fragment_mycalendar">My Calendar</string>
@@ -37,13 +39,12 @@
     <string name="login_action_signin">Sign in</string>
     <!--LOGIN MENU STRINGS-->
     <string name="login_action_register">Register</string>
+
     <!--LOGIN ERROR STRINGS-->
     <string name="login_error_invalid_email">This email address is invalid</string>
     <string name="login_error_invalid_password">This password is too short</string>
     <string name="login_error_incorrect_email">This email doesn\'t exist</string>
     <string name="login_error_incorrect_password">This password is incorrect</string>
-
-
 
     <!--REGISTER STRINGS-->
     <string name="register_name">Display name</string>
@@ -67,8 +68,7 @@
     <string name="pref_displayname_title">Display name</string>
     <string name="pref_email_title">Email</string>
     <!--SETTINGS KEY STRINGS-->
-    <string name="pref_displayname_key" translatable="false">display_name</string>
-    <string name="pref_email_key" translatable="false">email</string>
+
     <!--SETTINGS DEFAULT VALUES-->
     <string name="pref_displayname_default">Name</string>
     <string name="pref_email_default">email@mail.com</string>
@@ -81,6 +81,14 @@
     <string translatable="false" name="data_ref_users">users</string>
     <string translatable="false" name="data_ref_workgroups">workgroups</string>
     <string translatable="false" name="data_ref_shifts">shifts</string>
+
+    <!--CLOUD FIRESTORE KEYS-->
+    <string name="data_key_displayname">displayName</string>
+    <string name="data_key_email">email</string>
+    <string name="data_key_uid">uid</string>
+    <string name="data_key_workgroupid">workgroupId</string>
+    <string name="data_key_info">info</string>
+    <string name="data_key_role">role</string>
 
     <!--CALENDAR STRINGS-->
     <string-array name="calendar_days_of_week">

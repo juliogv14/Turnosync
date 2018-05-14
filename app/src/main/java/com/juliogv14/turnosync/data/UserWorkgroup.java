@@ -24,43 +24,43 @@ public class UserWorkgroup implements Parcelable {
             return new UserWorkgroup[size];
         }
     };
-    private String workgroupID;
-    private String displayname;
+    private String workgroupId;
+    private String displayName;
     private String info;
     private String role;
     @Exclude
     private boolean selected;
 
-    public UserWorkgroup(String workgroupID, String displayname, String info, String role) {
-        this.workgroupID = workgroupID;
-        this.displayname = displayname;
+    public UserWorkgroup(String workgroupId, String displayName, String info, String role) {
+        this.workgroupId = workgroupId;
+        this.displayName = displayName;
         this.info = info;
         this.role = role;
     }
 
     //Parcelable implementation
     private UserWorkgroup(Parcel in) {
-        this.workgroupID = in.readString();
-        this.displayname = in.readString();
+        this.workgroupId = in.readString();
+        this.displayName = in.readString();
         this.info = in.readString();
         this.role = in.readString();
         this.selected = in.readByte() != 0;
     }
 
-    public String getWorkgroupID() {
-        return workgroupID;
+    public String getWorkgroupId() {
+        return workgroupId;
     }
 
-    public void setWorkgroupID(String workgroupID) {
-        this.workgroupID = workgroupID;
+    public void setWorkgroupId(String workgroupId) {
+        this.workgroupId = workgroupId;
     }
 
-    public String getDisplayname() {
-        return displayname;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setDisplayname(String displayname) {
-        this.displayname = displayname;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getInfo() {
@@ -96,8 +96,8 @@ public class UserWorkgroup implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
-        out.writeString(workgroupID);
-        out.writeString(displayname);
+        out.writeString(workgroupId);
+        out.writeString(displayName);
         out.writeString(info);
         out.writeString(role);
         out.writeByte((byte) (selected ? 1 : 0));

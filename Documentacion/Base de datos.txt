@@ -2,7 +2,7 @@ Cloud firestore
 
 users {
 	userID {
-		displayname: "name"
+		displayName: "name"
 		email: "email"
 		info:"personal info"
 
@@ -21,8 +21,8 @@ users {
 
 workgroups {
 	groupID{
-		workgroupID: "id"
-		displayname:"name"
+		workgroupId: "id"
+		displayName:"name"
 		info:"group info"
 
 		shifts{

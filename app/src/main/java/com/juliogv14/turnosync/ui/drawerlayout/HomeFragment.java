@@ -32,7 +32,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.juliogv14.turnosync.CreateWorkgroupDialog;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.data.UserLevels;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
 import com.juliogv14.turnosync.databinding.ItemWorkgroupBinding;
@@ -180,9 +180,9 @@ public class HomeFragment extends Fragment
             //Global workgroup list
             DocumentReference globalWorkgroupRef = globalWorkgroupsColl.document();
             Map<String, String> workgroupData = new HashMap<>();
-            workgroupData.put("workgroupID", globalWorkgroupRef.getId());
-            workgroupData.put("displayname", name);
-            workgroupData.put("info", description);
+            workgroupData.put(getString(R.string.data_key_workgroupid), globalWorkgroupRef.getId());
+            workgroupData.put(getString(R.string.data_key_displayname), name);
+            workgroupData.put(getString(R.string.data_key_info), description);
             globalWorkgroupRef.set(workgroupData);
 
             Map<String, String> userData = new HashMap<>();
@@ -192,7 +192,7 @@ public class HomeFragment extends Fragment
 
             //Personal workgroup list
             DocumentReference userWorkgroupRef = userWorkgroupsColl.document(globalWorkgroupRef.getId());
-            UserWorkgroup userWorkgroup = new UserWorkgroup(globalWorkgroupRef.getId(), name, description, UserLevels.MANAGER.toString());
+            UserWorkgroup userWorkgroup = new UserWorkgroup(globalWorkgroupRef.getId(), name, description, UserRoles.MANAGER.toString());
             userWorkgroupRef.set(userWorkgroup);
 
             Log.d(TAG, "Create workgroup dialog return");
@@ -213,7 +213,7 @@ public class HomeFragment extends Fragment
                 mActionMode = ((AppCompatActivity) mListener)
                         .startSupportActionMode(tb);
             }
-            mActionMode.setTitle(workgroup.getDisplayname() + " selected");
+            mActionMode.setTitle(workgroup.getDisplayName() + " selected");
 
 
         } else {
@@ -254,9 +254,9 @@ public class HomeFragment extends Fragment
             UserWorkgroup workgroup = getItem(position);
             if (workgroup != null) {
                 //TODO temp level display
-                String display = workgroup.getDisplayname() + "-" + workgroup.getRole();
+                String display = workgroup.getDisplayName() + "-" + workgroup.getRole();
                 itemBinding.textViewGroupName.setText(display);
-                itemBinding.textViewGroupId.setText(workgroup.getWorkgroupID());
+                itemBinding.textViewGroupId.setText(workgroup.getWorkgroupId());
             }
             return convertView;
         }
@@ -298,7 +298,7 @@ public class HomeFragment extends Fragment
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_home_view:
-                    Toast.makeText(mContext, "wk:" + mWorkgroup.getWorkgroupID() + ": INFO BUTTON", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "wk:" + mWorkgroup.getWorkgroupId() + ": INFO BUTTON", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     break;
                 default:
