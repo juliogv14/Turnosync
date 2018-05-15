@@ -254,16 +254,16 @@ public class DrawerActivity extends AppCompatActivity
         mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-
+                //TODO: Catch exception
                 for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot document = docChange.getDocument();
-                    //TODO Hash key to values/string.xml
+
                     if (document.exists()) {
                         Map<String, Object> data = document.getData();
-                        data.get("workgroupId").toString();
-                        data.get("displayName").toString();
-                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get("workgroupId").toString(), data.get("displayName").toString(),
-                                data.get("info").toString(), data.get("role").toString());
+                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get(getString(R.string.data_key_workgroupid)).toString(),
+                                data.get(getString(R.string.data_key_displayname)).toString(),
+                                data.get(getString(R.string.data_key_info)).toString(),
+                                data.get(getString(R.string.data_key_role)).toString());
 
                         if (mCurrentWorkgroup == null) {
                             mCurrentWorkgroup = userWorkgroup;

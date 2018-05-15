@@ -19,6 +19,7 @@ import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
  */
 
 public class MonthAdapter extends BaseAdapter {
-    private GregorianCalendar mCalendar;
+    private Calendar mCalendar;
     private Calendar mCalendarToday;
     private Context mContext;
     private DisplayMetrics mDisplayMetrics;
@@ -44,11 +45,10 @@ public class MonthAdapter extends BaseAdapter {
     private ArrayList<Shift> mShiftsList;
 
 
-    public MonthAdapter(Context c, int year, int month, DisplayMetrics metrics, ArrayList<Shift> shifts) {
+    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts) {
         mContext = c;
-        mMonth = month;
-        mYear = year;
-        mCalendar = new GregorianCalendar(mYear, mMonth, 1);
+        mCalendar = Calendar.getInstance();
+        mCalendar.setTime(monthDate);
         mCalendarToday = Calendar.getInstance();
         mDisplayMetrics = metrics;
         mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
@@ -58,25 +58,34 @@ public class MonthAdapter extends BaseAdapter {
     }
 
     private void populateMonth() {
+
+        mYear = mCalendar.get(Calendar.YEAR);
+        mCalendar.add(Calendar.DAY_OF_MONTH, 7);
+        mMonth = mCalendar.get(Calendar.MONTH);
+
+
         mItems = new ArrayList<>();
         for (String day : mDays) {
             mItems.add(day);
             mDaysShown++;
         }
-
+        mCalendar.set(Calendar.DAY_OF_MONTH, 1);
         int firstDay = CalendarUtils.getDay(mCalendar.get(Calendar.DAY_OF_WEEK));
         int prevDay;
-        if (mMonth == 0)
-            prevDay = CalendarUtils.daysInMonth(mCalendar, mYear, 11) - firstDay + 1;
-        else
-            prevDay = CalendarUtils.daysInMonth(mCalendar, mYear, mMonth - 1) - firstDay + 1;
+        if (mMonth == 0) {
+            mCalendar.set(Calendar.MONTH, 11);
+            prevDay = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH) - firstDay + 1;
+        } else {
+            mCalendar.set(Calendar.MONTH, mMonth - 1);
+            prevDay = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH) - firstDay + 1;
+        }
         for (int i = 0; i < firstDay; i++) {
             mItems.add(String.valueOf(prevDay + i));
             mDaysLastMonth++;
             mDaysShown++;
         }
-
-        int daysInMonth = CalendarUtils.daysInMonth(mCalendar, mYear, mMonth);
+        mCalendar.set(Calendar.MONTH, mMonth);
+        int daysInMonth = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         for (int i = 1; i <= daysInMonth; i++) {
             mItems.add(String.valueOf(i));
             mDaysShown++;
@@ -145,19 +154,20 @@ public class MonthAdapter extends BaseAdapter {
             convertView.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, dayCellHeight));
             String stringDayInMonth = mItems.get(position);
             mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
-            int dayInMonth = Integer.parseInt(stringDayInMonth);
+
             if (!mShiftsList.isEmpty()) {
 
                 Shift shift = mShiftsList.get(0);
-                int firstDayPosition = mDays.length + mDaysLastMonth;
-                int lastDayPosition = mDaysShown - mDaysNextMonth;
-                if (dayInMonth == shift.getDay() && mMonth == shift.getMonth() - 1
-                        && position >= firstDayPosition && position <= lastDayPosition) {
+                Calendar calShift = new GregorianCalendar();
+                calShift.setTime(shift.getDate());
+
+                if (date[0] == calShift.get(Calendar.DAY_OF_MONTH) && date[1] == calShift.get(Calendar.MONTH)) {
 
                     mShiftsList.remove(shift);
                     mItemShiftBinding.textViewShiftType.setText(shift.getType());
                     //TODO color cells from settings and type
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
+
                 }
             }
 
@@ -165,7 +175,13 @@ public class MonthAdapter extends BaseAdapter {
             //Day number color
             if (date[1] != mMonth) {
                 // previous or next month
-                mItemShiftBinding.textViewDayMonth.setTextColor(Color.GRAY);
+
+                if (mItemShiftBinding.textViewShiftType.getText().equals("")) {
+                    mItemShiftBinding.textViewDayMonth.setTextColor(Color.GRAY);
+                } else {
+                    mItemShiftBinding.textViewDayMonth.setTextColor(Color.BLACK);
+                }
+
 
             } else {
                 // current month

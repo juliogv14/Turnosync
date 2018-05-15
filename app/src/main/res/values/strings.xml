@@ -86,9 +86,12 @@
     <string name="data_key_displayname">displayName</string>
     <string name="data_key_email">email</string>
     <string name="data_key_uid">uid</string>
+
     <string name="data_key_workgroupid">workgroupId</string>
     <string name="data_key_info">info</string>
     <string name="data_key_role">role</string>
+
+    <string name="data_key_date">date</string>
 
     <!--CALENDAR STRINGS-->
     <string-array name="calendar_days_of_week">

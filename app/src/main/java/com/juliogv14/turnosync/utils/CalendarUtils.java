@@ -72,14 +72,15 @@ public class CalendarUtils {
         return days[day];
     }
 
-    public static String getMonthString(Context context, int day){
+    public static String getMonthString(Context context, int month){
         String[]months = context.getResources().getStringArray(R.array.calendar_months_of_year);
-        return months[day];
+        return months[month];
     }
 
-    public static int daysInMonth(GregorianCalendar calendar, int year, int month) {
+    public static int daysInMonth(Calendar calendar, int year, int month) {
         int daysInMonth = mDaysInMonth[month];
-        if (month == 1 && calendar.isLeapYear(year))
+        GregorianCalendar gregCalendar = (GregorianCalendar) calendar;
+        if (month == 1 && gregCalendar.isLeapYear(year))
             daysInMonth++;
         return daysInMonth;
     }

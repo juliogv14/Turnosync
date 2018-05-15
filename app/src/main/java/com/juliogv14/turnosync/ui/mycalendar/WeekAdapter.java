@@ -1,21 +1,30 @@
 package com.juliogv14.turnosync.ui.mycalendar;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,52 +34,65 @@ public class WeekAdapter extends BaseAdapter {
     private Context mContext;
     private DisplayMetrics mDisplayMetrics;
     private List<String> mItems;
-    private int mMonth;
-    private int mYear;
-    private int mDaysShown;
-    private int mDaysLastMonth;
-    private int mDaysNextMonth;
+    private Date mWeekDate;
     private int mTitleHeight;
     private int mNamesWidth;
     private String[] mDays;
-    private ArrayList<Map<String, String>> mGroupUsers;
 
-    WeekAdapter(Context c, int month, int year, int firstDay, DisplayMetrics metrics, ArrayList<Map<String, String>> groupUsers) {
+    //Shifts variables
+    private Map<String, String> mCurrentUser;
+    private ArrayList<Map<String, String>> mGroupUsers;
+    private Map<String, ArrayList<Shift>> mUserShiftList;
+    private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
+    private String mCurrentUid;
+    private ArrayList<Shift> mCurrentUserShifts;
+
+
+    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<Map<String, String>> groupUsers, Map<String, ArrayList<Shift>> userShifts) {
         mContext = c;
-        mMonth = month;
-        mYear = year;
-        mCalendar = new GregorianCalendar(mYear, mMonth, 1);
-        mCalendarToday = Calendar.getInstance();
         mDisplayMetrics = metrics;
-        mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
         mGroupUsers = groupUsers;
+        mUserShiftList = userShifts;
+
+
+        mCalendar = new GregorianCalendar();
+        mCalendar.setTime(weekDate);
+        mCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        mWeekDate = mCalendar.getTime();
+        mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
 
         populateMonth();
     }
 
     private void populateMonth() {
+
         /* Label items */
         mItems = new ArrayList<>();
         mItems.add(""); //First item
-        for (String day : mDays) {
-            mItems.add(day);
-            mDaysShown++;
-        }
+        mItems.addAll(Arrays.asList(mDays));
 
-        for (Map<String, String> userUid : mGroupUsers) {
-
+        /*for (Map<String, String> userUid : mGroupUsers) {
             //User name item
-            mItems.add(userUid.get("uid"));
-            mDaysShown++;
+            mItems.add(userUid.get(mContext.getString(R.string.data_key_uid)));
 
             //Week days
             for (int i = 0; i < 7; i++) {
                 mItems.add("");
-                mDaysShown++;
             }
 
+        }*/
+
+        for (Map.Entry<String, ArrayList<Shift>> entry : mUserShiftList.entrySet()) {
+            //User name item
+            mItems.add(entry.getKey());
+
+            //Week days
+            for (int i = 0; i < 7; i++) {
+                mItems.add("");
+            }
         }
 
+        mShiftIterator = mUserShiftList.entrySet().iterator();
         mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
         mNamesWidth = CalendarUtils.getDayCellHeight(mDisplayMetrics);
     }
@@ -83,18 +105,29 @@ public class WeekAdapter extends BaseAdapter {
 
         switch (itemType) {
             case 0:             //names and first item
+                TextView names;
                 if (convertView == null) {
-                    TextView names = new TextView(mContext);
+                    names = new TextView(mContext);
                     names.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                     names.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
-                    if (position == 0) {
-                        names.setText("");
-                    } else {
-                        int nameIndex = position / 8 - 1;
-                        names.setText(mGroupUsers.get(nameIndex).get("uid"));
-                    }
+                    int nameIndex = position / 8 - 1;
+                    mCurrentUser = mGroupUsers.get(nameIndex);
                     convertView = names;
+                } else {
+                    names = (TextView) convertView;
                 }
+
+                //TODO set name to display
+                if (mShiftIterator.hasNext()) {
+                    Map.Entry<String, ArrayList<Shift>> entry = mShiftIterator.next();
+                    names.setText(entry.getKey());
+                    mCurrentUid = entry.getKey();
+
+                }
+                if(!mShiftIterator.hasNext()){
+                    mShiftIterator = mUserShiftList.entrySet().iterator();
+                }
+                mCalendar.setTime(mWeekDate);
                 convertView.setBackgroundColor(Color.GRAY);
                 return convertView;
             case 1:             //Header with days
@@ -110,14 +143,35 @@ public class WeekAdapter extends BaseAdapter {
                 return convertView;
             case 2:             //Shifts
                 if (convertView == null) {
-                    TextView shifts = new TextView(mContext);
-                    shifts.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                    shifts.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
-
-                    shifts.setText(mItems.get(position));
-
-                    convertView = shifts;
+                    convertView = LayoutInflater.from(mContext).inflate(R.layout.item_shift, parent, false);
                 }
+                ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
+
+                mCurrentUserShifts = mUserShiftList.get(mCurrentUid);
+
+                convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
+                convertView.setBackgroundColor(Color.CYAN);
+
+
+
+                if (!mCurrentUserShifts.isEmpty()) {
+
+                    int month = mCalendar.get(Calendar.MONTH);
+                    int day = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+                    Shift shift = mCurrentUserShifts.get(0);
+                    Calendar calShift = new GregorianCalendar();
+                    calShift.setTime(shift.getDate());
+
+                    if (day == calShift.get(Calendar.DAY_OF_MONTH) && month == calShift.get(Calendar.MONTH)) {
+                        mCurrentUserShifts.remove(shift);
+                        mItemShiftBinding.textViewDayMonth.setText(String.valueOf(day));
+                        mItemShiftBinding.textViewShiftType.setText(shift.getType());
+                        convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
+
+                    }
+                }
+                mCalendar.add(Calendar.DAY_OF_MONTH, 1);
 
                 return convertView;
             default:
