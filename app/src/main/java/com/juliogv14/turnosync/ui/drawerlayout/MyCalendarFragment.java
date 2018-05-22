@@ -49,7 +49,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,6 +61,7 @@ public class MyCalendarFragment extends Fragment {
 
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
+    private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
     //Constants
@@ -83,13 +83,9 @@ public class MyCalendarFragment extends Fragment {
     private boolean mPersonalSchedule = true;
 
     //Calendar var
-    private int mActualYear;
-    private int mActualMonth;
-    private int mActualWeek;
     private int mTotalWeeks;
     private int mCurrentPosition;
     private Calendar mInitMonth;
-    private int mInitMonthOffset;
 
 
     public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
@@ -130,13 +126,10 @@ public class MyCalendarFragment extends Fragment {
 
         mGroupUsersUids = new ArrayList<>();
         Calendar cal = new GregorianCalendar();
-        mActualYear = cal.get(Calendar.YEAR);
-        mActualMonth = cal.get(Calendar.MONTH);
-        mActualWeek = cal.get(Calendar.WEEK_OF_YEAR);
         mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 
         //Init month date
-        mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 - 1);
+        int mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 - 1);
         mInitMonth = new GregorianCalendar();
         mInitMonth.add(Calendar.MONTH, -mInitMonthOffset);
         mInitMonth.set(Calendar.WEEK_OF_MONTH, 1);
@@ -163,20 +156,22 @@ public class MyCalendarFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         PagerAdapter pagerAdapter;
-        if (mPersonalSchedule) {
-            if (savedInstanceState != null) {
-                mCurrentPosition = savedInstanceState.getInt(CURRENT_ADAPTER_POSITION);
+        if (savedInstanceState != null) {
+            mCurrentPosition = savedInstanceState.getInt(CURRENT_ADAPTER_POSITION);
+            mPersonalSchedule = savedInstanceState.getBoolean(CURRENT_PERSONAL_SCHEDULE);
+            if (mPersonalSchedule) {
+                pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
             } else {
-                mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
+                pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
             }
-            pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager(), mActualYear, mActualMonth);
         } else {
-            if (savedInstanceState != null) {
-                mCurrentPosition = savedInstanceState.getInt(CURRENT_ADAPTER_POSITION);
+            if (mPersonalSchedule) {
+                mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
+                pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
             } else {
                 mCurrentPosition = (mTotalWeeks / 2);
+                pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
             }
-            pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
         }
 
 
@@ -186,9 +181,15 @@ public class MyCalendarFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-
-        outState.putInt(CURRENT_ADAPTER_POSITION, mViewBinding.viewPagerMonths.getCurrentItem());
         super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_ADAPTER_POSITION, mViewBinding.viewPagerMonths.getCurrentItem());
+        outState.putBoolean(CURRENT_PERSONAL_SCHEDULE, mPersonalSchedule);
+
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
@@ -223,7 +224,7 @@ public class MyCalendarFragment extends Fragment {
                     menuItem.setIcon(R.drawable.ic_mycalendar_black_24dp);
                 }
             } else if (itemId == R.id.action_mycalendar_edit) {
-                if(!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString()) ){
+                if (!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString())) {
                     menuItem.setVisible(false);
                 }
             }
@@ -242,7 +243,6 @@ public class MyCalendarFragment extends Fragment {
             case R.id.action_mycalendar_edit:
 
 
-
                 return true;
             case R.id.action_mycalendar_switch:
                 mPersonalSchedule = !mPersonalSchedule;
@@ -257,7 +257,7 @@ public class MyCalendarFragment extends Fragment {
                     calend.get(Calendar.WEEK_OF_YEAR);
                     mCurrentPosition = calend.get(Calendar.MONTH) + 1;
 
-                    pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager(), mActualYear, mActualMonth);
+                    pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
                 } else {
 
                     Calendar calinit = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
@@ -290,7 +290,7 @@ public class MyCalendarFragment extends Fragment {
 
                 return true;
             case R.id.action_mycalendar_settings:
-                loadTestData();
+                //loadTestData();
                 Toast.makeText((Context) mListener, "Test data", Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -303,11 +303,11 @@ public class MyCalendarFragment extends Fragment {
 
         Calendar calendar;
         calendar = new GregorianCalendar(2018, 4, 1);
-        Shift shift1 = new Shift(mFirebaseUser.getUid(),"M", calendar.getTime(), "", "");
+        Shift shift1 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
         calendar = new GregorianCalendar(2018, 4, 6);
-        Shift shift2 = new Shift(mFirebaseUser.getUid(),"M", calendar.getTime(), "", "");
+        Shift shift2 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
         calendar = new GregorianCalendar(2018, 4, 29);
-        Shift shift3 = new Shift(mFirebaseUser.getUid(),"M", calendar.getTime(), "", "");
+        Shift shift3 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
 
         CollectionReference shiftsColl = mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
@@ -410,12 +410,8 @@ public class MyCalendarFragment extends Fragment {
 
     private class MonthSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        private int year, month;
-
-        MonthSlidePagerAdapter(FragmentManager fm, int year, int month) {
+        MonthSlidePagerAdapter(FragmentManager fm) {
             super(fm);
-            this.year = year;
-            this.month = month;
         }
 
         @Override
@@ -450,7 +446,7 @@ public class MyCalendarFragment extends Fragment {
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 Date firstDay = calendar.getTime();
 
-                calendar.add(Calendar.MONTH,1);
+                calendar.add(Calendar.MONTH, 1);
 
                 calendar.set(Calendar.WEEK_OF_MONTH, calendar.getActualMaximum(Calendar.WEEK_OF_MONTH));
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -493,8 +489,7 @@ public class MyCalendarFragment extends Fragment {
             //cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
             final HashMap<String, ArrayList<Shift>> shiftListMap = new HashMap<>();
 
-            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup,cal.getTime(), mGroupUsersUids, shiftListMap);
-            //TODO query shifts
+            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersUids, shiftListMap);
             queryScheduleData(pageFragment, cal.getTime(), shiftListMap);
             return pageFragment;
         }
@@ -527,52 +522,41 @@ public class MyCalendarFragment extends Fragment {
                 String dateKey = getString(R.string.data_key_date);
 
                 ListenerRegistration userShiftListener =
-                userShiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay)
-                        .orderBy(dateKey, Query.Direction.ASCENDING)
-                        /*.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List<Shift> list = task.getResult().toObjects(Shift.class);
-                        String id = uid;
-                        userShifts.addAll(list);
+                        userShiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay)
+                                .orderBy(dateKey, Query.Direction.ASCENDING)
+                                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
+                                        for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
+                                            DocumentSnapshot doc = docChange.getDocument();
+                                            if (doc.exists()) {
+                                                Shift shift = doc.toObject(Shift.class);
 
-                        pageFragment.notifyGridDataSetChanged();
-
-                    }
-                });*/
-                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-                                for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
-                                    DocumentSnapshot doc = docChange.getDocument();
-                                    if (doc.exists()) {
-                                        Shift shift = doc.toObject(Shift.class);
-
-                                        switch (docChange.getType()) {
-                                            case ADDED:
-                                                //Added
-                                                userShifts.add(shift);
-                                                break;
-                                            case MODIFIED:
-                                                if (docChange.getOldIndex() == docChange.getNewIndex()) {
-                                                    //Modified, same position
-                                                    userShifts.set(docChange.getOldIndex(), shift);
-                                                } else {
-                                                    //Modified, differnt position
-                                                    userShifts.remove(docChange.getOldIndex());
-                                                    userShifts.add(docChange.getNewIndex(), shift);
+                                                switch (docChange.getType()) {
+                                                    case ADDED:
+                                                        //Added
+                                                        userShifts.add(shift);
+                                                        break;
+                                                    case MODIFIED:
+                                                        if (docChange.getOldIndex() == docChange.getNewIndex()) {
+                                                            //Modified, same position
+                                                            userShifts.set(docChange.getOldIndex(), shift);
+                                                        } else {
+                                                            //Modified, differnt position
+                                                            userShifts.remove(docChange.getOldIndex());
+                                                            userShifts.add(docChange.getNewIndex(), shift);
+                                                        }
+                                                        break;
+                                                    case REMOVED:
+                                                        //Removed
+                                                        userShifts.remove(docChange.getOldIndex());
+                                                        break;
                                                 }
-                                                break;
-                                            case REMOVED:
-                                                //Removed
-                                                userShifts.remove(docChange.getOldIndex());
-                                                break;
+                                                pageFragment.notifyGridDataSetChanged();
+                                            }
                                         }
-                                        pageFragment.notifyGridDataSetChanged();
                                     }
-                                }
-                            }
-                        });
+                                });
                 mUserShiftsListeners.add(userShiftListener);
             }
         }

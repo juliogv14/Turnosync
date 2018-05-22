@@ -82,6 +82,7 @@ public class DrawerActivity extends AppCompatActivity
     private int mCurrentFragmentID;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private UserWorkgroup mCurrentWorkgroup;
+    private Boolean fromSavedInstanceState = false;
 
     //
 
@@ -93,6 +94,8 @@ public class DrawerActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
             mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
+            fromSavedInstanceState = true;
+
         } else {
             mCurrentFragmentID = R.string.fragment_home;
         }
@@ -239,7 +242,7 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         //replacing the fragment
-        if (fragment != null) {
+        if (fragment != null && !fromSavedInstanceState) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
@@ -304,7 +307,7 @@ public class DrawerActivity extends AppCompatActivity
     //OnNavigationItemSelectedListener
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+        fromSavedInstanceState = false;
         switch (item.getItemId()) {
             case R.id.nav_item_home:
                 displaySelectedScreen(R.string.fragment_home);
