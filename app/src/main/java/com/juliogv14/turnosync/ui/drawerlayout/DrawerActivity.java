@@ -146,9 +146,6 @@ public class DrawerActivity extends AppCompatActivity
             }
         };
 
-        mWorkgroupsList = new ArrayList<>();
-
-
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
     }
@@ -168,14 +165,14 @@ public class DrawerActivity extends AppCompatActivity
             Log.d(TAG, "RemoveAuthStateListener");
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+        if (mWorkgroupsListener != null) {
+            mWorkgroupsListener.remove();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mWorkgroupsListener != null) {
-            mWorkgroupsListener.remove();
-        }
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
@@ -253,7 +250,7 @@ public class DrawerActivity extends AppCompatActivity
 
         CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
                 .collection(getString(R.string.data_ref_workgroups));
-
+        mWorkgroupsList = new ArrayList<>();
         mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
