@@ -38,31 +38,27 @@ import java.util.Map;
 
 public class ScheduleWeekPageFragment extends Fragment {
 
-    //Workgroup
+    private final String TAG = this.getClass().getSimpleName();
+
+    //Keys
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private static final String USERS_SHIFT_LIST_KEY = "userShiftList";
     private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
-    private final String TAG = this.getClass().getSimpleName();
+
+    //Binding
     protected PageWeekBinding mViewBinding;
+
     //Firebase
-    private FirebaseFirestore mFirebaseFirestore;
-    private FirebaseUser mFirebaseUser;
     private OnScheduleFragmentInteractionListener mListener;
-
-    //TODO: remove mworkgroup, mFirebaseUser, mFirebaseFirestore
-    private UserWorkgroup mWorkgroup;
-
     private ArrayList<Map<String, String>> mWorkgroupUsers;
     private Map<String, ArrayList<Shift>> mUsersShiftList;
 
     //Month
-
     private Date mWeekDate;
+
     //GridAdapter
     private BaseAdapter mGridAdapter;
-    private List<Shift> mShiftList;
-
 
     public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<Map<String, Object>> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts) {
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
@@ -93,7 +89,6 @@ public class ScheduleWeekPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mWorkgroupUsers = (ArrayList<Map<String, String>>) args.getSerializable(WORKGROUP_USERS_KEY);
             mUsersShiftList = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_LIST_KEY);
             mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
@@ -112,9 +107,6 @@ public class ScheduleWeekPageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mFirebaseFirestore = FirebaseFirestore.getInstance();
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(mWeekDate);

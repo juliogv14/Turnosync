@@ -39,19 +39,12 @@ public class MonthPageFragment extends Fragment {
     protected PageMonthBinding mViewBinding;
 
     //Firebase
-    private FirebaseFirestore mFirebaseFirestore;
-    private FirebaseUser mFirebaseUser;
-    //private ListenerRegistration mShiftsListener;
-
     private OnMonthFragmentInteractionListener mListener;
 
     //Workgroup
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private static final String CURRENT_YEAR_KEY = "currentYear";
-    private static final String CURRENT_MONTH_KEY = "currentMonth";
     private static final String CURRENT_MONTH_DATE_KEY = "currentMonthDate";
     private static final String MONTH_SHIFT_LIST_KEY = "shiftList";
-    private UserWorkgroup mWorkgroup;
 
     //Month
     private Date mMonthDate;
@@ -88,7 +81,6 @@ public class MonthPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
             mMonthDate = new Date(args.getLong(CURRENT_MONTH_DATE_KEY));
             mShiftList = args.getParcelableArrayList(MONTH_SHIFT_LIST_KEY);
         }
@@ -105,9 +97,6 @@ public class MonthPageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mFirebaseFirestore = FirebaseFirestore.getInstance();
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(mMonthDate);

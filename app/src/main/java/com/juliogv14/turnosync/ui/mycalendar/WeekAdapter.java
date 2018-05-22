@@ -8,7 +8,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -21,7 +20,6 @@ import com.juliogv14.turnosync.utils.CalendarUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -30,7 +28,6 @@ import java.util.Map;
 
 public class WeekAdapter extends BaseAdapter {
     private GregorianCalendar mCalendar;
-    private Calendar mCalendarToday;
     private Context mContext;
     private DisplayMetrics mDisplayMetrics;
     private List<String> mItems;
@@ -40,7 +37,6 @@ public class WeekAdapter extends BaseAdapter {
     private String[] mDays;
 
     //Shifts variables
-    private Map<String, String> mCurrentUser;
     private ArrayList<Map<String, String>> mGroupUsers;
     private Map<String, ArrayList<Shift>> mUserShiftList;
     private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
@@ -110,8 +106,6 @@ public class WeekAdapter extends BaseAdapter {
                     names = new TextView(mContext);
                     names.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                     names.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
-                    int nameIndex = position / 8 - 1;
-                    mCurrentUser = mGroupUsers.get(nameIndex);
                     convertView = names;
                 } else {
                     names = (TextView) convertView;
@@ -176,9 +170,7 @@ public class WeekAdapter extends BaseAdapter {
                 return convertView;
             default:
                 TextView error = new TextView(mContext);
-                error.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                error.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, mTitleHeight));
-                error.setText("error");
+                error.setBackgroundColor(Color.RED);
                 convertView = error;
                 return convertView;
         }
