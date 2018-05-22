@@ -161,6 +161,9 @@ public class DrawerActivity extends AppCompatActivity
         super.onStart();
 
         Log.d(TAG, "AddAuthStateListener");
+        //Reset title and nav coming back from settings
+        onFragmentCreated(mCurrentFragmentID);
+
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 

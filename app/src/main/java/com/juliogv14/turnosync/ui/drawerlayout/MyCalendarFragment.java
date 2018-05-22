@@ -170,7 +170,6 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
