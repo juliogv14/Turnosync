@@ -155,25 +155,8 @@ public class MyCalendarFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        PagerAdapter pagerAdapter;
-        if (savedInstanceState != null) {
-            mCurrentPosition = savedInstanceState.getInt(CURRENT_ADAPTER_POSITION);
-            mPersonalSchedule = savedInstanceState.getBoolean(CURRENT_PERSONAL_SCHEDULE);
-            if (mPersonalSchedule) {
-                pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-            } else {
-                pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-            }
-        } else {
-            if (mPersonalSchedule) {
-                mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
-                pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-            } else {
-                mCurrentPosition = (mTotalWeeks / 2);
-                pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-            }
-        }
-
+        PagerAdapter pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+        mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
 
         mViewBinding.viewPagerMonths.setAdapter(pagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
@@ -187,10 +170,6 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-    }
 
     @Override
     public void onDestroy() {

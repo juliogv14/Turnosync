@@ -70,7 +70,7 @@ public class DrawerActivity extends AppCompatActivity
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mWorkgroupsListener;
     private ArrayList<UserWorkgroup> mWorkgroupsList;
-    private HomeFragment mHomeFragment;
+
 
     //drawer
     private DrawerLayout mDrawerLayout;
@@ -79,7 +79,10 @@ public class DrawerActivity extends AppCompatActivity
 
     //SavedInstanceState
     private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
+
     private int mCurrentFragmentID;
+    private MyCalendarFragment mMyCalendarFragment;
+    private HomeFragment mHomeFragment;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private UserWorkgroup mCurrentWorkgroup;
     private Boolean fromSavedInstanceState = false;
@@ -90,15 +93,18 @@ public class DrawerActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-
-        if (savedInstanceState != null) {
+        //TODO: instance state may not be needed
+/*        if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
+            mMyCalendarFragment = getSupportFragmentManager().getFragment(savedInstanceState, RESTORED_FRAGMENT_KEY);
             mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
             fromSavedInstanceState = true;
 
         } else {
             mCurrentFragmentID = R.string.fragment_home;
-        }
+        }*/
+
+        mCurrentFragmentID = R.string.fragment_home;
 
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
@@ -177,12 +183,17 @@ public class DrawerActivity extends AppCompatActivity
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
-
+    //TODO: instance state may not be needed
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentID);
         outState.putParcelable(CURRENT_WORKGROUP_KEY, mCurrentWorkgroup);
+
+        /*if(mMyCalendarFragment instanceof MyCalendarFragment ){
+            getSupportFragmentManager().putFragment(outState, RESTORED_FRAGMENT_KEY, mMyCalendarFragment);
+        }*/
+
     }
 
     @Override
@@ -234,7 +245,13 @@ public class DrawerActivity extends AppCompatActivity
 
                 break;
             case R.string.fragment_mycalendar:
-                fragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                if(mMyCalendarFragment != null){
+                    fragment = mMyCalendarFragment;
+                } else {
+                    mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                    fragment = mMyCalendarFragment;
+
+                }
                 break;
         }
 
