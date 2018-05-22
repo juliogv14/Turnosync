@@ -54,12 +54,16 @@ public class RegisterActivity extends AppCompatActivity {
         mViewBinding.editTextPasswordRepeat.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                if ((id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) && keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                     FormUtils.closeKeyboard(RegisterActivity.this, textView);
                     attemptRegister();
                     return true;
+                } else if(keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+                    return true;
+                } else {
+                    return false;
                 }
-                return false;
+
             }
         });
 
@@ -74,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void attemptRegister() {
         /*Reset error on textInputLayouts*/
+
         mViewBinding.editTextLayoutEmail.setError(null);
         mViewBinding.editTextLayoutName.setError(null);
         mViewBinding.editTextLayoutPassword.setError(null);
@@ -166,7 +171,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     CollectionReference usersReference = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users));
                                     User user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), mDisplayName);
 
-                                    /*//Add user to database
+                                    //Add user to database
                                     Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
@@ -175,10 +180,10 @@ public class RegisterActivity extends AppCompatActivity {
                                                     Toast.makeText(RegisterActivity.this,
                                                             R.string.toast_generic_error + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
-                                            });*/
+                                            });
 
                                     //When all tasks are done
-                                    Task<Void> alltasks = Tasks.whenAll(updateTask);
+                                    Task<Void> alltasks = Tasks.whenAll(updateTask, databaseTask);
                                     alltasks.addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
