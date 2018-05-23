@@ -2,6 +2,25 @@
     <string name="app_name" translatable="false">Turnosync</string>
     <string name="web_client_token" translatable="false">424030572418-q0mtitaf63mus90332mh6pud2kcp6c9d.apps.googleusercontent.com</string>
 
+    <!--CLOUD FIRESTORE REFERENCES-->
+    <string name="data_ref_users" translatable="false">users</string>
+    <string name="data_ref_workgroups" translatable="false">workgroups</string>
+    <string name="data_ref_shifts" translatable="false">shifts</string>
+    <string name="data_ref_invites" translatable="false">invites</string>
+
+    <!--CLOUD FIRESTORE KEYS-->
+    <string name="data_key_displayname" translatable="false">displayName</string>
+    <string name="data_key_email" translatable="false">email</string>
+    <string name="data_key_uid" translatable="false">uid</string>
+
+    <string name="data_key_workgroupid" translatable="false">workgroupId</string>
+    <string name="data_key_info" translatable="false">info</string>
+    <string name="data_key_role" translatable="false">role</string>
+    <string name="data_key_date" translatable="false">date</string>
+
+    <!--INTENT KEYS-->
+    <string name="data_int_workgroup">intentWorkgroup</string>
+
     <!--TOASTS MESSAGES-->
     <string name="toast_profile_displayname">Display name successfully updated</string>
     <string name="toast_profile_email">Account email successfully updated</string>
@@ -19,8 +38,6 @@
     <string name="activity_register">Register</string>
     <string name="activity_reset_password">Reset password</string>
     <string name="activity_settings">Settings</string>
-
-    <!--KEY STRINGS-->
 
     <!--DRAWER FRAGMENTS LABELS-->
     <string name="fragment_home">Home</string>
@@ -76,22 +93,6 @@
     <!--DRAWER STRINGS-->
     <string name="a11y_navigation_drawer_open">Open navigation drawer</string>
     <string name="a11y_navigation_drawer_close">Close navigation drawer</string>
-
-    <!--CLOUD FIRESTORE REFERENCES-->
-    <string translatable="false" name="data_ref_users">users</string>
-    <string translatable="false" name="data_ref_workgroups">workgroups</string>
-    <string translatable="false" name="data_ref_shifts">shifts</string>
-
-    <!--CLOUD FIRESTORE KEYS-->
-    <string name="data_key_displayname">displayName</string>
-    <string name="data_key_email">email</string>
-    <string name="data_key_uid">uid</string>
-
-    <string name="data_key_workgroupid">workgroupId</string>
-    <string name="data_key_info">info</string>
-    <string name="data_key_role">role</string>
-
-    <string name="data_key_date">date</string>
 
     <!--CALENDAR STRINGS-->
     <string-array name="calendar_days_of_week">

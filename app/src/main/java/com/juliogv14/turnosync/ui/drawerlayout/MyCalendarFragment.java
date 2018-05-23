@@ -1,6 +1,7 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -36,6 +37,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.WorkgroupSettings;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -227,40 +229,7 @@ public class MyCalendarFragment extends Fragment {
                 mCurrentPosition = mViewBinding.viewPagerMonths.getCurrentItem();
                 ((AppCompatActivity) mListener).invalidateOptionsMenu();
 
-                PagerAdapter pagerAdapter;
-                if (mPersonalSchedule) {
-
-                    Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-                    calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
-                    calend.get(Calendar.WEEK_OF_YEAR);
-                    mCurrentPosition = calend.get(Calendar.MONTH) + 1;
-
-                    pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-                } else {
-
-                    Calendar calinit = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-                    Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-
-                    calend.add(Calendar.MONTH, mCurrentPosition);
-
-                    calinit.get(Calendar.WEEK_OF_YEAR);
-
-                    int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
-                    int endWeek = calend.get(Calendar.WEEK_OF_YEAR);
-
-                    int diff = calend.get(Calendar.YEAR) - mInitMonth.get(Calendar.YEAR);
-
-                    int deltaYears = 0;
-                    for (int i = 0; i < diff; i++) {
-                        deltaYears += calinit.getActualMaximum(Calendar.WEEK_OF_YEAR);
-                        calinit.add(Calendar.YEAR, 1);
-                    }
-                    diff = (endWeek + deltaYears) - startWeek;
-
-                    mCurrentPosition = diff;          //Position 0 + firstweek
-
-                    pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
-                }
+                PagerAdapter pagerAdapter = changeAdapter();
 
                 mViewBinding.viewPagerMonths.setAdapter(pagerAdapter);
                 mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
@@ -269,6 +238,10 @@ public class MyCalendarFragment extends Fragment {
                 return true;
             case R.id.action_mycalendar_settings:
                 //loadTestData();
+                Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettings.class);
+                workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
+                startActivity(workgroupSettingsIntent);
                 Toast.makeText((Context) mListener, "Test data", Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -340,6 +313,44 @@ public class MyCalendarFragment extends Fragment {
         data.put("workgroupId", "VOBMWlT3iP0t9x5fq37X");
         usersColl.document(mFirebaseUser.getUid()).collection(getString(R.string.data_ref_workgroups)).document("VOBMWlT3iP0t9x5fq37X").set(data);*/
 
+    }
+
+    private PagerAdapter changeAdapter(){
+        PagerAdapter pagerAdapter;
+        if (mPersonalSchedule) {
+
+            Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
+            calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
+            calend.get(Calendar.WEEK_OF_YEAR);
+            mCurrentPosition = calend.get(Calendar.MONTH) + 1;
+
+            pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+        } else {
+
+            Calendar calinit = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
+            Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
+
+            calend.add(Calendar.MONTH, mCurrentPosition);
+
+            calinit.get(Calendar.WEEK_OF_YEAR);
+
+            int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
+            int endWeek = calend.get(Calendar.WEEK_OF_YEAR);
+
+            int diff = calend.get(Calendar.YEAR) - mInitMonth.get(Calendar.YEAR);
+
+            int deltaYears = 0;
+            for (int i = 0; i < diff; i++) {
+                deltaYears += calinit.getActualMaximum(Calendar.WEEK_OF_YEAR);
+                calinit.add(Calendar.YEAR, 1);
+            }
+            diff = (endWeek + deltaYears) - startWeek;
+
+            mCurrentPosition = diff;          //Position 0 + firstweek
+
+            pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+        }
+        return pagerAdapter;
     }
 
     private void queryWorkgroupUsers() {
@@ -435,7 +446,6 @@ public class MyCalendarFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
-
                                     for (DocumentSnapshot doc : task.getResult()) {
                                         if (doc != null && doc.exists()) {
                                             shiftList.add(doc.toObject(Shift.class));

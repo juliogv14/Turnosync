@@ -10,7 +10,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".ui.drawerlayout.DrawerActivity"
             android:launchMode="singleTop"
@@ -21,7 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.account.LoginActivity"
             android:label="@string/activity_signin"
@@ -34,7 +32,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.account.LoginActivity" />
         </activity>
-
         <activity
             android:name=".ui.account.ResetPasswordActivity"
             android:label="@string/activity_reset_password"
@@ -43,10 +40,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.account.LoginActivity" />
         </activity>
-
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/activity_settings" />
+        <activity
+            android:name=".WorkgroupSettings">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.drawerlayout.DrawerActivity" />
+        </activity>
 
 
     </application>
