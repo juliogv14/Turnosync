@@ -53,3 +53,10 @@ workgroups {
 	.
 	.
 }
+
+invites {
+    inviteId{
+        email: "email"
+        workgroupId: "id"
+    }
+}
