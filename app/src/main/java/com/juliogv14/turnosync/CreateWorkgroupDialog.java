@@ -1,6 +1,5 @@
 package com.juliogv14.turnosync;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -8,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -42,15 +40,12 @@ public class CreateWorkgroupDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        try {
+            mListener = (CreateWorkgroupListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(this.getClass().getSimpleName() + "needs his interface implemented by target fragment!");
+        }
     }
-
-
-    /*@Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = DialogCreateWorkgroupBinding.inflate(inflater, container, false);
-        return mViewBinding.getRoot();
-    }*/
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -76,25 +71,22 @@ public class CreateWorkgroupDialog extends DialogFragment {
                 .setNegativeButton(R.string.dialog_workgroup_button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        FormUtils.closeKeyboard(mContext, mViewBinding.editTextWorkgroupName);
                     }
                 });
 
         final AlertDialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
+                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        try {
-                            mListener = (CreateWorkgroupListener) getTargetFragment();
-                        } catch (ClassCastException e) {
-                            throw new ClassCastException(this.getClass().getSimpleName() + "needs his interface implemented by target fragment!");
-                        }
                         boolean isReadyToClose = attemptCreateWorkgroup();
                         if (isReadyToClose) {
-                            FormUtils.closeKeyboard(getActivity(), mViewBinding.editTextWorkgroupName);
+                            FormUtils.closeKeyboard(mContext, mViewBinding.editTextWorkgroupName);
                             mListener.onDialogPositiveClick(mName, mDescription);
                             dialog.dismiss();
                         }
@@ -102,12 +94,11 @@ public class CreateWorkgroupDialog extends DialogFragment {
                 });
             }
         });
-        //FormUtils.openKeyboard(mContext, mViewBinding.editTextWorkgroupName);
+
         return dialog;
     }
 
     private boolean attemptCreateWorkgroup() {
-        TextInputLayout wkname = ((Activity) mContext).findViewById(R.id.editTextLayout_workgroup_name);
         Boolean isReadyToClose = true;
         //Get strings from editText
         mName = mViewBinding.editTextWorkgroupName.getText().toString();
@@ -129,6 +120,6 @@ public class CreateWorkgroupDialog extends DialogFragment {
     }
 
     public interface CreateWorkgroupListener {
-        public void onDialogPositiveClick(String name, String description);
+        void onDialogPositiveClick(String name, String description);
     }
 }
