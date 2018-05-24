@@ -67,10 +67,11 @@ exports.onInvite =
 				 					//User exists in the system
 				 					let user = usr.data();
 				 					console.log('User data: \n' + usr + '|' + user + '|' + user.uid + '|' + user.displayName);
-				 					//copy user uid to global workgroup
-				 					userToGlobal(user, workgroupId);
-				 					snap.ref.delete();
-				 					//copy workgroup to user workgroup list
+				 					//Copy user uid to global workgroup
+				 					//Copy workgroup to user workgroup list
+				 					//Delete invite
+				 					return Promise.all([userToGlobal(user, workgroupId), workgroupToUser(usr.ref, workgroup), snap.ref.delete()]);
+				 					
 
 
 				 				} else{
@@ -92,6 +93,15 @@ exports.onInvite =
 	 });
 
 	 function userToGlobal(user, wkId){
-	 	return db.collection('workgroups').doc(wkId).collection('users').doc(user.uid).set({uid: user.uid})
+	 	return db.collection('workgroups').doc(wkId).collection('users').doc(user.uid).set({uid: user.uid});
+	 }
+
+	 function workgroupToUser(userRef, workgroup){
+	 	return userRef.collection('workgroups').doc(workgroup.workgroupId).set({
+	 		workgroupId : workgroup.workgroupId,
+	 		displayName : workgroup.displayName,
+	 		info : workgroup.info,
+	 		role : 'USER'
+	 	});
 	 }
 	
