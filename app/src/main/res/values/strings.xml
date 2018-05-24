@@ -46,7 +46,7 @@
 
     <!--FORM ERROR STRINGS-->
     <string name="form_error_field_required">This field is required</string>
-    <string name="form_error_name">This name is invalid. Only "-" symbol is allowed.</string>
+    <string name="form_error_name">This name is invalid. Only '-' symbol is allowed.</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>

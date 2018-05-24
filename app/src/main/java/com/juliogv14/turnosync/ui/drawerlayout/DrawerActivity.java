@@ -85,7 +85,7 @@ public class DrawerActivity extends AppCompatActivity
     private HomeFragment mHomeFragment;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private UserWorkgroup mCurrentWorkgroup;
-    private Boolean fromSavedInstanceState = false;
+    private boolean fromSavedInstanceState = false;
 
     //
 
@@ -248,6 +248,7 @@ public class DrawerActivity extends AppCompatActivity
 
                 break;
             case R.string.fragment_mycalendar:
+                //TODO: improve saved state, bug using menu
                 if(mMyCalendarFragment != null){
                     fragment = mMyCalendarFragment;
                 } else {
