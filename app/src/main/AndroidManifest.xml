@@ -13,7 +13,8 @@
         <activity
             android:name=".ui.drawerlayout.DrawerActivity"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,7 +45,8 @@
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/activity_settings" />
         <activity
-            android:name=".WorkgroupSettings">
+            android:name=".WorkgroupSettings"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.drawerlayout.DrawerActivity" />

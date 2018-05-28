@@ -46,7 +46,7 @@
 
     <!--FORM ERROR STRINGS-->
     <string name="form_error_field_required">This field is required</string>
-    <string name="form_error_name">This name is invalid. Only '-' symbol is allowed.</string>
+    <string name="form_error_name">This name is invalid. Only "-" symbol is allowed.</string>
 
     <!--LOGIN STRINGS-->
     <string name="login_email">Email</string>
@@ -126,6 +126,12 @@
     <string name="dialog_workgroup_desc">Description (optional)</string>
     <string name="dialog_workgroup_button_create">Create</string>
     <string name="dialog_workgroup_button_cancel">Cancel</string>
+
+    <!--ADDUSER DIALOG STRINGS-->
+    <string name="dialog_adduser_title">Add user to workgroup</string>
+    <string name="dialog_adduser_email">Email</string>
+    <string name="dialog_adduser_button_add">Invite</string>
+    <string name="dialog_adduser_button_cancel">Cancel</string>
 
     <!--HOME MENU OPTIONS-->
     <string name="menu_home_info">Info</string>

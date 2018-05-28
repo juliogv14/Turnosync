@@ -30,7 +30,7 @@ import com.juliogv14.turnosync.utils.FormUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkgroupSettings extends AppCompatActivity {
+public class WorkgroupSettings extends AppCompatActivity implements AddUserDialog.AddUserListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -59,14 +59,6 @@ public class WorkgroupSettings extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
 
-
-        mViewBinding.adduser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                attemptAddUser();
-            }
-        });
-
     }
 
     @Override
@@ -87,46 +79,35 @@ public class WorkgroupSettings extends AppCompatActivity {
         return true;
     }
 
-    private void attemptAddUser() {
-        mViewBinding.editTextLayoutEmail.setError(null);
-        String email = mViewBinding.editTextEmail.getText().toString();
-
-        Boolean cancel = false;
-
-        /*Check for a valid email address.*/
-        if (TextUtils.isEmpty(email)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.form_error_field_required));
-            cancel = true;
-        } else if (!FormUtils.isEmailValid(email)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_invalid_email));
-            cancel = true;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_wkSettings_addUser) {
+            AddUserDialog dialog = new AddUserDialog();
+            dialog.show(this.getSupportFragmentManager(), "addUser");
+            return true;
         }
+        return false;
+    }
 
-        if (cancel) {
-            mViewBinding.editTextLayoutEmail.requestFocus();
-        } else {
-            CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
+    @Override
+    public void onDialogPositiveClick(String email) {
+        CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
 
-            Map<String, String> inviteData = new HashMap<>();
-            inviteData.put(getString(R.string.data_key_email), email);
-            inviteData.put(getString(R.string.data_key_workgroupid), mWorkgroup.getWorkgroupId());
-            invitesColl.add(inviteData)
-                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if(task.isSuccessful()){
+        Map<String, String> inviteData = new HashMap<>();
+        inviteData.put(getString(R.string.data_key_email), email);
+        inviteData.put(getString(R.string.data_key_workgroupid), mWorkgroup.getWorkgroupId());
+        invitesColl.add(inviteData)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
 
-                            } else {
-                                if (task.getException() != null) {
-                                    Log.e(TAG, task.getException().getMessage());
-                                }
+                        } else {
+                            if (task.getException() != null) {
+                                Log.e(TAG, task.getException().getMessage());
                             }
                         }
-                    });
-
-
-        }
+                    }
+                });
     }
 }
