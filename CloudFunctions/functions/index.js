@@ -17,13 +17,15 @@ exports.onCreateUser =
 		const email = userRecord.email;
 		const uid = userRecord.uid;
 
-		console.log("User: " + uid);
+		console.log("User: " + uid + "|" + userRecord.displayName);
 
-		return admin.auth().getUser(uid)
+
+		//TODO test if necessary
+		const usrToDb = admin.auth().getUser(uid)
   		.then(function(userRecordName){
   			const displayName = userRecordName.displayName;
 			console.log("DisplayName: " + displayName);
-			return db.collection("users").doc(uid).set({
+			db.collection("users").doc(uid).set({
 				'uid': uid,
 				'email' : email,
 				'displayName' : displayName
@@ -31,8 +33,33 @@ exports.onCreateUser =
 		
 		})
 		.catch(function(error){
+    		console.log("Error get email:", error);
+  		});
+
+		const resolveInvite = db.collection("invites").where("email", "==", email).get()
+		.then(snapshot =>{
+			snapshot.forEach(inv =>{
+				let invite = inv.data();
+				const workgroupId = invite.workgroupId;
+				console.log("Invite: " + invite + "|" + invite.email + "|" + invite.workgroupId);
+				return db.collection('workgroups').doc(workgroupId).get()
+		 		.then(wk => {
+		 			if(wk.exists){
+		 				let workgroup = wk.data();
+		 				console.log('Workgroup data: \n' + wk + '|' + workgroup + '|' + workgroup.workgroupId + '|' + workgroup.displayName);
+		 				const usrRef = db.collection("users").doc(uid);
+		 				return Promise.all([userToGlobal(uid, workgroupId), workgroupToUser(usrRef, workgroup), inv.ref.delete()]);
+		 			}
+		 		});
+			
+
+			});
+		})
+		.catch(function(error){
     		console.log("Error fetching user data:", error);
-  		});;
+  		});
+		return Promise.all([usrToDb, resolveInvite]);
+
 	});
 
 /*exports.onDeleteUser = 
@@ -70,7 +97,7 @@ exports.onInvite =
 				 					//Copy user uid to global workgroup
 				 					//Copy workgroup to user workgroup list
 				 					//Delete invite
-				 					return Promise.all([userToGlobal(user, workgroupId), workgroupToUser(usr.ref, workgroup), snap.ref.delete()]);
+				 					return Promise.all([userToGlobal(user.uid, workgroupId), workgroupToUser(usr.ref, workgroup), snap.ref.delete()]);
 				 					
 
 
@@ -92,8 +119,8 @@ exports.onInvite =
 
 	 });
 
-	 function userToGlobal(user, wkId){
-	 	return db.collection('workgroups').doc(wkId).collection('users').doc(user.uid).set({uid: user.uid});
+	 function userToGlobal(userUid, wkId){
+	 	return db.collection('workgroups').doc(wkId).collection('users').doc(userUid).set({uid: userUid});
 	 }
 
 	 function workgroupToUser(userRef, workgroup){
