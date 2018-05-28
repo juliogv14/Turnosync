@@ -29,8 +29,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.juliogv14.turnosync.CreateWorkgroupDialog;
-import com.juliogv14.turnosync.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;

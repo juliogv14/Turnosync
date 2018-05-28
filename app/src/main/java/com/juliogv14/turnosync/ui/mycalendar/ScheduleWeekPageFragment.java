@@ -7,28 +7,22 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SupportActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.juliogv14.turnosync.OnFragmentInteractionListener;
+import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

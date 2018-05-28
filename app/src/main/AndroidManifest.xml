@@ -45,7 +45,7 @@
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/activity_settings" />
         <activity
-            android:name=".WorkgroupSettings"
+            android:name=".ui.mycalendar.workgroupsettings.WorkgroupSettings"
             android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

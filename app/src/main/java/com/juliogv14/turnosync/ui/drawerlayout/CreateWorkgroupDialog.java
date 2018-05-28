@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync;
+package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,7 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.juliogv14.turnosync.databinding.DialogAddUserBinding;
+import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.databinding.DialogCreateWorkgroupBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
@@ -21,53 +22,57 @@ import com.juliogv14.turnosync.utils.FormUtils;
  * CreateWorkgroupDialog
  */
 
-public class AddUserDialog extends DialogFragment {
+public class CreateWorkgroupDialog extends DialogFragment {
+
+    private DialogCreateWorkgroupBinding mViewBinding;
+    //Parent fragment
+    private CreateWorkgroupListener mListener;
+    private Context mContext;
 
     //Strings
-    String mEmail;
-    private DialogAddUserBinding mViewBinding;
-    //Parent fragment
-    private AddUserListener mListener;
+    String mName;
+    String mDescription;
 
-    public AddUserDialog() {
+
+    public CreateWorkgroupDialog() {
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof AddUserListener) {
-            mListener = (AddUserListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement AddUserListener");
+        mContext = context;
+        try {
+            mListener = (CreateWorkgroupListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(this.getClass().getSimpleName() + "needs his interface implemented by target fragment!");
         }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mViewBinding.editTextEmail.requestFocus();
+        mViewBinding.editTextWorkgroupName.requestFocus();
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = LayoutInflater.from((Context)mListener).inflate(R.layout.dialog_add_user, null);
-        mViewBinding = DialogAddUserBinding.bind(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_create_workgroup, null);
+        mViewBinding = DialogCreateWorkgroupBinding.bind(view);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.dialog_adduser_title)
+                .setTitle(R.string.dialog_workgroup_title)
                 .setView(view)
-                .setPositiveButton(R.string.dialog_adduser_button_add, new DialogInterface.OnClickListener() {
-                    //Add user to workgroup
+                .setPositiveButton(R.string.dialog_workgroup_button_create, new DialogInterface.OnClickListener() {
+                    //Create new workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                     }
                 })
-                .setNegativeButton(R.string.dialog_adduser_button_cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.dialog_workgroup_button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FormUtils.closeKeyboard((Context)mListener, mViewBinding.editTextEmail);
+                        FormUtils.closeKeyboard(mContext, mViewBinding.editTextWorkgroupName);
                     }
                 });
 
@@ -76,15 +81,15 @@ public class AddUserDialog extends DialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                FormUtils.openKeyboard((Context)mListener, mViewBinding.editTextEmail);
+                FormUtils.openKeyboard(mContext, mViewBinding.editTextWorkgroupName);
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        boolean isReadyToClose = attemptAddUser();
+                        boolean isReadyToClose = attemptCreateWorkgroup();
                         if (isReadyToClose) {
-                            FormUtils.closeKeyboard((Context)mListener, mViewBinding.editTextEmail);
-                            mListener.onDialogPositiveClick(mEmail);
+                            FormUtils.closeKeyboard(mContext, mViewBinding.editTextWorkgroupName);
+                            mListener.onDialogPositiveClick(mName, mDescription);
                             dialog.dismiss();
                         }
                     }
@@ -95,32 +100,28 @@ public class AddUserDialog extends DialogFragment {
         return dialog;
     }
 
-    private boolean attemptAddUser() {
+    private boolean attemptCreateWorkgroup() {
         Boolean isReadyToClose = true;
         //Get strings from editText
-        mViewBinding.editTextLayoutEmail.setError(null);
-        mEmail = mViewBinding.editTextEmail.getText().toString();
-
-        /*Check for a valid email address.*/
-        if (TextUtils.isEmpty(mEmail)) {
-            mViewBinding.editTextLayoutEmail
+        mName = mViewBinding.editTextWorkgroupName.getText().toString();
+        mDescription = mViewBinding.editTextWorkgroupDesc.getText().toString();
+        if (TextUtils.isEmpty(mName)) {
+            mViewBinding.editTextLayoutWorkgroupName
                     .setError(getString(R.string.form_error_field_required));
             isReadyToClose = false;
-        } else if (!FormUtils.isEmailValid(mEmail)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_invalid_email));
+        } else if (!FormUtils.isDisplayNameValid(mName)) {
+            mViewBinding.editTextLayoutWorkgroupName
+                    .setError(getString(R.string.form_error_name));
             isReadyToClose = false;
         }
 
-        //TODO: check if the user exists
-
         if (!isReadyToClose) {
-            mViewBinding.editTextEmail.requestFocus();
+            mViewBinding.editTextWorkgroupName.requestFocus();
         }
         return isReadyToClose;
     }
 
-    public interface AddUserListener {
-        void onDialogPositiveClick(String email);
+    public interface CreateWorkgroupListener {
+        void onDialogPositiveClick(String name, String description);
     }
 }
