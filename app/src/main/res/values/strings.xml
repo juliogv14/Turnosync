@@ -20,6 +20,7 @@
 
     <!--INTENT KEYS-->
     <string name="data_int_workgroup">intentWorkgroup</string>
+    <string name="data_int_users">intentUsers</string>
 
     <!--TOASTS MESSAGES-->
     <string name="toast_profile_displayname">Display name successfully updated</string>

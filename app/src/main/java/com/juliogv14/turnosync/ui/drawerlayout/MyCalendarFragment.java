@@ -59,25 +59,29 @@ import java.util.Map;
 
 public class MyCalendarFragment extends Fragment {
 
-
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
-    private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
+
     //Constants
     //TODO set number of months queried to settings
     private final int QUERY_MONTH_NUMBER = 12;
+    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
+    private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
     FirebaseUser mFirebaseUser;
+
     //Listener DrawerActivity
     private OnCalendarFragmentInteractionListener mListener;
+
     //Binding
     private FragmentMycalendarBinding mViewBinding;
+
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
     private ArrayList<Map<String, Object>> mGroupUsersUids;
+    private ArrayList<String> mUserNames;
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
     private UserWorkgroup mWorkgroup;
@@ -126,6 +130,7 @@ public class MyCalendarFragment extends Fragment {
         setHasOptionsMenu(true);
 
         mGroupUsersUids = new ArrayList<>();
+        mUserNames = new ArrayList<>();
         Calendar cal = new GregorianCalendar();
         mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 
@@ -236,12 +241,12 @@ public class MyCalendarFragment extends Fragment {
 
                 return true;
             case R.id.action_mycalendar_settings:
-                //loadTestData();
+
                 Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettings.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
+                workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mUserNames);
                 startActivity(workgroupSettingsIntent);
-                Toast.makeText((Context) mListener, "Test data", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return false;
@@ -364,25 +369,32 @@ public class MyCalendarFragment extends Fragment {
                     DocumentSnapshot doc = docChange.getDocument();
                     if (doc.exists()) {
                         Map<String, Object> userData = doc.getData();
-
+                        //TODO: get display names
+                        String userName = (String)userData.get("uid");
                         switch (docChange.getType()) {
                             case ADDED:
                                 //Added
                                 mGroupUsersUids.add(userData);
+                                mUserNames.add(userName);
                                 break;
                             case MODIFIED:
                                 if (docChange.getOldIndex() == docChange.getNewIndex()) {
                                     //Modified, same position
                                     mGroupUsersUids.set(docChange.getOldIndex(), userData);
+                                    mUserNames.set(docChange.getOldIndex(), userName);
                                 } else {
                                     //Modified, differnt position
                                     mGroupUsersUids.remove(docChange.getOldIndex());
                                     mGroupUsersUids.add(docChange.getNewIndex(), userData);
+
+                                    mUserNames.remove(docChange.getOldIndex());
+                                    mUserNames.add(docChange.getNewIndex(), userName);
                                 }
                                 break;
                             case REMOVED:
                                 //Removed
                                 mGroupUsersUids.remove(docChange.getOldIndex());
+                                mUserNames.remove(docChange.getOldIndex());
                                 break;
                         }
                     }

@@ -404,6 +404,7 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    //TODO: Test if needed
     @Override
     public void onFragmentSwapped(int fragmentId) {
         mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupId());

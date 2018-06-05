@@ -7,9 +7,13 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,10 +25,11 @@ import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityWorkgroupSettingsBinding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkgroupSettings extends AppCompatActivity implements AddUserDialog.AddUserListener {
+public class WorkgroupSettings extends AppCompatActivity implements AddUserDialog.AddUserListener, GroupUsersAdapter.UserOnClickHandler {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -38,7 +43,7 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
 
-    //Workgroup
+    //Intent data
     private UserWorkgroup mWorkgroup;
 
     @Override
@@ -52,6 +57,16 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
+
+        ArrayList<String> mUserList = getIntent().getStringArrayListExtra(getString(R.string.data_int_users));
+
+        //RecyclerView
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mViewBinding.recyclerUsers.setLayoutManager(layoutManager);
+        mViewBinding.recyclerUsers.setHasFixedSize(true);
+        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter(this, mUserList);
+        mViewBinding.recyclerUsers.setAdapter(recyclerAdapter);
 
     }
 
@@ -103,5 +118,10 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onClickUser(String uid) {
+        Toast.makeText(this, "User uid: "+ uid, Toast.LENGTH_SHORT).show();
     }
 }
