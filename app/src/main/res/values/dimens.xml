@@ -8,4 +8,8 @@
     <dimen name="header_drawer_height">176dp</dimen>
     <dimen name="header_drawer_imageview">56dp</dimen>
     <dimen name="home_fab_margin">16dp</dimen>
+
+
+    <dimen name="activity_settings_margin">16dp</dimen>
+    <dimen name="activity_settings_header_margin">24dp</dimen>
 </resources>

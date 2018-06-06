@@ -20,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,7 +35,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettings;
+import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -95,7 +94,7 @@ public class MyCalendarFragment extends Fragment {
 
     public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
-        // Supply index input as an argument.
+
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         f.setArguments(args);
@@ -242,7 +241,7 @@ public class MyCalendarFragment extends Fragment {
                 return true;
             case R.id.action_mycalendar_settings:
 
-                Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettings.class);
+                Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettingsActivity.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mUserNames);

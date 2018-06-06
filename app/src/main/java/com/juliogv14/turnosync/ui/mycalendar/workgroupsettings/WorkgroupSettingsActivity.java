@@ -4,15 +4,14 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,16 +28,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkgroupSettings extends AppCompatActivity implements AddUserDialog.AddUserListener, GroupUsersAdapter.UserOnClickHandler {
+public class WorkgroupSettingsActivity extends AppCompatActivity implements WorkgroupSettingsFragment.WorkgroupSettingsListener, GroupUsersAdapter.UserOnClickHandler, AddUserDialog.AddUserListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
 
     //Activity views
     ActivityWorkgroupSettingsBinding mViewBinding;
-
-    //Firebase Auth
-    private FirebaseAuth mFirebaseAuth;
 
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
@@ -53,21 +49,13 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
         setTitle("Workgroup settings");
 
         //Init
-        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_workgroup_settings);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_workgroup_settings);
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
+        ArrayList<String> userlist = getIntent().getStringArrayListExtra(getString(R.string.data_int_users));
 
-        ArrayList<String> mUserList = getIntent().getStringArrayListExtra(getString(R.string.data_int_users));
-
-        //RecyclerView
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mViewBinding.recyclerUsers.setLayoutManager(layoutManager);
-        mViewBinding.recyclerUsers.setHasFixedSize(true);
-        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter(this, mUserList);
-        mViewBinding.recyclerUsers.setAdapter(recyclerAdapter);
-
+        Fragment settings = WorkgroupSettingsFragment.newInstance(mWorkgroup, userlist);
+        displaySelectedScreen(settings);
     }
 
     @Override
@@ -98,6 +86,16 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
         return false;
     }
 
+    private void displaySelectedScreen(Fragment fragment) {
+
+        //replacing the fragment
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }
+    }
+
     @Override
     public void onDialogPositiveClick(String email) {
         CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
@@ -122,6 +120,6 @@ public class WorkgroupSettings extends AppCompatActivity implements AddUserDialo
 
     @Override
     public void onClickUser(String uid) {
-        Toast.makeText(this, "User uid: "+ uid, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "User uid: " + uid, Toast.LENGTH_SHORT).show();
     }
 }

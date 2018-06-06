@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity">
+
+        <TextView
+            android:id="@+id/settingsItem_shift_types"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="?android:attr/listPreferredItemPaddingEnd"
+            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+            android:paddingTop="?android:attr/listPreferredItemPaddingEnd"
+            android:text="Shift types"
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@android:drawable/divider_horizontal_bright"
+            android:contentDescription="divider"
+            android:scaleType="matrix"
+            android:src="@android:drawable/divider_horizontal_bright" />
+
+        <TextView
+            android:id="@+id/textView_wkSettings_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_settings_header_margin"
+            android:layout_marginTop="8dp"
+            android:text="USERS"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.PopupMenu.Header"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_marginStart="@dimen/activity_settings_margin"
+            android:background="@android:drawable/divider_horizontal_bright"
+            android:contentDescription="divider"
+            android:scaleType="matrix"
+            android:src="@android:drawable/divider_horizontal_bright" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_users"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_divider1"
+            tools:listitem="@layout/item_user" />
+
+    </LinearLayout>
+</layout>
