@@ -249,13 +249,17 @@ public class DrawerActivity extends AppCompatActivity
                 break;
             case R.string.fragment_mycalendar:
                 //TODO: improve saved state, bug using menu
-                if(mMyCalendarFragment != null){
+                /*if(mMyCalendarFragment != null){
                     fragment = mMyCalendarFragment;
                 } else {
                     mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
                     fragment = mMyCalendarFragment;
 
-                }
+                }*/
+
+                mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                fragment = mMyCalendarFragment;
+
                 break;
         }
 

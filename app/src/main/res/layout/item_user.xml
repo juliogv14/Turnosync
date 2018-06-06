@@ -7,6 +7,13 @@
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:orientation="horizontal">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"/>
+
         <TextView
             android:id="@+id/textView_userList_name"
             android:layout_gravity="center_vertical"
@@ -17,13 +24,6 @@
             android:layout_marginTop="?android:attr/listPreferredItemPaddingEnd"
             android:layout_marginBottom="?android:attr/listPreferredItemPaddingEnd"
             tools:text="Nombre de usuario" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"/>
 
     </FrameLayout>
 </layout>

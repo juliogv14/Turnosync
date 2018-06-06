@@ -144,7 +144,7 @@ public class WeekAdapter extends BaseAdapter {
                 mCurrentUserShifts = mUserShiftList.get(mCurrentUid);
 
                 convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
-                convertView.setBackgroundColor(Color.CYAN);
+                convertView.setBackgroundColor(Color.WHITE);
 
 
 

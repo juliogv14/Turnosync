@@ -32,17 +32,17 @@ public class CalendarUtils {
     public static int getDayCellHeight(DisplayMetrics displayMetrics) {
         int densityDpi = displayMetrics.densityDpi;
         if (densityDpi > DisplayMetrics.DENSITY_LOW && densityDpi < DisplayMetrics.DENSITY_MEDIUM) {
-            return 70;
+            return 140;
         } else if (densityDpi > DisplayMetrics.DENSITY_MEDIUM && densityDpi < DisplayMetrics.DENSITY_HIGH) {
-            return 90;
+            return 140;
         } else if (densityDpi > DisplayMetrics.DENSITY_HIGH && densityDpi < DisplayMetrics.DENSITY_XHIGH) {
-            return 110;
+            return 140;
         } else if (densityDpi > DisplayMetrics.DENSITY_XHIGH && densityDpi < DisplayMetrics.DENSITY_XXHIGH) {
-            return 130;
+            return 140;
         } else if (densityDpi > DisplayMetrics.DENSITY_XXHIGH && densityDpi < DisplayMetrics.DENSITY_XXXHIGH) {
             return 150;
         } else {
-            return 110;
+            return 140;
         }
     }
 
