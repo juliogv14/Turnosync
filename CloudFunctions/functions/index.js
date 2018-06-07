@@ -120,7 +120,7 @@ exports.onInvite =
 	 });
 
 	 function userToGlobal(userUid, wkId){
-	 	return db.collection('workgroups').doc(wkId).collection('users').doc(userUid).set({uid: userUid});
+	 	return db.collection('workgroups').doc(wkId).collection('users').doc(userUid).set({uid: userUid, active: true});
 	 }
 
 	 function workgroupToUser(userRef, workgroup){
