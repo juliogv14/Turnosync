@@ -100,6 +100,13 @@ public class CreateWorkgroupDialog extends DialogFragment {
         return dialog;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+        mListener = null;
+    }
+
     private boolean attemptCreateWorkgroup() {
         Boolean isReadyToClose = true;
         //Get strings from editText

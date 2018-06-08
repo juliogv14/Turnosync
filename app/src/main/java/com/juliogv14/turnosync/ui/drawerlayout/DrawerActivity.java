@@ -79,6 +79,7 @@ public class DrawerActivity extends AppCompatActivity
 
     //SavedInstanceState
     private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
+    private static final String RESTORED_FRAGMENT_KEY = "restoredFragment";
 
     private int mCurrentFragmentID;
     private MyCalendarFragment mMyCalendarFragment;
@@ -94,15 +95,15 @@ public class DrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         //TODO: instance state may not be needed
-/*        if (savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
-            mMyCalendarFragment = getSupportFragmentManager().getFragment(savedInstanceState, RESTORED_FRAGMENT_KEY);
+            mMyCalendarFragment = (MyCalendarFragment) getSupportFragmentManager().getFragment(savedInstanceState, RESTORED_FRAGMENT_KEY);
             mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
             fromSavedInstanceState = true;
 
         } else {
             mCurrentFragmentID = R.string.fragment_home;
-        }*/
+        }
 
         mCurrentFragmentID = R.string.fragment_home;
 

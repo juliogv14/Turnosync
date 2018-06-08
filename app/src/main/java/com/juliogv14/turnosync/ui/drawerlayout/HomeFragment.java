@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
@@ -167,6 +168,12 @@ public class HomeFragment extends Fragment
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
     public void onDialogPositiveClick(String name, String description) {
         if (mFirebaseUser != null) {
             //Database References
@@ -183,8 +190,7 @@ public class HomeFragment extends Fragment
             workgroupData.put(getString(R.string.data_key_info), description);
             globalWorkgroupRef.set(workgroupData);
 
-            Map<String, String> userData = new HashMap<>();
-            userData.put("uid", mFirebaseUser.getUid());
+            UserRef userData = new UserRef(mFirebaseUser.getUid(), true);
             globalWorkgroupRef.collection(getString(R.string.data_ref_users))
                     .document(mFirebaseUser.getUid()).set(userData);
 

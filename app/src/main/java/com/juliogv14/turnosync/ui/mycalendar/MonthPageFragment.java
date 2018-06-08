@@ -109,6 +109,12 @@ public class MonthPageFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
     public void notifyGridDataSetChanged(){
         ((SupportActivity)mListener).runOnUiThread(new Runnable() {
             @Override

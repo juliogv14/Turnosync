@@ -27,21 +27,15 @@ public class AddUserDialog extends DialogFragment {
     //Strings
     String mEmail;
     private DialogAddUserBinding mViewBinding;
-    //Parent fragment
-    private AddUserListener mListener;
 
-    public AddUserDialog() {
-    }
+    //Parent fragment
+    private Context mContext;
+    private AddUserListener mListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof AddUserListener) {
-            mListener = (AddUserListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement AddUserListener");
-        }
+        mContext = context;
     }
 
     @Override
@@ -53,7 +47,7 @@ public class AddUserDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = LayoutInflater.from((Context)mListener).inflate(R.layout.dialog_add_user, null);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_user, null);
         mViewBinding = DialogAddUserBinding.bind(view);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
@@ -68,7 +62,7 @@ public class AddUserDialog extends DialogFragment {
                 .setNegativeButton(R.string.dialog_adduser_button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FormUtils.closeKeyboard((Context)mListener, mViewBinding.editTextEmail);
+                        FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
                     }
                 });
 
@@ -77,14 +71,14 @@ public class AddUserDialog extends DialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                FormUtils.openKeyboard((Context)mListener, mViewBinding.editTextEmail);
+                FormUtils.openKeyboard(mContext, mViewBinding.editTextEmail);
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         boolean isReadyToClose = attemptAddUser();
                         if (isReadyToClose) {
-                            FormUtils.closeKeyboard((Context)mListener, mViewBinding.editTextEmail);
+                            FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
                             mListener.onDialogPositiveClick(mEmail);
                             dialog.dismiss();
                         }
@@ -94,6 +88,13 @@ public class AddUserDialog extends DialogFragment {
         });
 
         return dialog;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+        mListener = null;
     }
 
     private boolean attemptAddUser() {
@@ -119,6 +120,10 @@ public class AddUserDialog extends DialogFragment {
             mViewBinding.editTextEmail.requestFocus();
         }
         return isReadyToClose;
+    }
+
+    public void setOnClickListener(AddUserListener listener){
+        mListener = listener;
     }
 
     public interface AddUserListener {
