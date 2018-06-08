@@ -44,6 +44,7 @@
             android:layout_width="fill_parent"
             android:layout_height="2dp"
             android:layout_marginStart="@dimen/activity_settings_margin"
+            android:layout_marginEnd="@dimen/activity_settings_margin"
             android:background="@android:drawable/divider_horizontal_bright"
             android:contentDescription="divider"
             android:scaleType="matrix"
@@ -52,7 +53,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_users"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

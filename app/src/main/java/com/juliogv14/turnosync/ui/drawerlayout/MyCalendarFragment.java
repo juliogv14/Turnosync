@@ -35,13 +35,14 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentMycalendarBinding;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
+import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -79,8 +80,7 @@ public class MyCalendarFragment extends Fragment {
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
-    private ArrayList<Map<String, Object>> mGroupUsersUids;
-    private ArrayList<String> mUserNames;
+    private ArrayList<UserRef> mGroupUsersRef;
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
     private UserWorkgroup mWorkgroup;
@@ -128,8 +128,7 @@ public class MyCalendarFragment extends Fragment {
         mViewBinding = FragmentMycalendarBinding.inflate(inflater, container, false);
         setHasOptionsMenu(true);
 
-        mGroupUsersUids = new ArrayList<>();
-        mUserNames = new ArrayList<>();
+        mGroupUsersRef = new ArrayList<>();
         Calendar cal = new GregorianCalendar();
         mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 
@@ -191,6 +190,12 @@ public class MyCalendarFragment extends Fragment {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_mycalendar, menu);
     }
@@ -224,7 +229,7 @@ public class MyCalendarFragment extends Fragment {
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.action_mycalendar_edit:
-
+                loadTestData();
 
                 return true;
             case R.id.action_mycalendar_switch:
@@ -244,7 +249,7 @@ public class MyCalendarFragment extends Fragment {
                 Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettingsActivity.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
-                workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mUserNames);
+                //workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mGroupUsersRef);
                 startActivity(workgroupSettingsIntent);
                 return true;
             default:
@@ -367,35 +372,29 @@ public class MyCalendarFragment extends Fragment {
                 for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot doc = docChange.getDocument();
                     if (doc.exists()) {
-                        Map<String, Object> userData = doc.getData();
-                        //TODO: get display names
-                        String userName = (String)userData.get("uid");
+                        UserRef userData = doc.toObject(UserRef.class);
                         switch (docChange.getType()) {
                             case ADDED:
                                 //Added
-                                mGroupUsersUids.add(userData);
-                                mUserNames.add(userName);
+                                mGroupUsersRef.add(userData);
                                 break;
                             case MODIFIED:
                                 if (docChange.getOldIndex() == docChange.getNewIndex()) {
                                     //Modified, same position
-                                    mGroupUsersUids.set(docChange.getOldIndex(), userData);
-                                    mUserNames.set(docChange.getOldIndex(), userName);
+                                    mGroupUsersRef.set(docChange.getOldIndex(), userData);
                                 } else {
                                     //Modified, differnt position
-                                    mGroupUsersUids.remove(docChange.getOldIndex());
-                                    mGroupUsersUids.add(docChange.getNewIndex(), userData);
-
-                                    mUserNames.remove(docChange.getOldIndex());
-                                    mUserNames.add(docChange.getNewIndex(), userName);
+                                    mGroupUsersRef.remove(docChange.getOldIndex());
+                                    mGroupUsersRef.add(docChange.getNewIndex(), userData);
                                 }
                                 break;
                             case REMOVED:
                                 //Removed
-                                mGroupUsersUids.remove(docChange.getOldIndex());
-                                mUserNames.remove(docChange.getOldIndex());
+                                mGroupUsersRef.remove(docChange.getOldIndex());
                                 break;
                         }
+
+
                     }
                 }
             }
@@ -487,7 +486,7 @@ public class MyCalendarFragment extends Fragment {
             //cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
             final HashMap<String, ArrayList<Shift>> shiftListMap = new HashMap<>();
 
-            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersUids, shiftListMap);
+            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersRef, shiftListMap);
             queryScheduleData(pageFragment, cal.getTime(), shiftListMap);
             return pageFragment;
         }
@@ -499,12 +498,12 @@ public class MyCalendarFragment extends Fragment {
 
         private void queryScheduleData(final ScheduleWeekPageFragment pageFragment, Date date, Map<String, ArrayList<Shift>> shiftListMap) {
 
-            for (Map<String, Object> userUid : mGroupUsersUids) {
+            for (UserRef userUid : mGroupUsersRef) {
                 final ArrayList<Shift> userShifts = new ArrayList<>();
-                final String uid = (String) userUid.get(getString(R.string.data_key_uid));
+                final String uid = userUid.getUid();
                 shiftListMap.put(uid, userShifts);
 
-                CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document((String) userUid.get(getString(R.string.data_key_uid)))
+                CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(userUid.getUid())
                         .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                         .collection(getString(R.string.data_ref_shifts));
 
@@ -527,6 +526,7 @@ public class MyCalendarFragment extends Fragment {
                                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                                         for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                                             DocumentSnapshot doc = docChange.getDocument();
+
                                             if (doc.exists()) {
                                                 Shift shift = doc.toObject(Shift.class);
 

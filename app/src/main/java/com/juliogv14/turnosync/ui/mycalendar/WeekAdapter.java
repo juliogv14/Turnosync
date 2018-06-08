@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
@@ -37,14 +38,14 @@ public class WeekAdapter extends BaseAdapter {
     private String[] mDays;
 
     //Shifts variables
-    private ArrayList<Map<String, String>> mGroupUsers;
+    private ArrayList<UserRef> mGroupUsers;
     private Map<String, ArrayList<Shift>> mUserShiftList;
     private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
     private String mCurrentUid;
     private ArrayList<Shift> mCurrentUserShifts;
 
 
-    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<Map<String, String>> groupUsers, Map<String, ArrayList<Shift>> userShifts) {
+    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts) {
         mContext = c;
         mDisplayMetrics = metrics;
         mGroupUsers = groupUsers;
@@ -121,6 +122,7 @@ public class WeekAdapter extends BaseAdapter {
                 if(!mShiftIterator.hasNext()){
                     mShiftIterator = mUserShiftList.entrySet().iterator();
                 }
+
                 mCalendar.setTime(mWeekDate);
                 convertView.setBackgroundColor(Color.GRAY);
                 return convertView;

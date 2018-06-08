@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.ItemUserBinding;
 
 import java.util.ArrayList;
@@ -15,18 +17,13 @@ import java.util.List;
 public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.UserViewHolder>{
 
     private Context mContext;
-    private List<String> mNameList;
-    private UserOnClickHandler mUserOnClickHandler;
+    private List<UserRef> mUserList;
+    private UserOnClickListener mUserOnClickListener;
 
-    public GroupUsersAdapter(Context context, ArrayList<String> nameList) {
-        this.mNameList= nameList;
+    public GroupUsersAdapter(Context context, ArrayList<UserRef> userList, UserOnClickListener listener) {
+        this.mUserList = userList;
         this.mContext = context;
-        if(context instanceof UserOnClickHandler){
-            mUserOnClickHandler = (UserOnClickHandler) context;
-        } else{
-            throw new RuntimeException(context.toString()
-                    + " must implement UserOnClickHandler");
-        }
+        this.mUserOnClickListener = listener;
 
     }
 
@@ -39,26 +36,43 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-        holder.bind(mNameList.get(position));
-        //holder.itemView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 300));
+        holder.bind(mUserList.get(position).getUid());
     }
 
     @Override
     public int getItemCount() {
-        return mNameList.size();
+        return mUserList.size();
     }
 
-    public interface UserOnClickHandler {
-        void onClickUser(String uid);
+    public interface UserOnClickListener {
+        void onClickRemoveUser(String uid);
     }
 
-    class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class UserViewHolder extends RecyclerView.ViewHolder {
         ItemUserBinding binding;
 
         UserViewHolder(ItemUserBinding viewBinding) {
             super(viewBinding.getRoot());
-            viewBinding.getRoot().setOnClickListener(this);
             this.binding = viewBinding;
+
+            this.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    String uid = mUserList.get(pos).getUid();
+                    Toast.makeText(mContext, "User uid: " + uid, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            this.binding.buttonSettingsRemoveUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    String uid = mUserList.get(pos).getUid();
+                    Toast.makeText(mContext, "Remove user" + uid, Toast.LENGTH_SHORT).show();
+                    mUserOnClickListener.onClickRemoveUser(uid);
+                }
+            });
         }
 
         public void bind(String name){
@@ -66,11 +80,5 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
             binding.executePendingBindings();
         }
 
-        @Override
-        public void onClick(View v) {
-            int pos = getAdapterPosition();
-            String uid = mNameList.get(pos);
-            mUserOnClickHandler.onClickUser(uid);
-        }
     }
 }

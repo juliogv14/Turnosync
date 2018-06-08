@@ -12,6 +12,7 @@
     <string name="data_key_displayname" translatable="false">displayName</string>
     <string name="data_key_email" translatable="false">email</string>
     <string name="data_key_uid" translatable="false">uid</string>
+    <string name="data_key_active" translatable="false">active</string>
 
     <string name="data_key_workgroupid" translatable="false">workgroupId</string>
     <string name="data_key_info" translatable="false">info</string>
@@ -19,8 +20,8 @@
     <string name="data_key_date" translatable="false">date</string>
 
     <!--INTENT KEYS-->
-    <string name="data_int_workgroup">intentWorkgroup</string>
-    <string name="data_int_users">intentUsers</string>
+    <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
+    <string name="data_int_users" translatable="false">intentUsers</string>
 
     <!--TOASTS MESSAGES-->
     <string name="toast_profile_displayname">Display name successfully updated</string>
@@ -85,7 +86,6 @@
     <!--SETTINGS ITEM TITLES-->
     <string name="pref_displayname_title">Display name</string>
     <string name="pref_email_title">Email</string>
-    <!--SETTINGS KEY STRINGS-->
 
     <!--SETTINGS DEFAULT VALUES-->
     <string name="pref_displayname_default">Name</string>
@@ -133,6 +133,12 @@
     <string name="dialog_adduser_email">Email</string>
     <string name="dialog_adduser_button_add">Invite</string>
     <string name="dialog_adduser_button_cancel">Cancel</string>
+
+    <!--CONFIRM REMOVE USER DIALOG STRINGS-->
+    <string name="dialog_removeUser_title">Are you sure to remove this user?</string>
+    <string name="dialog_removeUser_message">You will no longer be able to set shifts to this user, existing shift will be preserved</string>
+    <string name="dialog_removeUser_button_remove">Remove</string>
+    <string name="dialog_removeUser_button_cancel">Cancel</string>
 
     <!--HOME MENU OPTIONS-->
     <string name="menu_home_info">Info</string>

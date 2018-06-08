@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -45,7 +46,7 @@ public class ScheduleWeekPageFragment extends Fragment {
 
     //Firebase
     private OnScheduleFragmentInteractionListener mListener;
-    private ArrayList<Map<String, String>> mWorkgroupUsers;
+    private ArrayList<UserRef> mWorkgroupUsers;
     private Map<String, ArrayList<Shift>> mUsersShiftList;
 
     //Month
@@ -54,12 +55,12 @@ public class ScheduleWeekPageFragment extends Fragment {
     //GridAdapter
     private BaseAdapter mGridAdapter;
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<Map<String, Object>> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts) {
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<UserRef> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts) {
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
-        args.putSerializable(WORKGROUP_USERS_KEY, workgroupUsers);
+        args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         args.putSerializable(USERS_SHIFT_LIST_KEY, userShifts);
         args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
         f.setArguments(args);
@@ -83,7 +84,7 @@ public class ScheduleWeekPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            mWorkgroupUsers = (ArrayList<Map<String, String>>) args.getSerializable(WORKGROUP_USERS_KEY);
+            mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
             mUsersShiftList = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_LIST_KEY);
             mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
 
@@ -126,9 +127,9 @@ public class ScheduleWeekPageFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     public void notifyGridDataSetChanged() {
