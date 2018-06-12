@@ -163,7 +163,7 @@ public class DrawerActivity extends AppCompatActivity
 
         Log.d(TAG, "AddAuthStateListener");
         //Reset title and nav coming back from settings
-        onFragmentCreated(mCurrentFragmentID);
+        onFragmentSwapped(mCurrentFragmentID);
 
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
@@ -396,7 +396,7 @@ public class DrawerActivity extends AppCompatActivity
 
     //OnFragmentInteractionListener
     @Override
-    public void onFragmentCreated(int fragmentId) {
+    public void onFragmentSwapped(int fragmentId) {
         switch (fragmentId) {
             case R.string.fragment_home:
                 mToolbar.setTitle(R.string.fragment_home);
@@ -410,11 +410,11 @@ public class DrawerActivity extends AppCompatActivity
     }
 
     //TODO: Test if needed
-    @Override
+/*    @Override
     public void onFragmentSwapped(int fragmentId) {
         mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupId());
         displaySelectedScreen(fragmentId);
-    }
+    }*/
 
     //OnHomeFragmentInteractionListener
     @Override

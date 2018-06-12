@@ -27,5 +27,24 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    
+    <style name="CustomToggle1" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle1</item>
+    </style>
+    <style name="CustomToggle2" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle2</item>
+    </style>
+    <style name="CustomToggle3" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle3</item>
+    </style>
+    <style name="CustomToggle4" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle4</item>
+    </style>
+    <style name="CustomToggle5" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle5</item>
+    </style>
+    <style name="CustomToggle6" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle6</item>
+    </style>
 
 </resources>

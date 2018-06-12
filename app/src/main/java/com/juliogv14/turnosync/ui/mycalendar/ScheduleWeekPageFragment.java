@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.data.Shift;
@@ -33,14 +34,13 @@ import java.util.Map;
 
 public class ScheduleWeekPageFragment extends Fragment {
 
-    private final String TAG = this.getClass().getSimpleName();
-
     //Keys
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private static final String USERS_SHIFT_LIST_KEY = "userShiftList";
-    private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
-
+    private static final String SHIFT_TYPES_LIST_KEY = "shiftTypesList";
+    private final String TAG = this.getClass().getSimpleName();
     //Binding
     protected PageWeekBinding mViewBinding;
 
@@ -48,6 +48,7 @@ public class ScheduleWeekPageFragment extends Fragment {
     private OnScheduleFragmentInteractionListener mListener;
     private ArrayList<UserRef> mWorkgroupUsers;
     private Map<String, ArrayList<Shift>> mUsersShiftList;
+    private Map<String, ShiftType> mShiftTypesList;
 
     //Month
     private Date mWeekDate;
@@ -55,14 +56,15 @@ public class ScheduleWeekPageFragment extends Fragment {
     //GridAdapter
     private BaseAdapter mGridAdapter;
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<UserRef> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts) {
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<UserRef> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts, HashMap<String, ShiftType> shiftTypes) {
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
+        args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
         args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         args.putSerializable(USERS_SHIFT_LIST_KEY, userShifts);
-        args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
+        args.putSerializable(SHIFT_TYPES_LIST_KEY, shiftTypes);
         f.setArguments(args);
         return f;
     }
@@ -87,7 +89,7 @@ public class ScheduleWeekPageFragment extends Fragment {
             mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
             mUsersShiftList = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_LIST_KEY);
             mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
-
+            mShiftTypesList = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_LIST_KEY);
         }
     }
 
@@ -120,7 +122,7 @@ public class ScheduleWeekPageFragment extends Fragment {
         mViewBinding.textViewWeek.setText(week);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new WeekAdapter((SupportActivity) mListener, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftList);
+        mGridAdapter = new WeekAdapter((SupportActivity) mListener, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftList, mShiftTypesList);
 
         mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
@@ -133,12 +135,14 @@ public class ScheduleWeekPageFragment extends Fragment {
     }
 
     public void notifyGridDataSetChanged() {
-        ((SupportActivity)mListener).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mGridAdapter.notifyDataSetChanged();
-            }
-        });
+        if (mListener != null) {
+            ((SupportActivity) mListener).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mGridAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {

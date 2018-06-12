@@ -6,6 +6,6 @@ package com.juliogv14.turnosync.ui.drawerlayout;
  */
 
 public interface OnFragmentInteractionListener {
-    void onFragmentCreated(int itemid);
     void onFragmentSwapped(int fragmentId);
+    //void onFragmentSwapped(int fragmentId);
 }

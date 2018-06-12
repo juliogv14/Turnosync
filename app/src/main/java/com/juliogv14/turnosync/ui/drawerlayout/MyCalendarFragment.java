@@ -36,6 +36,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -59,15 +60,14 @@ import java.util.Map;
 
 public class MyCalendarFragment extends Fragment {
 
-    //Log TAG
-    private final String TAG = this.getClass().getSimpleName();
-
-    //Constants
-    //TODO set number of months queried to settings
-    private final int QUERY_MONTH_NUMBER = 12;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
     private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
+    //Log TAG
+    private final String TAG = this.getClass().getSimpleName();
+    //Constants
+    //TODO set number of months queried to settings
+    private final int QUERY_MONTH_NUMBER = 12;
     FirebaseUser mFirebaseUser;
 
     //Listener DrawerActivity
@@ -81,6 +81,8 @@ public class MyCalendarFragment extends Fragment {
     private ListenerRegistration mGroupUsersListener;
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
     private ArrayList<UserRef> mGroupUsersRef;
+    private HashMap<String, ShiftType> mShiftTypes;
+
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
     private UserWorkgroup mWorkgroup;
@@ -137,20 +139,23 @@ public class MyCalendarFragment extends Fragment {
         mInitMonth = new GregorianCalendar();
         mInitMonth.add(Calendar.MONTH, -mInitMonthOffset);
         mInitMonth.set(Calendar.WEEK_OF_MONTH, 1);
+        mInitMonth.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
         mUserShiftsListeners = new ArrayList<>();
+        mShiftTypes = new HashMap<>();
         return mViewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mListener.onFragmentCreated(R.string.fragment_mycalendar);
+        mListener.onFragmentSwapped(R.string.fragment_mycalendar);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         queryWorkgroupUsers();
+        queryShiftTypes();
 
         Log.d(TAG, "Start MyCalendarFragment");
     }
@@ -175,8 +180,8 @@ public class MyCalendarFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (mGroupUsersListener != null) {
             mGroupUsersListener.remove();
         }
@@ -212,14 +217,13 @@ public class MyCalendarFragment extends Fragment {
                     menuItem.setIcon(R.drawable.ic_mycalendar_black_24dp);
                 }
             } else if (itemId == R.id.action_mycalendar_edit) {
-                if (!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString())) {
+                if (!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString()) || mPersonalSchedule) {
                     menuItem.setVisible(false);
                 }
             }
             Drawable icon = menuItem.getIcon();
             if (icon != null) {
-                icon.mutate();
-                icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                icon.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             }
         }
     }
@@ -246,7 +250,7 @@ public class MyCalendarFragment extends Fragment {
                 return true;
             case R.id.action_mycalendar_settings:
 
-                Intent workgroupSettingsIntent = new Intent((Context)mListener, WorkgroupSettingsActivity.class);
+                Intent workgroupSettingsIntent = new Intent((Context) mListener, WorkgroupSettingsActivity.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
                 //workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mGroupUsersRef);
@@ -323,13 +327,13 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
-    private PagerAdapter changeAdapter(){
+    private PagerAdapter changeAdapter() {
         PagerAdapter pagerAdapter;
         if (mPersonalSchedule) {
 
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
-            calend.get(Calendar.WEEK_OF_YEAR);
+            calend.set(Calendar.DAY_OF_MONTH, 1);
             mCurrentPosition = calend.get(Calendar.MONTH) + 1;
 
             pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
@@ -339,8 +343,6 @@ public class MyCalendarFragment extends Fragment {
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
 
             calend.add(Calendar.MONTH, mCurrentPosition);
-
-            calinit.get(Calendar.WEEK_OF_YEAR);
 
             int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
             int endWeek = calend.get(Calendar.WEEK_OF_YEAR);
@@ -402,6 +404,30 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
+
+    private void queryShiftTypes() {
+        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .collection(getString(R.string.data_ref_shiftTypes));
+
+        workgroupsUsersColl.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        if (doc != null && doc.exists()) {
+                            ShiftType type = doc.toObject(ShiftType.class);
+                            mShiftTypes.put(type.getId(), type);
+                        }
+                    }
+                } else {
+                    if (task.getException() != null) {
+                        Log.e(TAG, task.getException().getMessage());
+                    }
+                }
+            }
+        });
+    }
+
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
 
     }
@@ -417,10 +443,11 @@ public class MyCalendarFragment extends Fragment {
 
             Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             cal.add(Calendar.MONTH, position);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
 
             final ArrayList<Shift> shiftList = new ArrayList<>();
 
-            MonthPageFragment pageFragment = MonthPageFragment.newInstance(mWorkgroup, cal.getTime(), shiftList);
+            MonthPageFragment pageFragment = MonthPageFragment.newInstance(mWorkgroup, cal.getTime(), shiftList, mShiftTypes);
             queryShiftData(pageFragment, cal.getTime(), shiftList);
 
             return pageFragment;
@@ -483,10 +510,10 @@ public class MyCalendarFragment extends Fragment {
 
             Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             cal.set(Calendar.WEEK_OF_YEAR, cal.get(Calendar.WEEK_OF_YEAR) + position);
-            //cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
             final HashMap<String, ArrayList<Shift>> shiftListMap = new HashMap<>();
 
-            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersRef, shiftListMap);
+            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes);
             queryScheduleData(pageFragment, cal.getTime(), shiftListMap);
             return pageFragment;
         }

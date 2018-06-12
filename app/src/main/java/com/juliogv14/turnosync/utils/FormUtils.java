@@ -44,6 +44,11 @@ public class FormUtils {
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
 
+    public static boolean isTagValid(String tag){
+        String regEx = "^[\\p{L}\\p{N}-' ]{1,3}$";
+        return Pattern.compile(regEx).matcher(tag).matches();
+    }
+
     public static void showLoadingIndicator(View indicatorView, boolean show) {
         if (show) {
             AnimationViewUtils.animateView(indicatorView, View.VISIBLE, 0.4f, 200);

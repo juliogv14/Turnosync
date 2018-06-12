@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
@@ -40,17 +41,19 @@ public class WeekAdapter extends BaseAdapter {
     //Shifts variables
     private ArrayList<UserRef> mGroupUsers;
     private Map<String, ArrayList<Shift>> mUserShiftList;
+    private Map<String, ShiftType> mShiftsTypesList;
+
+    //Per user shifts
     private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
     private String mCurrentUid;
-    private ArrayList<Shift> mCurrentUserShifts;
 
 
-    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts) {
+    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts, Map<String, ShiftType> shiftTypes) {
         mContext = c;
         mDisplayMetrics = metrics;
         mGroupUsers = groupUsers;
         mUserShiftList = userShifts;
-
+        mShiftsTypesList = shiftTypes;
 
         mCalendar = new GregorianCalendar();
         mCalendar.setTime(weekDate);
@@ -143,27 +146,29 @@ public class WeekAdapter extends BaseAdapter {
                 }
                 ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
 
-                mCurrentUserShifts = mUserShiftList.get(mCurrentUid);
+                ArrayList<Shift> userShifts = mUserShiftList.get(mCurrentUid);
 
                 convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
                 convertView.setBackgroundColor(Color.WHITE);
 
 
 
-                if (!mCurrentUserShifts.isEmpty()) {
+                if (!userShifts.isEmpty()) {
 
                     int month = mCalendar.get(Calendar.MONTH);
                     int day = mCalendar.get(Calendar.DAY_OF_MONTH);
 
-                    Shift shift = mCurrentUserShifts.get(0);
+                    Shift shift = userShifts.get(0);
                     Calendar calShift = new GregorianCalendar();
                     calShift.setTime(shift.getDate());
 
                     if (day == calShift.get(Calendar.DAY_OF_MONTH) && month == calShift.get(Calendar.MONTH)) {
-                        mCurrentUserShifts.remove(shift);
-                        mItemShiftBinding.textViewDayMonth.setText(String.valueOf(day));
-                        mItemShiftBinding.textViewShiftType.setText(shift.getType());
-                        convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
+                        userShifts.remove(shift);
+                        //mItemShiftBinding.textViewDayMonth.setText(String.valueOf(day));
+                        mItemShiftBinding.textViewDayMonth.setVisibility(View.GONE);
+                        ShiftType type = mShiftsTypesList.get(shift.getType());
+                        mItemShiftBinding.textViewShiftType.setText(type.getTag());
+                        convertView.setBackgroundColor(type.getColor());
 
                     }
                 }

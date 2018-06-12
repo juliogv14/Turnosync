@@ -20,7 +20,8 @@
             android:text="Shift types"
             android:textAppearance="@style/TextAppearance.AppCompat.Menu"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground"/>
 
         <ImageView
             android:layout_width="fill_parent"

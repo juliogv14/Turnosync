@@ -7,6 +7,7 @@
     <string name="data_ref_workgroups" translatable="false">workgroups</string>
     <string name="data_ref_shifts" translatable="false">shifts</string>
     <string name="data_ref_invites" translatable="false">invites</string>
+    <string name="data_ref_shiftTypes" translatable="false">shifttypes</string>
 
     <!--CLOUD FIRESTORE KEYS-->
     <string name="data_key_displayname" translatable="false">displayName</string>
@@ -45,6 +46,81 @@
     <string name="fragment_home">Home</string>
     <string name="fragment_mycalendar">My Calendar</string>
     <string name="fragment_schedule">Schedule</string>
+    <string name="fragment_workgroupSettings">Workgroup settings</string>
+    <string name="fragment_shiftTypes">Shift types</string>
+
+    <!--WORKGROUP DIALOG STRINGS-->
+    <string name="dialog_workgroup_title">Create new workgroup</string>
+    <string name="dialog_workgroup_name">Name</string>
+    <string name="dialog_workgroup_desc">Description (optional)</string>
+    <string name="dialog_workgroup_button_create">Create</string>
+    <string name="dialog_workgroup_button_cancel">Cancel</string>
+
+    <!--ADDUSER DIALOG STRINGS-->
+    <string name="dialog_adduser_title">Add user to workgroup</string>
+    <string name="dialog_adduser_email">Email</string>
+    <string name="dialog_adduser_button_add">Invite</string>
+    <string name="dialog_adduser_button_cancel">Cancel</string>
+
+    <!--CONFIRM REMOVE USER DIALOG STRINGS-->
+    <string name="dialog_removeUser_title">Are you sure to remove this user?</string>
+    <string name="dialog_removeUser_message">You will no longer be able to set shifts to this user, existing shift will be preserved</string>
+    <string name="dialog_removeUser_button_remove">Remove</string>
+    <string name="dialog_removeUser_button_cancel">Cancel</string>
+
+    <!--CREATE NEW TYPE DIALOG STRINGS-->
+    <string name="dialog_createType_title">Are you sure to remove this type?</string>
+    <string name="dialog_createType_button_create">Create</string>
+    <string name="dialog_createType_button_edit">Edit</string>
+    <string name="dialog_createType_button_cancel">Cancel</string>
+
+    <string name="dialog_createType_name">Name</string>
+    <string name="dialog_createType_tag">Tag</string>
+    <string name="dialog_createType_interval">Shift interval:</string>
+    <string name="dialog_createType_from">from</string>
+    <string name="dialog_createType_start">Start</string>
+    <string name="dialog_createType_to">to</string>
+    <string name="dialog_createType_end">End</string>
+    <string name="dialog_createType_defaultTime">00:00</string>
+    <string name="dialog_createType_color">Background color:</string>
+    <string name="dialog_createType_error_tag">Max 3 characters.</string>
+    <string name="dialog_createType_error_time">You cannot set the end time to a time earlier than the start time.</string>
+
+    <!--TIME PICKER DIALOG STRINGS-->
+    <string name="dialog_timePicker_title">Set time</string>
+
+
+
+    <!--CONFIRM REMOVE TYPE DIALOG STRINGS-->
+    <string name="dialog_removeType_title">Are you sure to remove this type?</string>
+    <string name="dialog_removeType_message">You will no longer be able to set this shift type to shifts, this action will not remove existing shifts with this type</string>
+    <string name="dialog_removeType_button_remove">Remove</string>
+    <string name="dialog_removeType_button_cancel">Cancel</string>
+
+    <!--DRAWER NAV ITEM TITLES-->
+    <string name="nav_item_home">Home</string>
+    <string name="nav_item_calendar">My calendar</string>
+    <string name="nav_item_settings">Settings</string>
+    <string name="nav_item_signout">Sign out</string>
+
+    <!--HOME MENU OPTIONS-->
+    <string name="menu_home_info">Info</string>
+    <string name="menu_home_settings">Settings</string>
+
+    <!--MYCALENDAR MENU OPTIONS-->
+    <string name="menu_mycalendar_switch">Schedule</string>
+    <string name="menu_mycalendar_settings">Settings</string>
+
+    <!--SCHEDULE MENU OPTIONS-->
+    <string name="menu_schedule_edit">Edit</string>
+    <string name="menu_schedule_switch">My calendar</string>
+    <string name="menu_schedule_settings">Settings</string>
+
+    <!--WORKGROUP SETTINGS MENU OPTIONS-->
+    <string name="menu_wkSettings_add">Add user</string>
+
+    <!--WORKGROUP SETTINGS MENU OPTIONS-->
+    <string name="menu_shiftTypes_add">New type</string>
 
     <!--FORM ERROR STRINGS-->
     <string name="form_error_field_required">This field is required</string>
@@ -56,6 +132,7 @@
     <string name="login_forgot_password">Forgot password?</string>
     <string name="login_or">Or</string>
     <string name="login_action_signin">Sign in</string>
+
     <!--LOGIN MENU STRINGS-->
     <string name="login_action_register">Register</string>
 
@@ -76,12 +153,6 @@
     <string name="resetpassword_label_question">Forgot your account password? </string>
     <string name="resetpassword_label_instructions">Enter your email below to reset your password</string>
     <string name="resetpassword_action_sendemail">Send email</string>
-
-    <!--DRAWER NAV ITEM TITLES-->
-    <string name="nav_item_home">Home</string>
-    <string name="nav_item_calendar">My calendar</string>
-    <string name="nav_item_settings">Settings</string>
-    <string name="nav_item_signout">Sign out</string>
 
     <!--SETTINGS ITEM TITLES-->
     <string name="pref_displayname_title">Display name</string>
@@ -121,41 +192,9 @@
         <item>December</item>
     </string-array>
 
-    <!--WORKGROUP DIALOG STRINGS-->
-    <string name="dialog_workgroup_title">Create new workgroup</string>
-    <string name="dialog_workgroup_name">Name</string>
-    <string name="dialog_workgroup_desc">Description (optional)</string>
-    <string name="dialog_workgroup_button_create">Create</string>
-    <string name="dialog_workgroup_button_cancel">Cancel</string>
-
-    <!--ADDUSER DIALOG STRINGS-->
-    <string name="dialog_adduser_title">Add user to workgroup</string>
-    <string name="dialog_adduser_email">Email</string>
-    <string name="dialog_adduser_button_add">Invite</string>
-    <string name="dialog_adduser_button_cancel">Cancel</string>
-
-    <!--CONFIRM REMOVE USER DIALOG STRINGS-->
-    <string name="dialog_removeUser_title">Are you sure to remove this user?</string>
-    <string name="dialog_removeUser_message">You will no longer be able to set shifts to this user, existing shift will be preserved</string>
-    <string name="dialog_removeUser_button_remove">Remove</string>
-    <string name="dialog_removeUser_button_cancel">Cancel</string>
-
-    <!--HOME MENU OPTIONS-->
-    <string name="menu_home_info">Info</string>
-    <string name="menu_home_settings">Settings</string>
-
-    <!--MYCALENDAR MENU OPTIONS-->
-    <string name="menu_mycalendar_switch">Schedule</string>
-    <string name="menu_mycalendar_settings">Settings</string>
-
-    <!--SCHEDULE MENU OPTIONS-->
-    <string name="menu_schedule_edit">Edit</string>
-    <string name="menu_schedule_switch">My calendar</string>
-    <string name="menu_schedule_settings">Settings</string>
-
-
     <!--reference errors-->
     <item name="visible" type="id" />
     <item name="masked" type="id" />
+
 
 </resources>

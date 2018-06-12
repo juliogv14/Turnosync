@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/editTextLayout_createType_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toStartOf="@+id/editTextLayout_createType_tag"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/editText_createType_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/dialog_createType_name" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/editTextLayout_createType_tag"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="16dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/editText_createType_tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/dialog_createType_tag" />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textView_createType_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/dialog_createType_interval"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintBottom_toBottomOf="@+id/button_createType_start"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_start" />
+
+        <Button
+            android:id="@+id/button_createType_start"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/textView_createType_to"
+            app:layout_constraintEnd_toStartOf="@+id/textView_createType_to"
+            app:layout_constraintTop_toTopOf="@+id/textView_createType_to"
+            tools:text="00:00" />
+
+        <TextView
+            android:id="@+id/textView_createType_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/dialog_createType_to"
+            app:layout_constraintBottom_toBottomOf="@+id/button_createType_end"
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_end"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_end" />
+
+        <Button
+            android:id="@+id/button_createType_end"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextLayout_createType_tag"
+            app:layout_constraintStart_toStartOf="@+id/editTextLayout_createType_tag"
+            app:layout_constraintTop_toBottomOf="@+id/editTextLayout_createType_tag"
+            tools:text="00:00" />
+
+        <TextView
+            android:id="@+id/textView_createType_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/dialog_createType_color"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_createType_start" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:background="@android:drawable/divider_horizontal_bright"
+            android:contentDescription="divider"
+            android:scaleType="matrix"
+            android:src="@android:drawable/divider_horizontal_bright"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_createType_background" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color1"
+            android:theme="@style/CustomToggle1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:checked="true"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_color2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_createType_background" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color2"
+            android:theme="@style/CustomToggle2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_color3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_createType_color1"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_color1" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color3"
+            android:theme="@style/CustomToggle3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_color4"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_createType_color2"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_color2" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color4"
+            android:theme="@style/CustomToggle4"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_color5"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_createType_color3"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_color3" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color5"
+            android:theme="@style/CustomToggle5"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toStartOf="@+id/button_createType_color6"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_createType_color4"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_color4" />
+
+        <ToggleButton
+            android:id="@+id/button_createType_color6"
+            android:theme="@style/CustomToggle6"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
+            android:textOn=""
+            android:textOff=""
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_createType_color5"
+            app:layout_constraintTop_toTopOf="@+id/button_createType_color5" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

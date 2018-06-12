@@ -4,6 +4,6 @@
     <item
         android:id="@+id/action_wkSettings_addUser"
         android:icon="@drawable/ic_person_add_black_24dp"
-        android:title="@string/menu_home_info"
+        android:title="@string/menu_wkSettings_add"
         app:showAsAction="always" />
 </menu>

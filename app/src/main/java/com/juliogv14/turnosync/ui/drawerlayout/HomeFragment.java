@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment
         mGridAdapter = new GroupItemsAdapter((Activity) mListener, R.layout.fragment_home, mWorkgroupsList);
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
-        mListener.onFragmentCreated(R.string.fragment_home);
+        mListener.onFragmentSwapped(R.string.fragment_home);
         //attatchWorkgroupsListener();
 
 

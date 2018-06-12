@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,17 +45,19 @@ public class MonthAdapter extends BaseAdapter {
     private String[] mDays;
 
     private ArrayList<Shift> mShiftsList;
+    private HashMap<String, ShiftType> mShiftsTypesList;
 
 
-    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts) {
+    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts, HashMap<String, ShiftType> types) {
         mContext = c;
         mCalendar = Calendar.getInstance();
         mCalendar.setTime(monthDate);
         mCalendarToday = Calendar.getInstance();
         mDisplayMetrics = metrics;
         mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
-        mShiftsList = shifts;
 
+        mShiftsList = shifts;
+        mShiftsTypesList = types;
         populateMonth();
     }
 
@@ -164,9 +168,9 @@ public class MonthAdapter extends BaseAdapter {
                 if (date[0] == calShift.get(Calendar.DAY_OF_MONTH) && date[1] == calShift.get(Calendar.MONTH)) {
 
                     mShiftsList.remove(shift);
-                    mItemShiftBinding.textViewShiftType.setText(shift.getType());
-                    //TODO color cells from settings and type
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.colorAccent));
+                    ShiftType type = mShiftsTypesList.get(shift.getType());
+                    mItemShiftBinding.textViewShiftType.setText(type.getTag());
+                    convertView.setBackgroundColor(type.getColor());
 
                 }
             }

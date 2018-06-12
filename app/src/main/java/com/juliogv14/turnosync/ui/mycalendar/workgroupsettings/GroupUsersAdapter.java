@@ -55,21 +55,11 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
             super(viewBinding.getRoot());
             this.binding = viewBinding;
 
-            this.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    String uid = mUserList.get(pos).getUid();
-                    Toast.makeText(mContext, "User uid: " + uid, Toast.LENGTH_SHORT).show();
-                }
-            });
-
             this.binding.buttonSettingsRemoveUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
                     String uid = mUserList.get(pos).getUid();
-                    Toast.makeText(mContext, "Remove user" + uid, Toast.LENGTH_SHORT).show();
                     mUserOnClickListener.onClickRemoveUser(uid);
                 }
             });

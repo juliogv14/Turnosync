@@ -35,6 +35,7 @@ import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentWorkgroupSettingsBinding;
+import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,14 +53,14 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     //Listener
     WorkgroupSettingsListener mListener;
 
+    //Binding
+    FragmentWorkgroupSettingsBinding mViewBinding;
+
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
 
-    //Binding
-    FragmentWorkgroupSettingsBinding mViewBinding;
-
-    //Intent data
+    //Workgroup
     private UserWorkgroup mWorkgroup;
 
     ArrayList<UserRef> mUserList;
@@ -116,25 +117,32 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mListener.onFragmentSwapped(R.string.fragment_workgroupSettings);
 
         //Init
         mFirebaseFirestore = FirebaseFirestore.getInstance();
-        queryWorkgroupUsers();
+        attatchWorkgroupUsersListener();
+
         //RecyclerView
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager((Context)mListener, LinearLayoutManager.VERTICAL, false);
         mViewBinding.recyclerUsers.setLayoutManager(layoutManager);
         mViewBinding.recyclerUsers.setHasFixedSize(true);
-
-
         GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter((Context) mListener, mUserList,this);
         mViewBinding.recyclerUsers.setAdapter(recyclerAdapter);
+
+        mViewBinding.settingsItemShiftTypes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.swapFragment(R.string.fragment_shiftTypes);
+            }
+        });
 
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (mGroupUsersListener != null){
             mGroupUsersListener.remove();
         }
@@ -173,7 +181,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         return false;
     }
 
-    private void queryWorkgroupUsers() {
+    private void attatchWorkgroupUsersListener() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
 
@@ -265,7 +273,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
 
 
-    public interface WorkgroupSettingsListener {
-
+    public interface WorkgroupSettingsListener extends OnFragmentInteractionListener {
+        void swapFragment(int fragmentId);
     }
 }

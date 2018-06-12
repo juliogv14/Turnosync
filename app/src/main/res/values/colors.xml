@@ -10,10 +10,25 @@
     <color name="linkColor">#0000EE</color>
     <color name="visitedLinkColor">#551A8B</color>
 
+    <!--CREATE SHIFTTYPE COLORS-->
+    <color name="customToggle1">#d05454</color>
+    <color name="customToggle2">#7CB9E8</color>
+    <color name="customToggle3">#B2BEB5</color>
+    <color name="customToggle4">#BF94E4</color>
+    <color name="customToggle5">#8DB600</color>
+    <color name="customToggle6">#FFEF00</color>
+    <array name="shiftType_colors">
+        <item>@color/customToggle1</item>
+        <item>@color/customToggle2</item>
+        <item>@color/customToggle3</item>
+        <item>@color/customToggle4</item>
+        <item>@color/customToggle5</item>
+        <item>@color/customToggle6</item>
+    </array>
+
     <!--NAV DRAWER ITEM COLORS-->
     <color name="statecolor_checked">#EEDDDDDD</color>
     <color name="statecolor_pressed">#DDDDDD</color>
 
-    <!--HOME ITEM BACKGROUND COLORS-->
 
 </resources>
