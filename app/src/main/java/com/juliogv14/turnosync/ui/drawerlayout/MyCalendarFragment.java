@@ -60,15 +60,15 @@ import java.util.Map;
 
 public class MyCalendarFragment extends Fragment {
 
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
-    private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
-    private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
+
     //Constants
     //TODO set number of months queried to settings
     private final int QUERY_MONTH_NUMBER = 12;
-    FirebaseUser mFirebaseUser;
+    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
+    private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
 
     //Listener DrawerActivity
     private OnCalendarFragmentInteractionListener mListener;
@@ -85,6 +85,7 @@ public class MyCalendarFragment extends Fragment {
 
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
+    FirebaseUser mFirebaseUser;
     private UserWorkgroup mWorkgroup;
     private boolean mPersonalSchedule = true;
 
