@@ -13,11 +13,8 @@ import java.util.Date;
 public class Shift implements Parcelable {
     //JSON database
     private String type;
-    private String userID;
+    private String userId;
 
-    private int year;
-    private int month;
-    private int day;
     private Date date;
     private String start;
     private String end;
@@ -25,20 +22,20 @@ public class Shift implements Parcelable {
     public Shift() {
     }
 
-    public Shift(String userID, String type, Date date, String start, String end) {
+    public Shift(String userId, String type, Date date, String start, String end) {
         this.type = type;
-        this.userID = userID;
+        this.userId = userId;
         this.date = date;
         this.start = start;
         this.end = end;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getType() {
@@ -76,7 +73,7 @@ public class Shift implements Parcelable {
 
     //Parcelable implementation
     private Shift(Parcel in) {
-        this.userID = in.readString();
+        this.userId = in.readString();
         this.type = in.readString();
         this.date = new Date(in.readLong());
         this.start = in.readString();
@@ -102,7 +99,7 @@ public class Shift implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
-        out.writeString(userID);
+        out.writeString(userId);
         out.writeString(type);
         out.writeLong(date.getTime());
         out.writeString(start);

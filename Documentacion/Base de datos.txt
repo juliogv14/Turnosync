@@ -1,7 +1,7 @@
 Cloud firestore
 
 users {
-	userID {
+	userId {
 		displayName: "name"
 		email: "email"
 		info:"personal info"
@@ -43,7 +43,7 @@ workgroups {
 
 
         users{
-            userID{
+            userId{
                 uid: "uid"
             }
             .

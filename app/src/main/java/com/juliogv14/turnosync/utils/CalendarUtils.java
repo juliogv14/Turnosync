@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 
 public class CalendarUtils {
 
-    public static final int[] mDaysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static final int[] mDaysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     public static int getLabelHeight(DisplayMetrics displayMetrics) {
         int densityDpi = displayMetrics.densityDpi;

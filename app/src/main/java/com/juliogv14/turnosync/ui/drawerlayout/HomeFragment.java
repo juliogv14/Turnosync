@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
@@ -48,17 +47,21 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment
         implements CreateWorkgroupDialog.CreateWorkgroupListener {
-    //Key constants
-    private static final String WORKGROUP_LIST_KEY = "workgroupList";
+
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
+
+    //Key constants
+    private static final String WORKGROUP_LIST_KEY = "workgroupList";
+
     //Data binding
     protected FragmentHomeBinding mViewBinding;
     ToolbarActionModeCallback tb;
+
     //Firebase
     private FirebaseFirestore mFirebaseFirestore;
     private FirebaseUser mFirebaseUser;
-    private ListenerRegistration mWorkgroupsListener;
+
     //GridAdapter
     private GroupItemsAdapter mGridAdapter;
     private ArrayList<UserWorkgroup> mWorkgroupsList;
@@ -117,13 +120,11 @@ public class HomeFragment extends Fragment
 
         mViewBinding.gridViewGroupDisplay.setAdapter(mGridAdapter);
         mListener.onFragmentSwapped(R.string.fragment_home);
-        //attatchWorkgroupsListener();
 
 
         mViewBinding.floatingButtonNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //testData();
                 CreateWorkgroupDialog dialog = new CreateWorkgroupDialog();
                 dialog.show(getChildFragmentManager(), "cwk");
             }
@@ -211,7 +212,7 @@ public class HomeFragment extends Fragment
             mSelectedWorkgroup = workgroup;
             mSelectedWorkgroup.setSelected(true);
 
-            tb = new ToolbarActionModeCallback((Context) mListener, mGridAdapter, mSelectedWorkgroup);
+            tb = new ToolbarActionModeCallback((Context) mListener, mSelectedWorkgroup);
             if (mActionMode == null) {
                 mActionMode = ((AppCompatActivity) mListener)
                         .startSupportActionMode(tb);
@@ -269,11 +270,9 @@ public class HomeFragment extends Fragment
 
         UserWorkgroup mWorkgroup;
         private Context mContext;
-        private GroupItemsAdapter mGroupsAdapter;
 
-        ToolbarActionModeCallback(Context mContext, GroupItemsAdapter mGroupsAdapter, UserWorkgroup workgroup) {
+        ToolbarActionModeCallback(Context mContext, UserWorkgroup workgroup) {
             this.mContext = mContext;
-            this.mGroupsAdapter = mGroupsAdapter;
             this.mWorkgroup = workgroup;
         }
 

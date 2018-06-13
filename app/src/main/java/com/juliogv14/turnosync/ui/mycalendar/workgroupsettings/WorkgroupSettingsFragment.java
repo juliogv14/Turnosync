@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,7 +47,6 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
     //Constants
     private static final String WORKGROUP_KEY = "workgroup";
-    private static final String USER_LIST = "userList";
 
     //Listener
     WorkgroupSettingsListener mListener;
@@ -64,16 +62,6 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     private UserWorkgroup mWorkgroup;
 
     ArrayList<UserRef> mUserList;
-
-    /*public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup, ArrayList<UserRef> userList) {
-        WorkgroupSettingsFragment f = new WorkgroupSettingsFragment();
-
-        Bundle args = new Bundle();
-        args.putParcelable(WORKGROUP_KEY, workgroup);
-        args.putParcelableArrayList(USER_LIST, userList);
-        f.setArguments(args);
-        return f;
-    }*/
 
     public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup) {
         WorkgroupSettingsFragment f = new WorkgroupSettingsFragment();
@@ -100,8 +88,6 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         Bundle args = getArguments();
         if (args != null) {
             mWorkgroup = args.getParcelable(WORKGROUP_KEY);
-            //mUserList = args.getParcelableArrayList(USER_LIST);
-            //Remove non active users
         }
     }
 
@@ -259,9 +245,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-
-                        } else {
+                        if (!task.isSuccessful()) {
                             if (task.getException() != null) {
                                 Log.e(TAG, task.getException().getMessage());
                             }

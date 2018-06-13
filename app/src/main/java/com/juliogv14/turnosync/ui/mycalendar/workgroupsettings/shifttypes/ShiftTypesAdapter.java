@@ -12,8 +12,6 @@ import com.juliogv14.turnosync.databinding.ItemShifttypeBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 

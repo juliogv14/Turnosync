@@ -12,18 +12,7 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
  */
 @IgnoreExtraProperties
 public class UserWorkgroup implements Parcelable {
-    @Exclude
-    public static final Parcelable.Creator<UserWorkgroup> CREATOR = new Parcelable.Creator<UserWorkgroup>() {
-        @Override
-        public UserWorkgroup createFromParcel(Parcel in) {
-            return new UserWorkgroup(in);
-        }
 
-        @Override
-        public UserWorkgroup[] newArray(int size) {
-            return new UserWorkgroup[size];
-        }
-    };
     private String workgroupId;
     private String displayName;
     private String info;
@@ -36,15 +25,6 @@ public class UserWorkgroup implements Parcelable {
         this.displayName = displayName;
         this.info = info;
         this.role = role;
-    }
-
-    //Parcelable implementation
-    private UserWorkgroup(Parcel in) {
-        this.workgroupId = in.readString();
-        this.displayName = in.readString();
-        this.info = in.readString();
-        this.role = in.readString();
-        this.selected = in.readByte() != 0;
     }
 
     public String getWorkgroupId() {
@@ -88,6 +68,28 @@ public class UserWorkgroup implements Parcelable {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+    //Parcelable implementation
+    private UserWorkgroup(Parcel in) {
+        this.workgroupId = in.readString();
+        this.displayName = in.readString();
+        this.info = in.readString();
+        this.role = in.readString();
+        this.selected = in.readByte() != 0;
+    }
+
+    @Exclude
+    public static final Parcelable.Creator<UserWorkgroup> CREATOR = new Parcelable.Creator<UserWorkgroup>() {
+        @Override
+        public UserWorkgroup createFromParcel(Parcel in) {
+            return new UserWorkgroup(in);
+        }
+
+        @Override
+        public UserWorkgroup[] newArray(int size) {
+            return new UserWorkgroup[size];
+        }
+    };
 
     @Override
     public int describeContents() {

@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityResetPasswordBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
-
+//TODO make it a dialog
 public class ResetPasswordActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
 
