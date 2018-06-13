@@ -58,34 +58,30 @@ import java.util.Map;
  * MyCalendarFragment.java
  */
 
-public class MyCalendarFragment extends Fragment {
+public class MyCalendarFragment extends Fragment implements MonthPageFragment.OnMonthFragmentInteractionListener,
+        ScheduleWeekPageFragment.OnScheduleFragmentInteractionListener {
 
-    //Log TAG
-    private final String TAG = this.getClass().getSimpleName();
-
-    //Constants
-    //TODO set number of months queried to settings
-    private final int QUERY_MONTH_NUMBER = 12;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
     private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
-
+    //Log TAG
+    private final String TAG = this.getClass().getSimpleName();
+    //Constants
+    //TODO set number of months queried to settings
+    private final int QUERY_MONTH_NUMBER = 12;
+    FirebaseUser mFirebaseUser;
     //Listener DrawerActivity
     private OnCalendarFragmentInteractionListener mListener;
-
     //Binding
     private FragmentMycalendarBinding mViewBinding;
-
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
     private ArrayList<UserRef> mGroupUsersRef;
     private HashMap<String, ShiftType> mShiftTypes;
-
     //Firebase Auth
     private FirebaseAuth mFirebaseAuth;
-    FirebaseUser mFirebaseUser;
     private UserWorkgroup mWorkgroup;
     private boolean mPersonalSchedule = true;
 
@@ -94,6 +90,8 @@ public class MyCalendarFragment extends Fragment {
     private int mCurrentPosition;
     private Calendar mInitMonth;
 
+    //Edit mode
+    private boolean editMode = false;
 
     public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
@@ -165,7 +163,7 @@ public class MyCalendarFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        PagerAdapter pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+        PagerAdapter pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
 
         mViewBinding.viewPagerMonths.setAdapter(pagerAdapter);
@@ -234,8 +232,8 @@ public class MyCalendarFragment extends Fragment {
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.action_mycalendar_edit:
-                loadTestData();
-
+                //loadTestData();
+                editMode = true;
                 return true;
             case R.id.action_mycalendar_switch:
                 mPersonalSchedule = !mPersonalSchedule;
@@ -337,7 +335,7 @@ public class MyCalendarFragment extends Fragment {
             calend.set(Calendar.DAY_OF_MONTH, 1);
             mCurrentPosition = calend.get(Calendar.MONTH) + 1;
 
-            pagerAdapter = new MonthSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+            pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         } else {
 
             Calendar calinit = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
@@ -359,7 +357,7 @@ public class MyCalendarFragment extends Fragment {
 
             mCurrentPosition = diff;          //Position 0 + firstweek
 
-            pagerAdapter = new WeekSlidePagerAdapter(((AppCompatActivity) mListener).getSupportFragmentManager());
+            pagerAdapter = new WeekSlidePagerAdapter(getChildFragmentManager());
         }
         return pagerAdapter;
     }
@@ -405,7 +403,6 @@ public class MyCalendarFragment extends Fragment {
 
     }
 
-
     private void queryShiftTypes() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
@@ -427,6 +424,16 @@ public class MyCalendarFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onShiftSelected(int fragment, Shift shift) {
+
+    }
+
+    @Override
+    public void onFragmentSwapped(int fragmentId) {
+
     }
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {

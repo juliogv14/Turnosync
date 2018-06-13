@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes;
+package com.juliogv14.turnosync.ui.mycalendar.workgroupsettings;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -34,6 +34,8 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentShiftTypesBinding;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
+import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.CreateTypeDialog;
+import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftTypesAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +43,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Created by Julio on 08/06/2018.
- * MonthPageFragment
+ * ShiftTypesFragmentFragment
  */
 public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.TypeOnClickListener, CreateTypeDialog.CreateTypeListener {
 
@@ -158,8 +160,7 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         if (item.getItemId() == R.id.action_shiftTypes_newType) {
             Toast.makeText((Context) mListener, "New type", Toast.LENGTH_SHORT).show();
             CreateTypeDialog dialog = new CreateTypeDialog();
-            dialog.show(((AppCompatActivity)mListener).getSupportFragmentManager(), "createTypeDialog");
-            dialog.setOnClickListener(this);
+            dialog.show(getChildFragmentManager(), "createTypeDialog");
             return true;
         } else if (item.getItemId() == R.id.action_shiftTypes_loadTest) {
             loadTest();
@@ -258,7 +259,6 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         Toast.makeText((Context) mListener, "Edit type" + type.getId(), Toast.LENGTH_SHORT).show();
         CreateTypeDialog dialog = CreateTypeDialog.newInstance(type);
         dialog.show(((AppCompatActivity)mListener).getSupportFragmentManager(), "createTypeDialog");
-        dialog.setOnClickListener(this);
     }
 
     @Override

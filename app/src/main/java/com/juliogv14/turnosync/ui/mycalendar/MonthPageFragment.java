@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Julio on 18/02/2018.
@@ -39,8 +38,11 @@ public class MonthPageFragment extends Fragment {
     private static final String MONTH_SHIFT_TYPES_LIST_KEY = "shiftTypesList";
     private final String TAG = this.getClass().getSimpleName();
     protected PageMonthBinding mViewBinding;
-    //Firebase
+
+    //Context and listener
+    private Context mContext;
     private OnMonthFragmentInteractionListener mListener;
+
     //Month
     private Date mMonthDate;
 
@@ -66,8 +68,9 @@ public class MonthPageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMonthFragmentInteractionListener) {
-            mListener = (OnMonthFragmentInteractionListener) context;
+        mContext = context;
+        if (getParentFragment() instanceof OnMonthFragmentInteractionListener) {
+            mListener = (OnMonthFragmentInteractionListener) getParentFragment();
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnMonthFragmentInteractionListener");
@@ -102,13 +105,13 @@ public class MonthPageFragment extends Fragment {
         cal.setTime(mMonthDate);
         cal.add(Calendar.DAY_OF_MONTH, 7);
 
-        mViewBinding.textViewMonth.setText(CalendarUtils.getMonthString((Context) mListener, cal.get(Calendar.MONTH)));
+        mViewBinding.textViewMonth.setText(CalendarUtils.getMonthString((Context) mContext, cal.get(Calendar.MONTH)));
 
         cal.setTime(mMonthDate);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
 
-        mGridAdapter = new MonthAdapter((SupportActivity) mListener, mMonthDate, metrics, mShiftList, mShiftTypesList);
+        mGridAdapter = new MonthAdapter((SupportActivity) mContext, mMonthDate, metrics, mShiftList, mShiftTypesList);
 
         mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
 
@@ -117,12 +120,13 @@ public class MonthPageFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
     public void notifyGridDataSetChanged() {
-        if (mListener != null) {
-            ((SupportActivity) mListener).runOnUiThread(new Runnable() {
+        if (mContext != null) {
+            ((SupportActivity) mContext).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mGridAdapter.notifyDataSetChanged();
@@ -132,7 +136,7 @@ public class MonthPageFragment extends Fragment {
     }
 
     public interface OnMonthFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onShiftSelected(Shift shift);
+        void onShiftSelected(int fragment, Shift shift);
     }
 
 }

@@ -69,6 +69,12 @@ public class CreateTypeDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        if (getParentFragment() instanceof CreateTypeListener) {
+            mListener = (CreateTypeListener) getParentFragment();
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement CreateTypeListener");
+        }
     }
 
     @Override
@@ -293,10 +299,6 @@ public class CreateTypeDialog extends DialogFragment {
             focusView.requestFocus();
         }
         return isReadyToClose;
-    }
-
-    public void setOnClickListener(CreateTypeListener listener) {
-        mListener = listener;
     }
 
     public interface CreateTypeListener {

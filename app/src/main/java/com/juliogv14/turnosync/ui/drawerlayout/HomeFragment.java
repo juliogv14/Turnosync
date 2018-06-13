@@ -125,8 +125,7 @@ public class HomeFragment extends Fragment
             public void onClick(View view) {
                 //testData();
                 CreateWorkgroupDialog dialog = new CreateWorkgroupDialog();
-                dialog.setTargetFragment(HomeFragment.this, 1);
-                dialog.show(((AppCompatActivity) mListener).getSupportFragmentManager(), "cwk");
+                dialog.show(getChildFragmentManager(), "cwk");
             }
         });
 

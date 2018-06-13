@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityWorkgroupSettingsBinding;
-import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftTypesFragment;
 
 public class WorkgroupSettingsActivity extends AppCompatActivity implements WorkgroupSettingsFragment.WorkgroupSettingsListener, ShiftTypesFragment.OnShiftTypesListener {
 

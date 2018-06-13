@@ -41,10 +41,11 @@ public class CreateWorkgroupDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        try {
-            mListener = (CreateWorkgroupListener) getTargetFragment();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(this.getClass().getSimpleName() + "needs his interface implemented by target fragment!");
+        if (getParentFragment() instanceof CreateWorkgroupListener) {
+            mListener = (CreateWorkgroupListener) getParentFragment();
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement CreateTypeListener");
         }
     }
 

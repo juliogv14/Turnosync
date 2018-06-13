@@ -174,8 +174,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_wkSettings_addUser) {
             AddUserDialog dialog = new AddUserDialog();
-            dialog.setOnClickListener(this);
-            dialog.show(((AppCompatActivity) mListener).getSupportFragmentManager(), "addUser");
+            dialog.show(getChildFragmentManager(), "addUser");
             return true;
         }
         return false;

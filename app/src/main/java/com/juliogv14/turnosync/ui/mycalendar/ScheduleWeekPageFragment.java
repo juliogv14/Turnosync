@@ -44,8 +44,10 @@ public class ScheduleWeekPageFragment extends Fragment {
     //Binding
     protected PageWeekBinding mViewBinding;
 
-    //Firebase
+    //Context and listener
+    private Context mContext;
     private OnScheduleFragmentInteractionListener mListener;
+    //Firebase
     private ArrayList<UserRef> mWorkgroupUsers;
     private Map<String, ArrayList<Shift>> mUsersShiftList;
     private Map<String, ShiftType> mShiftTypesList;
@@ -72,8 +74,9 @@ public class ScheduleWeekPageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnScheduleFragmentInteractionListener) {
-            mListener = (OnScheduleFragmentInteractionListener) context;
+        mContext = context;
+        if (getParentFragment() instanceof OnScheduleFragmentInteractionListener) {
+            mListener = (OnScheduleFragmentInteractionListener) getParentFragment();
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnScheduleFragmentInteractionListener");
@@ -117,12 +120,12 @@ public class ScheduleWeekPageFragment extends Fragment {
         int lastDay = calendar.get(Calendar.DAY_OF_MONTH);
         int lastMonth = calendar.get(Calendar.MONTH);
 
-        String week = "" + firstDay + "/" + CalendarUtils.getMonthString((Context) mListener, firstMonth) + "-"
-                + lastDay + "/" + CalendarUtils.getMonthString((Context) mListener, lastMonth);
+        String week = "" + firstDay + "/" + CalendarUtils.getMonthString(mContext, firstMonth) + "-"
+                + lastDay + "/" + CalendarUtils.getMonthString(mContext, lastMonth);
         mViewBinding.textViewWeek.setText(week);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new WeekAdapter((SupportActivity) mListener, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftList, mShiftTypesList);
+        mGridAdapter = new WeekAdapter(mContext, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftList, mShiftTypesList);
 
         mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
@@ -131,12 +134,13 @@ public class ScheduleWeekPageFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
     public void notifyGridDataSetChanged() {
-        if (mListener != null) {
-            ((SupportActivity) mListener).runOnUiThread(new Runnable() {
+        if (mContext != null) {
+            ((SupportActivity) mContext).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mGridAdapter.notifyDataSetChanged();
@@ -146,7 +150,7 @@ public class ScheduleWeekPageFragment extends Fragment {
     }
 
     public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onShiftSelected(Shift shift);
+        void onShiftSelected(int fragment, Shift shift);
     }
 
 }

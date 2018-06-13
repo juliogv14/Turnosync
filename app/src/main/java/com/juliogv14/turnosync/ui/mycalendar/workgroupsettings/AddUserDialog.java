@@ -36,6 +36,13 @@ public class AddUserDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        if (getParentFragment() instanceof AddUserListener) {
+            mListener = (AddUserListener) getParentFragment();
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement AddUserListener");
+        }
+
     }
 
     @Override
@@ -120,10 +127,6 @@ public class AddUserDialog extends DialogFragment {
             mViewBinding.editTextEmail.requestFocus();
         }
         return isReadyToClose;
-    }
-
-    public void setOnClickListener(AddUserListener listener){
-        mListener = listener;
     }
 
     public interface AddUserListener {

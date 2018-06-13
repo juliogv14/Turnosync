@@ -51,9 +51,7 @@ public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
         HomeFragment.OnHomeFragmentInteractionListener,
-        MyCalendarFragment.OnCalendarFragmentInteractionListener,
-        MonthPageFragment.OnMonthFragmentInteractionListener,
-        ScheduleWeekPageFragment.OnScheduleFragmentInteractionListener{
+        MyCalendarFragment.OnCalendarFragmentInteractionListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -409,13 +407,6 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
-    //TODO: Test if needed
-/*    @Override
-    public void onFragmentSwapped(int fragmentId) {
-        mToolbar.setTitle(mCurrentWorkgroup.getWorkgroupId());
-        displaySelectedScreen(fragmentId);
-    }*/
-
     //OnHomeFragmentInteractionListener
     @Override
     public void onWorkgroupSelected(UserWorkgroup workgroup) {
@@ -425,12 +416,4 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    //OnCalendarFragmentInteractionListener
-
-
-    //OnMonthFragmentInteractionListener
-    @Override
-    public void onShiftSelected(Shift shift) {
-
-    }
 }
