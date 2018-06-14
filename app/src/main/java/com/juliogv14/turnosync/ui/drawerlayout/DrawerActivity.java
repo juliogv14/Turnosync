@@ -313,11 +313,12 @@ public class DrawerActivity extends AppCompatActivity
                                 mWorkgroupsList.remove(docChange.getOldIndex());
                                 break;
                         }
-                        if(mHomeFragment != null){
-                            mHomeFragment.notifyGridDataSetChanged();
-                        }
+
 
                     }
+                }
+                if(mHomeFragment != null){
+                    mHomeFragment.notifyGridDataSetChanged();
                 }
             }
         });

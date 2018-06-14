@@ -10,14 +10,15 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
-import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageWeekBinding;
+import com.juliogv14.turnosync.ui.mycalendar.createshift.CreateShiftDialog;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -32,14 +34,16 @@ import java.util.Map;
  * MonthPageFragment
  */
 
-public class ScheduleWeekPageFragment extends Fragment {
+public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener {
 
     //Keys
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
-    private static final String USERS_SHIFT_LIST_KEY = "userShiftList";
-    private static final String SHIFT_TYPES_LIST_KEY = "shiftTypesList";
+    private static final String USERS_SHIFT_MAP_KEY = "userShiftMap";
+    private static final String SHIFT_TYPES_MAP_KEY = "shiftTypesMap";
+    private static final String SHIFT_CHANGES_MAP_KEY = "shiftChangesMap";
+
     private final String TAG = this.getClass().getSimpleName();
     //Binding
     protected PageWeekBinding mViewBinding;
@@ -49,8 +53,9 @@ public class ScheduleWeekPageFragment extends Fragment {
     private OnScheduleFragmentInteractionListener mListener;
     //Firebase
     private ArrayList<UserRef> mWorkgroupUsers;
-    private Map<String, ArrayList<Shift>> mUsersShiftList;
-    private Map<String, ShiftType> mShiftTypesList;
+    private Map<String, ArrayList<Shift>> mUsersShiftsMap;
+    private Map<String, ShiftType> mShiftTypesMap;
+    private Map<String, ArrayList<Shift>> mShiftChanges;
 
     //Month
     private Date mWeekDate;
@@ -58,15 +63,23 @@ public class ScheduleWeekPageFragment extends Fragment {
     //GridAdapter
     private BaseAdapter mGridAdapter;
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup, Date weekDate, ArrayList<UserRef> workgroupUsers, HashMap<String, ArrayList<Shift>> userShifts, HashMap<String, ShiftType> shiftTypes) {
+    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup,
+                                                       Date weekDate,
+                                                       ArrayList<UserRef> workgroupUsers,
+                                                       LinkedHashMap<String, ArrayList<Shift>> userShifts,
+                                                       HashMap<String, ShiftType> shiftTypes,
+                                                       HashMap<String, ArrayList<Shift>> shiftChanges) {
+
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
+        //TODO: check if workgroup is needed
         args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
         args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
-        args.putSerializable(USERS_SHIFT_LIST_KEY, userShifts);
-        args.putSerializable(SHIFT_TYPES_LIST_KEY, shiftTypes);
+        args.putSerializable(USERS_SHIFT_MAP_KEY, userShifts);
+        args.putSerializable(SHIFT_TYPES_MAP_KEY, shiftTypes);
+        args.putSerializable(SHIFT_CHANGES_MAP_KEY, shiftChanges);
         f.setArguments(args);
         return f;
     }
@@ -90,9 +103,10 @@ public class ScheduleWeekPageFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
-            mUsersShiftList = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_LIST_KEY);
+            mUsersShiftsMap = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_MAP_KEY);
             mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
-            mShiftTypesList = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_LIST_KEY);
+            mShiftTypesMap = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP_KEY);
+            mShiftChanges = (Map<String, ArrayList<Shift>>) args.getSerializable(SHIFT_CHANGES_MAP_KEY);
         }
     }
 
@@ -111,11 +125,9 @@ public class ScheduleWeekPageFragment extends Fragment {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(mWeekDate);
 
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        //Week label
         int firstDay = calendar.get(Calendar.DAY_OF_MONTH);
         int firstMonth = calendar.get(Calendar.MONTH);
-
-
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         int lastDay = calendar.get(Calendar.DAY_OF_MONTH);
         int lastMonth = calendar.get(Calendar.MONTH);
@@ -124,11 +136,31 @@ public class ScheduleWeekPageFragment extends Fragment {
                 + lastDay + "/" + CalendarUtils.getMonthString(mContext, lastMonth);
         mViewBinding.textViewWeek.setText(week);
 
+        //Adapter
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new WeekAdapter(mContext, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftList, mShiftTypesList);
-
+        mGridAdapter = new WeekAdapter(mContext, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftsMap, mShiftTypesMap);
         mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
+        //createShift onclick
+        mViewBinding.gridViewWeek.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int day = position % 8;
+                if(position > 7 && day > 0){
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTime(mWeekDate);
+                    cal.add(Calendar.DAY_OF_MONTH, + day-1);
+                    Date date = cal.getTime();
+
+                    int row = position / 8;
+                    UserRef userRef = mWorkgroupUsers.get(row-1);
+
+                    CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap);
+                    dialog.show(getChildFragmentManager(), "cs");
+                }
+
+            }
+        });
     }
 
     @Override
@@ -149,8 +181,19 @@ public class ScheduleWeekPageFragment extends Fragment {
         }
     }
 
-    public interface OnScheduleFragmentInteractionListener extends OnFragmentInteractionListener {
-        void onShiftSelected(int fragment, Shift shift);
+    @Override
+    public void onDialogPositiveClick(ArrayList<Shift> newShifts) {
+        for (Shift shift : newShifts) {
+            mUsersShiftsMap.get(shift.getUserId()).add(shift);
+            mShiftChanges.get("added").add(shift );
+        }
+
+        mGridAdapter.notifyDataSetChanged();
+
+    }
+
+    public interface OnScheduleFragmentInteractionListener {
+        void onWeekDaySelected(Date date, UserRef userRef);
     }
 
 }

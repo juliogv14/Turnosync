@@ -199,12 +199,9 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                                 mUserList.remove(docChange.getOldIndex());
                                 break;
                         }
-
-                        mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
-
-
                     }
                 }
+                mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
             }
         });
 

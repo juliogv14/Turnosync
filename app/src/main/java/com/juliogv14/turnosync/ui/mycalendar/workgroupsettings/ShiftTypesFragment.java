@@ -39,6 +39,7 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftT
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 
 /**
@@ -246,9 +247,9 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
                                 shifTypesList.remove(docChange.getOldIndex());
                                 break;
                         }
-                        mViewBinding.recyclerShiftTypes.getAdapter().notifyDataSetChanged();
                     }
                 }
+                mViewBinding.recyclerShiftTypes.getAdapter().notifyDataSetChanged();
             }
         });
 

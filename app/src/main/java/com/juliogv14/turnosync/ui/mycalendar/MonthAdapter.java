@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Julio on 08/02/2018.
@@ -45,10 +45,10 @@ public class MonthAdapter extends BaseAdapter {
     private String[] mDays;
 
     private ArrayList<Shift> mShiftsList;
-    private HashMap<String, ShiftType> mShiftsTypesList;
+    private Map<String, ShiftType> mShiftsTypesMap;
 
 
-    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts, HashMap<String, ShiftType> types) {
+    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts, Map<String, ShiftType> types) {
         mContext = c;
         mCalendar = Calendar.getInstance();
         mCalendar.setTime(monthDate);
@@ -57,7 +57,7 @@ public class MonthAdapter extends BaseAdapter {
         mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
 
         mShiftsList = shifts;
-        mShiftsTypesList = types;
+        mShiftsTypesMap = types;
         populateMonth();
     }
 
@@ -159,7 +159,7 @@ public class MonthAdapter extends BaseAdapter {
             String stringDayInMonth = mItems.get(position);
             mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
 
-            if (!mShiftsList.isEmpty()) {
+            if (!mShiftsList.isEmpty() && !mShiftsTypesMap.isEmpty()) {
 
                 Shift shift = mShiftsList.get(0);
                 Calendar calShift = new GregorianCalendar();
@@ -168,7 +168,7 @@ public class MonthAdapter extends BaseAdapter {
                 if (date[0] == calShift.get(Calendar.DAY_OF_MONTH) && date[1] == calShift.get(Calendar.MONTH)) {
 
                     mShiftsList.remove(shift);
-                    ShiftType type = mShiftsTypesList.get(shift.getType());
+                    ShiftType type = mShiftsTypesMap.get(shift.getType());
                     mItemShiftBinding.textViewShiftType.setText(type.getTag());
                     convertView.setBackgroundColor(type.getColor());
 

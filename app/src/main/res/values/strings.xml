@@ -20,6 +20,11 @@
     <string name="data_key_role" translatable="false">role</string>
     <string name="data_key_date" translatable="false">date</string>
 
+    <!--SHIFT CHANGES KEYS-->
+    <string name="data_changes_added">added</string>
+    <string name="data_changes_removed">added</string>
+    <string name="data_changes_edited">added</string>
+
     <!--INTENT KEYS-->
     <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
     <string name="data_int_users" translatable="false">intentUsers</string>
@@ -49,26 +54,26 @@
     <string name="fragment_workgroupSettings">Workgroup settings</string>
     <string name="fragment_shiftTypes">Shift types</string>
 
-    <!--WORKGROUP DIALOG STRINGS-->
+    <!--WORKGROUP DIALOG-->
     <string name="dialog_workgroup_title">Create new workgroup</string>
     <string name="dialog_workgroup_name">Name</string>
     <string name="dialog_workgroup_desc">Description (optional)</string>
     <string name="dialog_workgroup_button_create">Create</string>
     <string name="dialog_workgroup_button_cancel">Cancel</string>
 
-    <!--ADDUSER DIALOG STRINGS-->
+    <!--ADDUSER DIALOG-->
     <string name="dialog_adduser_title">Add user to workgroup</string>
     <string name="dialog_adduser_email">Email</string>
     <string name="dialog_adduser_button_add">Invite</string>
     <string name="dialog_adduser_button_cancel">Cancel</string>
 
-    <!--CONFIRM REMOVE USER DIALOG STRINGS-->
+    <!--CONFIRM REMOVE USER DIALOG-->
     <string name="dialog_removeUser_title">Are you sure to remove this user?</string>
     <string name="dialog_removeUser_message">You will no longer be able to set shifts to this user, existing shift will be preserved</string>
     <string name="dialog_removeUser_button_remove">Remove</string>
     <string name="dialog_removeUser_button_cancel">Cancel</string>
 
-    <!--CREATE NEW TYPE DIALOG STRINGS-->
+    <!--CREATE NEW TYPE DIALOG-->
     <string name="dialog_createType_title">Are you sure to remove this type?</string>
     <string name="dialog_createType_button_create">Create</string>
     <string name="dialog_createType_button_edit">Edit</string>
@@ -86,17 +91,23 @@
     <string name="dialog_createType_error_tag">Max 3 characters.</string>
     <string name="dialog_createType_error_time">You cannot set the end time to a time earlier than the start time.</string>
 
-    <!--TIME PICKER DIALOG STRINGS-->
+    <!--TIME PICKER DIALOG-->
     <string name="dialog_timePicker_title">Set time</string>
 
-
-
-    <!--CONFIRM REMOVE TYPE DIALOG STRINGS-->
+    <!--CONFIRM REMOVE TYPE DIALOG-->
     <string name="dialog_removeType_title">Are you sure to remove this type?</string>
     <string name="dialog_removeType_message">You will no longer be able to set this shift type to shifts, this action will not remove existing shifts with this type</string>
     <string name="dialog_removeType_button_remove">Remove</string>
     <string name="dialog_removeType_button_cancel">Cancel</string>
-
+    
+    <!--CREATE SHIFT DIALOG-->
+    <string name="dialog_createShift_title">Create shifts</string>
+    <string name="dialog_createShift_button_create">Create</string>
+    <string name="dialog_createShift_button_cancel">Cancel</string>
+    
+    <string name="dialog_createShift_user">User</string>
+    <string name="dialog_createShift_type">Shift type</string>
+    
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_calendar">My calendar</string>
