@@ -5,14 +5,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
@@ -20,10 +17,7 @@ import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
-import com.juliogv14.turnosync.databinding.DialogAddUserBinding;
 import com.juliogv14.turnosync.databinding.DialogCreateShiftBinding;
-import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.CreateTypeDialog;
-import com.juliogv14.turnosync.utils.FormUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

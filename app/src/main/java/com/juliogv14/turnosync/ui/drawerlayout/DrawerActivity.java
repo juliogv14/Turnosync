@@ -35,13 +35,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
-import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
-import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
