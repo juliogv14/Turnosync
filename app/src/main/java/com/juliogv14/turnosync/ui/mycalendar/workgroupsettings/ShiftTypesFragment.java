@@ -31,6 +31,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.ShiftType;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentShiftTypesBinding;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
@@ -39,7 +40,6 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftT
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 
 /**
@@ -120,7 +120,7 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
                 new LinearLayoutManager((Context) mListener, LinearLayoutManager.VERTICAL, false);
         mViewBinding.recyclerShiftTypes.setLayoutManager(layoutManager);
         mViewBinding.recyclerShiftTypes.setHasFixedSize(true);
-        ShiftTypesAdapter adapter = new ShiftTypesAdapter((Context) mListener, shifTypesList, this);
+        ShiftTypesAdapter adapter = new ShiftTypesAdapter((Context) mListener, this, shifTypesList, mWorkgroup.getRole());
         mViewBinding.recyclerShiftTypes.setAdapter(adapter);
 
 
@@ -153,6 +153,10 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
                 icon.mutate();
                 icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             }
+            if(menu.getItem(i).getItemId() == R.id.action_shiftTypes_newType && !mWorkgroup.getRole().equals(UserRoles.MANAGER.toString())){
+                menu.getItem(i).setVisible(false);
+            }
+
         }
     }
 
@@ -163,12 +167,12 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
             CreateTypeDialog dialog = new CreateTypeDialog();
             dialog.show(getChildFragmentManager(), "createTypeDialog");
             return true;
-        } else if (item.getItemId() == R.id.action_shiftTypes_loadTest) {
-            loadTest();
         }
+
         return false;
     }
 
+    //TODO: remove
     private void loadTest() {
         CollectionReference shiftTypesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
@@ -210,7 +214,9 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         mShiftTypesListener = shiftTypesColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-
+                if (e != null){
+                    return;
+                }
                 for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot doc = docChange.getDocument();
                     if (doc.exists()) {

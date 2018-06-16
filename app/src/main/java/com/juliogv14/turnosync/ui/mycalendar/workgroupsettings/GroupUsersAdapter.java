@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.juliogv14.turnosync.data.UserRef;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.databinding.ItemUserBinding;
 
 import java.util.ArrayList;
@@ -18,11 +19,13 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
     private Context mContext;
     private List<UserRef> mUserList;
     private UserOnClickListener mUserOnClickListener;
+    private String mRole;
 
-    public GroupUsersAdapter(Context context, ArrayList<UserRef> userList, UserOnClickListener listener) {
-        this.mUserList = userList;
+    public GroupUsersAdapter(Context context, UserOnClickListener listener, ArrayList<UserRef> userList, String role) {
         this.mContext = context;
         this.mUserOnClickListener = listener;
+        this.mUserList = userList;
+        this.mRole = role;
 
     }
 
@@ -65,6 +68,9 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
         }
 
         public void bind(String name){
+            if (!mRole.equals(UserRoles.MANAGER.toString())){
+                binding.buttonSettingsRemoveUser.setVisibility(View.GONE);
+            }
             binding.textViewUserListName.setText(name);
             binding.executePendingBindings();
         }

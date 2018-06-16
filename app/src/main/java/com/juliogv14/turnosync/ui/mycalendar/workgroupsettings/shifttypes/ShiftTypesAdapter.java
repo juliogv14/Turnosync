@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.juliogv14.turnosync.data.ShiftType;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.databinding.ItemShifttypeBinding;
 
 import java.text.SimpleDateFormat;
@@ -20,11 +21,13 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
     private Context mContext;
     private List<ShiftType> mShiftTypesList;
     private TypeOnClickListener mTypeOnClickListener;
+    private String mRole;
 
-    public ShiftTypesAdapter(Context context, ArrayList<ShiftType> shiftTypesList, TypeOnClickListener listener) {
-        this.mShiftTypesList = shiftTypesList;
+    public ShiftTypesAdapter(Context context, TypeOnClickListener listener, ArrayList<ShiftType> shiftTypesList, String role) {
         this.mContext = context;
         this.mTypeOnClickListener = listener;
+        this.mShiftTypesList = shiftTypesList;
+        this.mRole = role;
 
     }
 
@@ -77,6 +80,10 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
         }
 
         public void bind(ShiftType shiftType){
+            if(!mRole.equals(UserRoles.MANAGER.toString())){
+                binding.buttonShiftTypeRemove.setVisibility(View.GONE);
+                binding.buttonShiftTypeEdit.setVisibility(View.GONE);
+            }
             binding.textViewShiftTypeLong.setText(shiftType.getName());
             binding.textViewShiftTypeShort.setText(shiftType.getTag());
             binding.imageViewTypeColor.setBackgroundColor(shiftType.getColor());

@@ -32,6 +32,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRef;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentWorkgroupSettingsBinding;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
@@ -114,7 +115,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 new LinearLayoutManager((Context)mListener, LinearLayoutManager.VERTICAL, false);
         mViewBinding.recyclerUsers.setLayoutManager(layoutManager);
         mViewBinding.recyclerUsers.setHasFixedSize(true);
-        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter((Context) mListener, mUserList,this);
+        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter((Context) mListener, this, mUserList, mWorkgroup.getRole());
         mViewBinding.recyclerUsers.setAdapter(recyclerAdapter);
 
         mViewBinding.settingsItemShiftTypes.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +154,10 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 icon.mutate();
                 icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             }
+
+            if(menu.getItem(i).getItemId() == R.id.action_wkSettings_addUser && !mWorkgroup.getRole().equals(UserRoles.MANAGER.toString())){
+                menu.getItem(i).setVisible(false);
+            }
         }
     }
 
@@ -173,7 +178,9 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-
+                if(e != null){
+                    return;
+                }
                 for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot doc = docChange.getDocument();
                     if (doc.exists()) {
