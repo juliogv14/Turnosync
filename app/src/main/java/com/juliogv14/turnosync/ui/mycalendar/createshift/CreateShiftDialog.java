@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Julio on 26/02/2018.
- * CreateWorkgroupDialog
+ * Created by Julio on 14/06/2018.
+ * CreateShiftDialog
  */
 
 public class CreateShiftDialog extends DialogFragment {
@@ -105,7 +105,7 @@ public class CreateShiftDialog extends DialogFragment {
                         int spinnerPos = mViewBinding.spinnerCreateShiftType.getSelectedItemPosition();
                         Shift shift = new Shift(mUserRef.getUid(), mShiftTypesList.get(spinnerPos).getId(), mDay, "","");
                         newShifts.add(shift);
-                        mListener.onDialogPositiveClick(newShifts);
+                        mListener.onCreateShiftCreate(newShifts);
                     }
                 })
                 .setNegativeButton(R.string.dialog_createShift_button_cancel, new DialogInterface.OnClickListener() {
@@ -192,6 +192,6 @@ public class CreateShiftDialog extends DialogFragment {
     }*/
 
     public interface CreateShiftListener {
-        void onDialogPositiveClick(ArrayList<Shift> newShifts);
+        void onCreateShiftCreate(ArrayList<Shift> newShifts);
     }
 }

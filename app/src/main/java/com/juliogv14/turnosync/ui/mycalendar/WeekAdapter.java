@@ -46,6 +46,7 @@ public class WeekAdapter extends BaseAdapter {
     //Per user shifts
     private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
     private String mCurrentUid;
+    private int mCurrentShiftIndex;
 
 
     WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts, Map<String, ShiftType> shiftTypes) {
@@ -126,8 +127,10 @@ public class WeekAdapter extends BaseAdapter {
                 }
 
                 mCalendar.setTime(mWeekDate);
-                names.setBackgroundColor(Color.GRAY);
-                return names;
+                mCurrentShiftIndex = 0;
+                convertView.setBackgroundColor(Color.GRAY);
+
+                return convertView;
             case 1:             //Header with days
                 if (convertView == null) {
                     TextView days = new TextView(mContext);
@@ -144,23 +147,22 @@ public class WeekAdapter extends BaseAdapter {
                     convertView = LayoutInflater.from(mContext).inflate(R.layout.item_shift, parent, false);
                 }
                 ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
-
-                ArrayList<Shift> userShifts = new ArrayList<>(mUserShiftMap.get(mCurrentUid));
+                mItemShiftBinding.textViewShiftType.setText("");
                 convertView.setBackgroundColor(Color.WHITE);
 
                 convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
 
-                if (!userShifts.isEmpty() && !mShiftsTypesMap.isEmpty()) {
+                if (mCurrentShiftIndex < mUserShiftMap.get(mCurrentUid).size() && !mShiftsTypesMap.isEmpty()) {
 
                     int month = mCalendar.get(Calendar.MONTH);
                     int day = mCalendar.get(Calendar.DAY_OF_MONTH);
 
-                    Shift shift = userShifts.get(0);
+                    Shift shift = mUserShiftMap.get(mCurrentUid).get(mCurrentShiftIndex);
                     Calendar calShift = new GregorianCalendar();
                     calShift.setTime(shift.getDate());
 
                     if (day == calShift.get(Calendar.DAY_OF_MONTH) && month == calShift.get(Calendar.MONTH)) {
-                        userShifts.remove(shift);
+                        mCurrentShiftIndex++;
                         //mItemShiftBinding.textViewDayMonth.setText(String.valueOf(day));
                         mItemShiftBinding.textViewDayMonth.setVisibility(View.GONE);
                         ShiftType type = mShiftsTypesMap.get(shift.getType());

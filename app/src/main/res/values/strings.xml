@@ -22,8 +22,8 @@
 
     <!--SHIFT CHANGES KEYS-->
     <string name="data_changes_added">added</string>
-    <string name="data_changes_removed">added</string>
-    <string name="data_changes_edited">added</string>
+    <string name="data_changes_removed">removed</string>
+    <string name="data_changes_edited">edited</string>
 
     <!--INTENT KEYS-->
     <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
@@ -104,10 +104,18 @@
     <string name="dialog_createShift_title">Create shifts</string>
     <string name="dialog_createShift_button_create">Create</string>
     <string name="dialog_createShift_button_cancel">Cancel</string>
-    
-    <string name="dialog_createShift_user">User</string>
+
     <string name="dialog_createShift_type">Shift type</string>
-    
+
+    <!--EDIT SHIFT DIALOG-->
+    <string name="dialog_editShift_title">Edit or remove shifts</string>
+    <string name="dialog_editShift_button_change">Change</string>
+    <string name="dialog_editShift_button_remove">Remove</string>
+    <string name="dialog_editShift_button_cancel">Cancel</string>
+
+    <string name="dialog_editShift_user">User</string>
+    <string name="dialog_editShift_type">Shift type</string>
+
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_calendar">My calendar</string>

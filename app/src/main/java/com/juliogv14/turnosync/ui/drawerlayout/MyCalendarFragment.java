@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,6 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Julio on 20/01/2018.
@@ -95,7 +97,7 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
 
     //Runtime variables
     private boolean mPersonalSchedule = true;
-    private boolean editMode = false;
+    private AtomicBoolean mEditMode;
 
     //Data lists
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
@@ -153,10 +155,11 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
         mUserShiftsListeners = new ArrayList<>();
         mShiftTypes = new HashMap<>();
         mShiftChanges = new HashMap<>();
+        mEditMode = new AtomicBoolean(false);
         mShiftChanges.put(getString(R.string.data_changes_added), new ArrayList<Shift>());
         mShiftChanges.put(getString(R.string.data_changes_removed), new ArrayList<Shift>());
         //TODO: consider implement edit shift
-        //mShiftChanges.put(getString(R.string.data_changes_edited), new ArrayList<Shift>());
+        mShiftChanges.put(getString(R.string.data_changes_edited), new ArrayList<Shift>());
         return mViewBinding.getRoot();
     }
 
@@ -233,7 +236,7 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
                 if (!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString()) || mPersonalSchedule) {
                     menuItem.setVisible(false);
                 } else {
-                    if(editMode){
+                    if(mEditMode.get()){
                         menuItem.setIcon(R.drawable.ic_save_black_24dp);
                     } else {
                         menuItem.setIcon(R.drawable.ic_mode_edit_black_24dp);
@@ -253,9 +256,9 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
         switch (itemId) {
             case R.id.action_mycalendar_edit:
                 //loadTestData();
-                editMode = !editMode;
+                mEditMode.set(!mEditMode.get());
                 ((AppCompatActivity) mListener).invalidateOptionsMenu();
-                if(!editMode){
+                if(!mEditMode.get()){
                     applyChanges();
                 }
 
@@ -291,14 +294,36 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
         List<Shift> addedShifts =  mShiftChanges.get(getString(R.string.data_changes_added));
         for (Iterator<Shift> iterator = addedShifts.iterator(); iterator.hasNext(); ) {
             Shift shift = iterator.next();
-            mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+            DocumentReference docRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(shift.getUserId())
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                    .collection(getString(R.string.data_ref_shifts)).document().set(shift);
+                    .collection(getString(R.string.data_ref_shifts)).document();
+            shift.setId(docRef.getId());
+            docRef.set(shift);
             iterator.remove();
         }
 
         //Removed
         List<Shift> removedShifts=  mShiftChanges.get(getString(R.string.data_changes_removed));
+        for (Iterator<Shift> iterator = removedShifts.iterator(); iterator.hasNext(); ) {
+            Shift shift = iterator.next();
+            DocumentReference docRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                    .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
+            docRef.delete();
+            iterator.remove();
+        }
+
+        //Edited or user change
+        List<Shift> editedShifts=  mShiftChanges.get(getString(R.string.data_changes_edited));
+        for (Iterator<Shift> iterator = editedShifts.iterator(); iterator.hasNext(); ) {
+            Shift shift = iterator.next();
+            DocumentReference docRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                    .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
+            docRef.set(shift);
+            iterator.remove();
+        }
+
     }
 
     private void loadTestData() {
@@ -372,8 +397,8 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
 
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
-            calend.set(Calendar.DAY_OF_MONTH, 1);
-            mCurrentPosition = calend.get(Calendar.MONTH) + 1;
+            calend.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            mCurrentPosition = calend.get(Calendar.MONTH);
 
             pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         } else {
@@ -560,7 +585,7 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
 
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
 
-            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges);
+            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(mWorkgroup, cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode);
             queryScheduleData(pageFragment, cal.getTime(), shiftListMap);
             return pageFragment;
         }
@@ -598,6 +623,10 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
                                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                     @Override
                                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
+                                        if(e != null){
+                                            return;
+                                        }
+
                                         for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                                             DocumentSnapshot doc = docChange.getDocument();
 

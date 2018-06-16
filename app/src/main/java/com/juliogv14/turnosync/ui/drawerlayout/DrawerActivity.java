@@ -278,7 +278,9 @@ public class DrawerActivity extends AppCompatActivity
         mWorkgroupsListener = userGroupsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                //TODO: Catch exception
+                if(e != null){
+                    return;
+                }
                 for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot document = docChange.getDocument();
 

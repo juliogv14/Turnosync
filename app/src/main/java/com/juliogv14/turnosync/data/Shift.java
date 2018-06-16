@@ -11,9 +11,10 @@ import java.util.Date;
  */
 
 public class Shift implements Parcelable {
-    //JSON database
-    private String type;
+
+    private String id;
     private String userId;
+    private String type;
 
     private Date date;
     private String start;
@@ -28,6 +29,14 @@ public class Shift implements Parcelable {
         this.date = date;
         this.start = start;
         this.end = end;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUserId() {
