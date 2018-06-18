@@ -10,8 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ToggleButton;
 
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
@@ -21,7 +23,9 @@ import com.juliogv14.turnosync.databinding.DialogCreateShiftBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +54,9 @@ public class CreateShiftDialog extends DialogFragment {
     private Date mDay;
     private UserRef mUserRef;
     private ArrayList<ShiftType> mShiftTypesList;
+
+    //Layout
+    private ArrayList<ToggleButton> mDayButtons;
 
     public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes) {
         CreateShiftDialog fragment = new CreateShiftDialog();
@@ -91,6 +98,32 @@ public class CreateShiftDialog extends DialogFragment {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_create_shift, null);
         mViewBinding = DialogCreateShiftBinding.bind(view);
 
+        mDayButtons = new ArrayList<>();
+        mDayButtons.add(mViewBinding.buttonCreateShift1);
+        mDayButtons.add(mViewBinding.buttonCreateShift2);
+        mDayButtons.add(mViewBinding.buttonCreateShift3);
+        mDayButtons.add(mViewBinding.buttonCreateShift4);
+        mDayButtons.add(mViewBinding.buttonCreateShift5);
+        mDayButtons.add(mViewBinding.buttonCreateShift6);
+        mDayButtons.add(mViewBinding.buttonCreateShift7);
+
+        //Set current day
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(mDay);
+        int buttonPos = cal.get(Calendar.DAY_OF_WEEK)-2;
+        mDayButtons.get(buttonPos).setChecked(true);
+
+        //Togglebutton setup
+        String[] weekDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
+        for (int i = 0; i < mDayButtons.size(); i++) {
+            ToggleButton button = mDayButtons.get(i);
+            button.setText(weekDays[i]);
+            button.setTextOn(null);
+            button.setTextOff(null);
+            ViewGroup.LayoutParams buttonParams = button.getLayoutParams();
+            buttonParams.height = buttonParams.width;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_createShift_title)
                 .setView(view)
@@ -99,8 +132,19 @@ public class CreateShiftDialog extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ArrayList<Shift> newShifts = new ArrayList<>();
                         int spinnerPos = mViewBinding.spinnerCreateShiftType.getSelectedItemPosition();
-                        Shift shift = new Shift(mUserRef.getUid(), mShiftTypesList.get(spinnerPos).getId(), mDay, "","");
-                        newShifts.add(shift);
+
+                        Calendar cal = new GregorianCalendar();
+                        cal.setTime(mDay);
+                        for (int j = 0; j < mDayButtons.size(); j++) {
+                            ToggleButton toggleButton = mDayButtons.get(j);
+                            if(toggleButton.isChecked()){
+                                cal.set(Calendar.DAY_OF_WEEK, j+2);
+                                Shift shift = new Shift(mUserRef.getUid(), mShiftTypesList.get(spinnerPos).getId(), cal.getTime(), "","");
+                                newShifts.add(shift);
+                            }
+                        }
+
+
                         mListener.onCreateShiftCreate(newShifts);
                     }
                 })
@@ -113,6 +157,7 @@ public class CreateShiftDialog extends DialogFragment {
 
         final AlertDialog dialog = builder.create();
 
+        //Types spinner
         List<String> displayTypes = new ArrayList<>();
         for (ShiftType type : mShiftTypesList) {
             displayTypes.add(type.getName());

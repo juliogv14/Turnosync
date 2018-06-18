@@ -47,4 +47,9 @@
         <item name="android:colorButtonNormal">@color/customToggle6</item>
     </style>
 
+    <!--TODO: custom weekday toggle button-->
+    <style name="WeekDayToggle" parent="@android:style/Widget.Material.Light.Button.Toggle">
+        <item name="android:colorButtonNormal">@color/customToggle6</item>
+    </style>
+
 </resources>

@@ -407,6 +407,7 @@ public class MyCalendarFragment extends Fragment implements MonthPageFragment.On
 
     private PagerAdapter changeAdapter() {
         PagerAdapter pagerAdapter;
+        mEditMode.set(false);
         if (mPersonalSchedule) {
 
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));

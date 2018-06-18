@@ -108,6 +108,7 @@
 
     <string name="dialog_createShift_type">Shift type</string>
     <string name="dialog_createShift_schedule">Schedule</string>
+    <string name="dialog_createShift_repeat">Repeat:</string>
 
     <!--EDIT SHIFT DIALOG-->
     <string name="dialog_editShift_title">Edit or remove shifts</string>
