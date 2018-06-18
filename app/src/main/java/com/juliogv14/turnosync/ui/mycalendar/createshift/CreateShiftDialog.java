@@ -19,9 +19,11 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogCreateShiftBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -111,24 +113,6 @@ public class CreateShiftDialog extends DialogFragment {
 
         final AlertDialog dialog = builder.create();
 
-        /*dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                FormUtils.openKeyboard(mContext, mViewBinding.editTextEmail);
-                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        boolean isReadyToClose = attemptAddUser();
-                        if (isReadyToClose) {
-                            FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
-                            mListener.onDialogPositiveClick(mEmail);
-                            dialog.dismiss();
-                        }
-                    }
-                });
-            }
-        });*/
         List<String> displayTypes = new ArrayList<>();
         for (ShiftType type : mShiftTypesList) {
             displayTypes.add(type.getName());
@@ -142,6 +126,15 @@ public class CreateShiftDialog extends DialogFragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mViewBinding.textViewCreateShiftTag.setText(mShiftTypesList.get(position).getTag());
+                mViewBinding.textViewCreateShiftTag.setText(mShiftTypesList.get(position).getTag());
+                mViewBinding.textViewCreateShiftTag.setBackgroundColor(mShiftTypesList.get(position).getColor());
+
+                //Time interval
+                SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
+                String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
+                String timeInterval = "Schedule: " + startHour + " - " + endHour;
+                mViewBinding.textViewCreateShiftTime.setText(timeInterval);
             }
 
             @Override
@@ -159,31 +152,6 @@ public class CreateShiftDialog extends DialogFragment {
         mContext = null;
         mListener = null;
     }
-
-    /*private boolean attemptAddUser() {
-        Boolean isReadyToClose = true;
-        //Get strings from editText
-        mViewBinding.editTextLayoutEmail.setError(null);
-        mEmail = mViewBinding.editTextEmail.getText().toString();
-
-        *//*Check for a valid email address.*//*
-        if (TextUtils.isEmpty(mEmail)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.form_error_field_required));
-            isReadyToClose = false;
-        } else if (!FormUtils.isEmailValid(mEmail)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_invalid_email));
-            isReadyToClose = false;
-        }
-
-        //TODO: check if the user exists
-
-        if (!isReadyToClose) {
-            mViewBinding.editTextEmail.requestFocus();
-        }
-        return isReadyToClose;
-    }*/
 
     public interface CreateShiftListener {
         void onCreateShiftCreate(ArrayList<Shift> newShifts);
