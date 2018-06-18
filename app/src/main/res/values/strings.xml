@@ -107,6 +107,7 @@
     <string name="dialog_createShift_button_cancel">Cancel</string>
 
     <string name="dialog_createShift_type">Shift type</string>
+    <string name="dialog_createShift_schedule">Schedule</string>
 
     <!--EDIT SHIFT DIALOG-->
     <string name="dialog_editShift_title">Edit or remove shifts</string>
@@ -116,6 +117,7 @@
 
     <string name="dialog_editShift_user">User</string>
     <string name="dialog_editShift_type">Shift type</string>
+    <string name="dialog_editShift_schedule">Schedule</string>
 
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>

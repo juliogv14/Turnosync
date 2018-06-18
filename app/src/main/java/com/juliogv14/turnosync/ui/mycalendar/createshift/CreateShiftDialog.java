@@ -133,7 +133,7 @@ public class CreateShiftDialog extends DialogFragment {
                 SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
                 String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
-                String timeInterval = "Schedule: " + startHour + " - " + endHour;
+                String timeInterval = getString(R.string.dialog_createShift_schedule) + ": " + startHour + " - " + endHour;
                 mViewBinding.textViewCreateShiftTime.setText(timeInterval);
             }
 
