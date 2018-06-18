@@ -172,7 +172,7 @@ public class EditShiftDialog extends DialogFragment {
                 String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
                 String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
                 String timeInterval = "Schedule: " + startHour + " - " + endHour;
-                mViewBinding.textViewTime.setText(timeInterval);
+                mViewBinding.textViewEditShiftTime.setText(timeInterval);
             }
 
             @Override
