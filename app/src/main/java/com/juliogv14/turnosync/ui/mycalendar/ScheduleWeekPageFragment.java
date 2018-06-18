@@ -24,7 +24,9 @@ import com.juliogv14.turnosync.ui.mycalendar.createshift.EditShiftDialog;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -209,8 +211,10 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onCreateShiftCreate(ArrayList<Shift> newShifts) {
         for (Shift shift : newShifts) {
             mUsersShiftsMap.get(shift.getUserId()).add(shift);
-            mShiftChanges.get(getString(R.string.data_changes_added)).add(shift );
+            Collections.sort(mUsersShiftsMap.get(shift.getUserId()));
+            mShiftChanges.get(getString(R.string.data_changes_added)).add(shift);
         }
+
         mGridAdapter.notifyDataSetChanged();
 
     }
@@ -220,10 +224,13 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         if(oldShift != newShift){
             mUsersShiftsMap.get(oldShift.getUserId()).remove(oldShift);
             mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
+            Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
+
 
         }
         //TODO: handle user changes in firestore
-        mShiftChanges.get(getString(R.string.data_changes_edited)).add(newShift);
+        mShiftChanges.get(getString(R.string.data_changes_editedNew)).add(newShift);
+        mShiftChanges.get(getString(R.string.data_changes_editedOld)).add(oldShift);
         mGridAdapter.notifyDataSetChanged();
 
     }

@@ -2,6 +2,7 @@ package com.juliogv14.turnosync.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.Date;
 
@@ -10,7 +11,7 @@ import java.util.Date;
  * Shift.java
  */
 
-public class Shift implements Parcelable {
+public class Shift implements Parcelable, Comparable<Shift> {
 
     private String id;
     private String userId;
@@ -113,5 +114,10 @@ public class Shift implements Parcelable {
         out.writeLong(date.getTime());
         out.writeString(start);
         out.writeString(end);
+    }
+
+    @Override
+    public int compareTo(@NonNull Shift o) {
+        return Long.compare(this.date.getTime(), o.getDate().getTime());
     }
 }

@@ -23,7 +23,8 @@
     <!--SHIFT CHANGES KEYS-->
     <string name="data_changes_added">added</string>
     <string name="data_changes_removed">removed</string>
-    <string name="data_changes_edited">edited</string>
+    <string name="data_changes_editedNew">editedNew</string>
+    <string name="data_changes_editedOld">editedOld</string>
 
     <!--INTENT KEYS-->
     <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
