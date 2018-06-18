@@ -19,9 +19,11 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogEditShiftBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -161,7 +163,16 @@ public class EditShiftDialog extends DialogFragment {
         mViewBinding.spinnerEditShiftType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Tag
                 mViewBinding.textViewEditShiftTag.setText(mShiftTypesList.get(position).getTag());
+                mViewBinding.textViewEditShiftTag.setBackgroundColor(mShiftTypesList.get(position).getColor());
+
+                //Time interval
+                SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
+                String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
+                String timeInterval = "Schedule: " + startHour + " - " + endHour;
+                mViewBinding.textViewTime.setText(timeInterval);
             }
 
             @Override
@@ -179,31 +190,6 @@ public class EditShiftDialog extends DialogFragment {
         mContext = null;
         mListener = null;
     }
-
-    /*private boolean attemptAddUser() {
-        Boolean isReadyToClose = true;
-        //Get strings from editText
-        mViewBinding.editTextLayoutEmail.setError(null);
-        mEmail = mViewBinding.editTextEmail.getText().toString();
-
-        *//*Check for a valid email address.*//*
-        if (TextUtils.isEmpty(mEmail)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.form_error_field_required));
-            isReadyToClose = false;
-        } else if (!FormUtils.isEmailValid(mEmail)) {
-            mViewBinding.editTextLayoutEmail
-                    .setError(getString(R.string.login_error_invalid_email));
-            isReadyToClose = false;
-        }
-
-        //TODO: check if the user exists
-
-        if (!isReadyToClose) {
-            mViewBinding.editTextEmail.requestFocus();
-        }
-        return isReadyToClose;
-    }*/
 
     public interface EditShiftListener {
         void onEditShiftChange(Shift oldShift, Shift newShift);
