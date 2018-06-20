@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp">
+
+        <TextView
+            android:id="@+id/textView_change_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Added to user" />
+
+        <TextView
+            android:id="@+id/textView_change_date"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:maxLines="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView_change_name"
+            tools:text="14 Junio" />
+
+        <TextView
+            android:id="@+id/textView_change_weekDay"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:maxLines="2"
+            app:layout_constraintBottom_toBottomOf="@+id/textView_change_time"
+            app:layout_constraintEnd_toEndOf="@+id/textView_change_date"
+            app:layout_constraintStart_toStartOf="@+id/textView_change_date"
+            app:layout_constraintTop_toBottomOf="@+id/textView_change_date"
+            tools:text="Jueves" />
+
+        <TextView
+            android:id="@+id/textView_change_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/textView_change_tag"
+            app:layout_constraintStart_toEndOf="@+id/textView_change_date"
+            app:layout_constraintTop_toBottomOf="@+id/textView_change_label"
+            tools:text="Shift: Mañana " />
+
+        <TextView
+            android:id="@+id/textView_change_tag"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@+id/textView_change_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView_change_name"
+            tools:text="M" />
+
+        <TextView
+            android:id="@+id/textView_change_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            app:layout_constraintEnd_toEndOf="@+id/textView_change_name"
+            app:layout_constraintStart_toStartOf="@+id/textView_change_name"
+            app:layout_constraintTop_toBottomOf="@+id/textView_change_name"
+            tools:text="08:00 - 14:00" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

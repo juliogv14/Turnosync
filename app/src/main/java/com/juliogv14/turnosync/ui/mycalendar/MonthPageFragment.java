@@ -45,7 +45,6 @@ public class MonthPageFragment extends Fragment {
 
     //Context and listener
     private Context mContext;
-    private OnMonthFragmentInteractionListener mListener;
 
     //Month
     private Date mMonthDate;
@@ -73,12 +72,6 @@ public class MonthPageFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (getParentFragment() instanceof OnMonthFragmentInteractionListener) {
-            mListener = (OnMonthFragmentInteractionListener) getParentFragment();
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnMonthFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -125,7 +118,6 @@ public class MonthPageFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mContext = null;
-        mListener = null;
     }
 
     public void notifyGridDataSetChanged() {
@@ -138,9 +130,4 @@ public class MonthPageFragment extends Fragment {
             });
         }
     }
-
-    public interface OnMonthFragmentInteractionListener {
-        void onMonthDaySelected(int fragment, Shift shift);
-    }
-
 }

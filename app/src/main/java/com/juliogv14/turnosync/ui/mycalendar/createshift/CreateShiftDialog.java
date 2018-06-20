@@ -42,8 +42,7 @@ public class CreateShiftDialog extends DialogFragment {
     private static final String USER_REF_KEY = "userRef";
     private static final String SHIFT_TYPES_KEY = "shiftTypes";
 
-
-    //Strings
+    //Binding
     private DialogCreateShiftBinding mViewBinding;
 
     //Parent fragment
@@ -79,11 +78,6 @@ public class CreateShiftDialog extends DialogFragment {
                     + " must implement CreateShiftListener");
         }
 
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @NonNull

@@ -31,18 +31,18 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by Julio on 18/02/2018.
- * MonthPageFragment
+ * Created by Julio on 11/05/2018.
+ * ScheduleWeekPageFragment
  */
 
 public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener, EditShiftDialog.EditShiftListener {
 
     //Keys
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private static final String USERS_SHIFT_MAP_KEY = "userShiftMap";
@@ -57,7 +57,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
     //Context and listener
     private Context mContext;
-    private OnScheduleFragmentInteractionListener mListener;
 
     //Variables
     private Date mWeekDate;
@@ -72,8 +71,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     //GridAdapter
     private BaseAdapter mGridAdapter;
 
-    public static ScheduleWeekPageFragment newInstance(UserWorkgroup workgroup,
-                                                       Date weekDate,
+    public static ScheduleWeekPageFragment newInstance(Date weekDate,
                                                        ArrayList<UserRef> workgroupUsers,
                                                        LinkedHashMap<String, ArrayList<Shift>> userShifts,
                                                        HashMap<String, ShiftType> shiftTypes,
@@ -83,8 +81,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
-        //TODO: check if workgroup is needed
-        args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
         args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         args.putSerializable(USERS_SHIFT_MAP_KEY, userShifts);
@@ -99,12 +95,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (getParentFragment() instanceof OnScheduleFragmentInteractionListener) {
-            mListener = (OnScheduleFragmentInteractionListener) getParentFragment();
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnScheduleFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -193,7 +183,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onDetach() {
         super.onDetach();
         mContext = null;
-        mListener = null;
     }
 
     public void notifyGridDataSetChanged() {
@@ -225,25 +214,36 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             mUsersShiftsMap.get(oldShift.getUserId()).remove(oldShift);
             mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
             Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
-
-
         }
-        //TODO: handle user changes in firestore
-        mShiftChanges.get(getString(R.string.data_changes_editedNew)).add(newShift);
-        mShiftChanges.get(getString(R.string.data_changes_editedOld)).add(oldShift);
-        mGridAdapter.notifyDataSetChanged();
 
+        //If undo change
+        if(mShiftChanges.get(getString(R.string.data_changes_editedNew)).contains(oldShift)){
+            mShiftChanges.get(getString(R.string.data_changes_editedNew)).remove(oldShift);
+
+            List<Shift> editedOld = mShiftChanges.get(getString(R.string.data_changes_editedOld));
+            for (Shift shift : editedOld) {
+                    if(shift.getUserId().equals(newShift.getUserId()) && shift.getDate().getTime() == newShift.getDate().getTime()){
+                        editedOld.remove(shift);
+                    }
+            }
+        } else {
+            mShiftChanges.get(getString(R.string.data_changes_editedNew)).add(newShift);
+            mShiftChanges.get(getString(R.string.data_changes_editedOld)).add(oldShift);
+        }
+        mGridAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onEditShiftRemove(Shift removedShift) {
         mUsersShiftsMap.get(removedShift.getUserId()).remove(removedShift);
-        mShiftChanges.get(getString(R.string.data_changes_removed)).add(removedShift);
+
+        //If undo add
+        if(mShiftChanges.get(getString(R.string.data_changes_added)).contains(removedShift)){
+            mShiftChanges.get(getString(R.string.data_changes_added)).remove(removedShift);
+        } else {
+            mShiftChanges.get(getString(R.string.data_changes_removed)).add(removedShift);
+        }
+
         mGridAdapter.notifyDataSetChanged();
     }
-
-    public interface OnScheduleFragmentInteractionListener {
-        void onWeekDaySelected(Date date, UserRef userRef);
-    }
-
 }

@@ -21,10 +21,10 @@
     <string name="data_key_date" translatable="false">date</string>
 
     <!--SHIFT CHANGES KEYS-->
-    <string name="data_changes_added">added</string>
-    <string name="data_changes_removed">removed</string>
-    <string name="data_changes_editedNew">editedNew</string>
-    <string name="data_changes_editedOld">editedOld</string>
+    <string name="data_changes_added" translatable="false">added</string>
+    <string name="data_changes_removed" translatable="false">removed</string>
+    <string name="data_changes_editedNew" translatable="false">editedNew</string>
+    <string name="data_changes_editedOld" translatable="false">editedOld</string>
 
     <!--INTENT KEYS-->
     <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
@@ -119,6 +119,18 @@
     <string name="dialog_editShift_user">User</string>
     <string name="dialog_editShift_type">Shift type</string>
     <string name="dialog_editShift_schedule">Schedule</string>
+
+    <!--SHIFT CHANGES DIALOG-->
+    <string name="dialog_shiftChanges_title">Confirm schedule changes?</string>
+    <string name="dialog_shiftChanges_button_confirm">Confirm</string>
+    <string name="dialog_shiftChanges_button_cancel">Cancel</string>
+
+    <string name="dialog_shiftChanges_added">Added to</string>
+    <string name="dialog_shiftChanges_removed">Removed from</string>
+    <string name="dialog_shiftChanges_editedNew">Added by exchange to</string>
+    <string name="dialog_shiftChanges_editedOld">Removed by exchange from</string>
+    <string name="dialog_shiftChanges_shift">Shift</string>
+    <string name="dialog_shiftChanges_schedule">Schedule</string>
 
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
