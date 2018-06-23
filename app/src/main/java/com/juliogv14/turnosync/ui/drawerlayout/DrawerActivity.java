@@ -28,20 +28,25 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityDrawerBinding;
 import com.juliogv14.turnosync.databinding.HeaderDrawerBinding;
 import com.juliogv14.turnosync.ui.account.LoginActivity;
 import com.juliogv14.turnosync.ui.settings.SettingsActivity;
+import com.juliogv14.turnosync.utils.FormUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DrawerActivity extends AppCompatActivity
@@ -89,7 +94,6 @@ public class DrawerActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-        //TODO: instance state may not be needed
         if (savedInstanceState != null) {
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
             mMyCalendarFragment = (MyCalendarFragment) getSupportFragmentManager().getFragment(savedInstanceState, RESTORED_FRAGMENT_KEY);
@@ -150,6 +154,7 @@ public class DrawerActivity extends AppCompatActivity
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
@@ -161,6 +166,12 @@ public class DrawerActivity extends AppCompatActivity
         onFragmentSwapped(mCurrentFragmentID);
 
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FormUtils.checkGooglePlayServices(this);
     }
 
     @Override
@@ -220,10 +231,31 @@ public class DrawerActivity extends AppCompatActivity
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
 
+        sendToken(user, shrPreferences);
         attatchWorkgroupsListener();
-
         displaySelectedScreen(mCurrentFragmentID);
 
+    }
+
+    private void sendToken(FirebaseUser user, SharedPreferences shrPreferences) {
+        DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid());
+
+        /*String idToken = shrPreferences.getString(getString(R.string.data_key_token),"");
+        if (!idToken.isEmpty()){
+            String[] idTokenSplit = idToken.split(":");
+            Map<String, Object> userMap = new HashMap<>();
+            Map<String, String> devices = new HashMap<>();
+            devices.put(idTokenSplit[0], idTokenSplit[1]);
+            userMap.put(getString(R.string.data_key_devices), devices);
+            userRef.set(userMap, SetOptions.merge());
+        }*/
+        String appId = FirebaseInstanceId.getInstance().getId();
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Map<String, Object> userMap = new HashMap<>();
+        Map<String, String> devices = new HashMap<>();
+        devices.put(appId, token);
+        userMap.put(getString(R.string.data_key_devices), devices);
+        userRef.set(userMap, SetOptions.merge());
     }
 
     private void onSignedOutCleanup() {

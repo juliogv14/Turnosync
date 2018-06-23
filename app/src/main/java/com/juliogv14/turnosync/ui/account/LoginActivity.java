@@ -64,8 +64,6 @@ public class LoginActivity extends AppCompatActivity {
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        FormUtils.checkGooglePlayServices(this);
-
         //EditText done listener, attempt login
         mViewBinding.editTextPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

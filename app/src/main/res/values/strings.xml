@@ -14,11 +14,14 @@
     <string name="data_key_email" translatable="false">email</string>
     <string name="data_key_uid" translatable="false">uid</string>
     <string name="data_key_active" translatable="false">active</string>
+    <string name="data_key_devices" translatable="false">devices</string>
+    <string name="data_key_token" translatable="false">token</string>
 
     <string name="data_key_workgroupid" translatable="false">workgroupId</string>
     <string name="data_key_info" translatable="false">info</string>
     <string name="data_key_role" translatable="false">role</string>
     <string name="data_key_date" translatable="false">date</string>
+
 
     <!--SHIFT CHANGES KEYS-->
     <string name="data_changes_added" translatable="false">added</string>
