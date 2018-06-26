@@ -20,10 +20,9 @@ public class InstanceIDService extends FirebaseInstanceIdService {
     }
 
     private void saveToken(String token){
-        String deviceID =  FirebaseInstanceId.getInstance().getId();
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = shrPreferences.edit();
-        editor.putString(getString(R.string.data_key_token), deviceID + ":" + token);
+        editor.putString(getString(R.string.data_key_token), token);
         editor.apply();
     }
 }

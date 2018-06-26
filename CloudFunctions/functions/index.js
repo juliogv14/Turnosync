@@ -98,9 +98,6 @@ exports.onInvite =
 				 					//Copy workgroup to user workgroup list
 				 					//Delete invite
 				 					return Promise.all([userToGlobal(user.uid, workgroupId), workgroupToUser(usr.ref, workgroup), snap.ref.delete()]);
-				 					
-
-
 				 				} else{
 				 					//User doesn't exist in the system
 				 					//Do nothing, the process will be done on create
@@ -131,4 +128,52 @@ exports.onInvite =
 	 		role : 'USER'
 	 	});
 	 }
+
+exports.onNewToken =
+	 functions.firestore.document('messaging/{userId}/devices/{device}').onWrite((snap, context) => {
+	    const device = snap.after.data();
+	    const uid = context.params.userId;
+	    console.log(device.deviceId + "|" + device.token);
+	    const topic = "msg_" + uid;
+
+        return admin.messaging().subscribeToTopic(device.token, topic)
+            .then(function(response) {
+                console.log("[" + device.deviceId + "|" + device.token + "] subscribed to " + topic + " response: " + response);
+            })
+            .catch(function(error) {
+                console.log("[" + device.deviceId + "|" + device.token + "] error subscribing to " + topic + "with error: " + error);
+            });
+	 });
+
+exports.onScheduleUpdated =
+	 functions.firestore.document('messaging/{userId}/workgroups/{workgroupId}').onCreate((snap, context) => {
+        const uid = context.params.userId;
+        const wkId = context.params.workgroupId;
+        const wkName = snap.get('displayName');
+        console.log(uid + "|" + wkId + "|" + wkName);
+        const topic = "msg_" + uid;
+
+
+        var message = {
+            android: {
+                ttl: 3600*24*14,
+                priority: 'high',
+                data: {
+                    workgroupId: wkId,
+                    displayName: wkName
+                }
+            },
+            topic: topic
+        };
+
+        return admin.messaging().send(message)
+            .then(function(response){
+                console.log("Message sent to " + uid + " updated " + wkId);
+                snap.ref.delete();
+            })
+            .catch(function(error) {
+                console.log("Error sending message to " + uid + " updated " + wkId + ": " + error);
+                snap.ref.delete();
+            });
+	 });
 	

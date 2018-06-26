@@ -8,13 +8,15 @@
     <string name="data_ref_shifts" translatable="false">shifts</string>
     <string name="data_ref_invites" translatable="false">invites</string>
     <string name="data_ref_shiftTypes" translatable="false">shifttypes</string>
+    <string name="data_ref_messaging" translatable="false">messaging</string>
+    <string name="data_ref_devices" translatable="false">devices</string>
 
     <!--CLOUD FIRESTORE KEYS-->
     <string name="data_key_displayname" translatable="false">displayName</string>
     <string name="data_key_email" translatable="false">email</string>
     <string name="data_key_uid" translatable="false">uid</string>
     <string name="data_key_active" translatable="false">active</string>
-    <string name="data_key_devices" translatable="false">devices</string>
+    <string name="data_key_deviceid" translatable="false">deviceId</string>
     <string name="data_key_token" translatable="false">token</string>
 
     <string name="data_key_workgroupid" translatable="false">workgroupId</string>
@@ -229,6 +231,15 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+
+    <!--NOTIFICATION CHANNEL-->
+    <string name="push_channel_name">Schedule updates</string>
+    <string name="push_channel_desc">Notifies when your schedule is updated</string>
+
+
+    <!--PUSH NOTIFICATION -->
+    <string name="push_title_schedule">Schedule update</string>
+    <string name="push_body_workgroup">Your schedule in %1$s has been updated</string>
 
     <!--reference errors-->
     <item name="visible" type="id" />

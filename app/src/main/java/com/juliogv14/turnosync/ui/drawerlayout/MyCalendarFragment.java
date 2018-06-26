@@ -52,6 +52,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -297,6 +298,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     }
 
     private void applyChanges() {
+
+        HashSet<String> changedUsers = new HashSet<>();
+
         //Added
         List<Shift> addedShifts =  mShiftChanges.get(getString(R.string.data_changes_added));
         for (Iterator<Shift> iterator = addedShifts.iterator(); iterator.hasNext(); ) {
@@ -306,6 +310,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     .collection(getString(R.string.data_ref_shifts)).document();
             shift.setId(docRef.getId());
             docRef.set(shift);
+            changedUsers.add(shift.getUserId());
             iterator.remove();
         }
 
@@ -317,6 +322,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                     .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
             docRef.delete();
+            changedUsers.add(shift.getUserId());
             iterator.remove();
         }
 
@@ -329,6 +335,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     .collection(getString(R.string.data_ref_shifts)).document();
             shift.setId(docRef.getId());
             docRef.set(shift);
+            changedUsers.add(shift.getUserId());
             iterator.remove();
         }
         List<Shift> editedOldShifts=  mShiftChanges.get(getString(R.string.data_changes_editedOld));
@@ -338,7 +345,17 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                     .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
             docRef.delete();
+            changedUsers.add(shift.getUserId());
             iterator.remove();
+        }
+
+        //Set schedule changed for users
+        HashMap<String, String> notifData = new HashMap<>();
+        notifData.put(getString(R.string.data_key_displayname), mWorkgroup.getDisplayName());
+        for (String userId : changedUsers) {
+            CollectionReference notifRef = mFirebaseFirestore.collection(getString(R.string.data_ref_messaging)).document(userId)
+                    .collection(getString(R.string.data_ref_workgroups));
+            notifRef.document(mWorkgroup.getWorkgroupId()).set(notifData);
         }
     }
 
@@ -593,6 +610,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     private class WeekSlidePagerAdapter extends FragmentStatePagerAdapter {
 
+        ScheduleWeekPageFragment[] fragmentsRef = new ScheduleWeekPageFragment[mTotalWeeks];
+
         WeekSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -605,9 +624,12 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
 
-            ScheduleWeekPageFragment pageFragment = ScheduleWeekPageFragment.newInstance(cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode);
-            queryScheduleData(pageFragment, cal.getTime(), shiftListMap);
-            return pageFragment;
+            if(fragmentsRef[position] == null){
+                fragmentsRef[position] = ScheduleWeekPageFragment.newInstance(cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode);
+                queryScheduleData(fragmentsRef[position], cal.getTime(), shiftListMap);
+            }
+
+            return fragmentsRef[position];
         }
 
         @Override

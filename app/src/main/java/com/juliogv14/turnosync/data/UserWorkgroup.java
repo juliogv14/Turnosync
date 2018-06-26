@@ -20,6 +20,9 @@ public class UserWorkgroup implements Parcelable {
     @Exclude
     private boolean selected;
 
+    public UserWorkgroup() {
+    }
+
     public UserWorkgroup(String workgroupId, String displayName, String info, String role) {
         this.workgroupId = workgroupId;
         this.displayName = displayName;

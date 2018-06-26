@@ -3,6 +3,7 @@ package com.juliogv14.turnosync.ui.drawerlayout;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -133,8 +134,9 @@ public class DrawerActivity extends AppCompatActivity
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                mFirebaseUser = firebaseAuth.getCurrentUser();
-                if (mFirebaseUser != null) {
+
+                if (firebaseAuth.getCurrentUser() != null) {
+                    mFirebaseUser = firebaseAuth.getCurrentUser();
                     Log.d(TAG, "Authlistener: logged in user " + mFirebaseUser.getDisplayName());
                     //USER logged in
                     onSignedInInitialize(mFirebaseUser);
@@ -152,8 +154,11 @@ public class DrawerActivity extends AppCompatActivity
             }
         };
 
+        //Shared preferences
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
+
+
 
     }
 
@@ -216,9 +221,7 @@ public class DrawerActivity extends AppCompatActivity
                 super.onBackPressed();
             } else {
                 displaySelectedScreen(R.string.fragment_home);
-
             }
-
         }
     }
 
@@ -231,31 +234,9 @@ public class DrawerActivity extends AppCompatActivity
         mHeaderBinding.textViewDisplayName.setText(user.getDisplayName());
         mHeaderBinding.textViewEmail.setText(user.getEmail());
 
-        sendToken(user, shrPreferences);
         attatchWorkgroupsListener();
         displaySelectedScreen(mCurrentFragmentID);
-
-    }
-
-    private void sendToken(FirebaseUser user, SharedPreferences shrPreferences) {
-        DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(user.getUid());
-
-        /*String idToken = shrPreferences.getString(getString(R.string.data_key_token),"");
-        if (!idToken.isEmpty()){
-            String[] idTokenSplit = idToken.split(":");
-            Map<String, Object> userMap = new HashMap<>();
-            Map<String, String> devices = new HashMap<>();
-            devices.put(idTokenSplit[0], idTokenSplit[1]);
-            userMap.put(getString(R.string.data_key_devices), devices);
-            userRef.set(userMap, SetOptions.merge());
-        }*/
-        String appId = FirebaseInstanceId.getInstance().getId();
-        String token = FirebaseInstanceId.getInstance().getToken();
-        Map<String, Object> userMap = new HashMap<>();
-        Map<String, String> devices = new HashMap<>();
-        devices.put(appId, token);
-        userMap.put(getString(R.string.data_key_devices), devices);
-        userRef.set(userMap, SetOptions.merge());
+        registerDevice(shrPreferences);
     }
 
     private void onSignedOutCleanup() {
@@ -314,11 +295,7 @@ public class DrawerActivity extends AppCompatActivity
                     DocumentSnapshot document = docChange.getDocument();
 
                     if (document.exists()) {
-                        Map<String, Object> data = document.getData();
-                        UserWorkgroup userWorkgroup = new UserWorkgroup(data.get(getString(R.string.data_key_workgroupid)).toString(),
-                                data.get(getString(R.string.data_key_displayname)).toString(),
-                                data.get(getString(R.string.data_key_info)).toString(),
-                                data.get(getString(R.string.data_key_role)).toString());
+                        UserWorkgroup userWorkgroup = document.toObject(UserWorkgroup.class);
 
                         if (mCurrentWorkgroup == null) {
                             mCurrentWorkgroup = userWorkgroup;
@@ -344,8 +321,6 @@ public class DrawerActivity extends AppCompatActivity
                                 mWorkgroupsList.remove(docChange.getOldIndex());
                                 break;
                         }
-
-
                     }
                 }
                 if(mHomeFragment != null){
@@ -369,6 +344,7 @@ public class DrawerActivity extends AppCompatActivity
                 displaySelectedScreen(R.string.fragment_mycalendar);
                 break;
             case R.id.nav_item_signout:
+                unregisterDevice();
                 mFirebaseAuth.signOut();
                 break;
             case R.id.nav_item_settings:
@@ -386,7 +362,6 @@ public class DrawerActivity extends AppCompatActivity
     //OnSharedPreferenceChangeListener
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
 
         /*Update Firebase with new settings*/
         if (TextUtils.equals(key, getString(R.string.data_key_displayname))) {
@@ -421,7 +396,40 @@ public class DrawerActivity extends AppCompatActivity
                             }
                         });
             }
+        } else if (TextUtils.equals(key, getString(R.string.data_key_token))){
+
+            registerDevice(sharedPreferences);
+
         }
+    }
+
+    private void registerDevice(SharedPreferences sharedPreferences) {
+        //Update app token
+        String token = sharedPreferences.getString( getString(R.string.data_key_token),"");
+        if (!token.isEmpty()){
+            DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_messaging)).document(mFirebaseUser.getUid());
+
+            //Set user
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put(getString(R.string.data_key_uid), mFirebaseUser.getUid());
+            userRef.set(userMap, SetOptions.merge());
+
+            //Set device token
+            String appId = FirebaseInstanceId.getInstance().getId();
+            Map<String, String> device = new HashMap<>();
+            device.put(getString(R.string.data_key_deviceid), appId);
+            device.put(getString(R.string.data_key_token), token);
+            userRef.collection(getString(R.string.data_ref_devices)).document(appId).set(device);
+
+        }
+    }
+
+    private void unregisterDevice(){
+        String appId = FirebaseInstanceId.getInstance().getId();
+        DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_messaging)).document(mFirebaseUser.getUid())
+        .collection(getString(R.string.data_ref_devices)).document(appId);
+        userRef.delete();
+
     }
 
     //OnFragmentInteractionListener
