@@ -265,7 +265,7 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
     public void onClickEditType(ShiftType type) {
         Toast.makeText((Context) mListener, "Edit type" + type.getId(), Toast.LENGTH_SHORT).show();
         CreateTypeDialog dialog = CreateTypeDialog.newInstance(type);
-        dialog.show(((AppCompatActivity)mListener).getSupportFragmentManager(), "createTypeDialog");
+        dialog.show(getChildFragmentManager(), "createTypeDialog");
     }
 
     @Override

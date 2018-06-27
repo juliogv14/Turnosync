@@ -256,7 +256,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             case R.id.action_mycalendar_edit:
                 //loadTestData();
 
-                ((AppCompatActivity) mListener).invalidateOptionsMenu();
                 if(mEditMode.get()){
                     int changesSize = mShiftChanges.get(getString(R.string.data_changes_added)).size()
                         + mShiftChanges.get(getString(R.string.data_changes_removed)).size()
@@ -265,10 +264,15 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     if(changesSize > 0){
                         ConfirmChangesDialog dialog = ConfirmChangesDialog.newInstance(mShiftChanges, mShiftTypes);
                         dialog.show(getChildFragmentManager(),"confirmChanges");
+                    } else {
+                        mEditMode.set(!mEditMode.get());
+                        ((AppCompatActivity) mListener).invalidateOptionsMenu();
                     }
-
+                } else {
+                    mEditMode.set(!mEditMode.get());
+                    ((AppCompatActivity) mListener).invalidateOptionsMenu();
                 }
-                mEditMode.set(!mEditMode.get());
+
 
                 return true;
             case R.id.action_mycalendar_switch:
@@ -535,6 +539,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     public void onConfirmChanges() {
         applyChanges();
         mMadeChanges = true;
+        mEditMode.set(false);
+        ((AppCompatActivity) mListener).invalidateOptionsMenu();
+
     }
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {

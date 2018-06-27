@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +19,8 @@ import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogEditShiftBinding;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,10 +113,10 @@ public class EditShiftDialog extends DialogFragment {
                         String oldUserId = mUserRef.getUid();
                         String newUserId = mWorkgroupUsers.get(userPos).getUid();
 
-                        if(oldUserId.equals(newUserId)){
+                        if(oldUserId.equals(newUserId) && !mSelectedShift.getType().equals(mShiftTypesList.get(typePos).getId())){
                             mSelectedShift.setType(mShiftTypesList.get(typePos).getId());
                             mListener.onEditShiftChange(mSelectedShift, mSelectedShift);
-                        } else  {
+                        } else if (!oldUserId.equals(newUserId)) {
                             Shift newShift = new Shift(newUserId, mShiftTypesList.get(typePos).getId(), mDay, "","");
                             mListener.onEditShiftChange(mSelectedShift, newShift);
                         }
@@ -151,7 +154,7 @@ public class EditShiftDialog extends DialogFragment {
         for (int i = 0; i < mShiftTypesList.size(); i++) {
             ShiftType type = mShiftTypesList.get(i);
             displayTypes.add(type.getName());
-            if (type.getId().equals(mSelectedShift.getType())) {
+            if (TextUtils.equals(mSelectedShift.getType(), type.getId())) {
                 typePos = i;
             }
         }

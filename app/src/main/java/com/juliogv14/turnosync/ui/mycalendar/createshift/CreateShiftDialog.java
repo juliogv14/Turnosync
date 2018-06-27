@@ -102,9 +102,10 @@ public class CreateShiftDialog extends DialogFragment {
         mDayButtons.add(mViewBinding.buttonCreateShift7);
 
         //Set current day
-        Calendar cal = new GregorianCalendar();
+        Calendar cal = new GregorianCalendar(Locale.FRANCE);
         cal.setTime(mDay);
         int buttonPos = cal.get(Calendar.DAY_OF_WEEK)-2;
+        if(buttonPos == -1) buttonPos = 6;
         mDayButtons.get(buttonPos).setChecked(true);
 
         //Togglebutton setup
@@ -132,7 +133,7 @@ public class CreateShiftDialog extends DialogFragment {
                         for (int j = 0; j < mDayButtons.size(); j++) {
                             ToggleButton toggleButton = mDayButtons.get(j);
                             if(toggleButton.isChecked()){
-                                cal.set(Calendar.DAY_OF_WEEK, j+2);
+                                cal.set(Calendar.DAY_OF_WEEK, j+1);
                                 Shift shift = new Shift(mUserRef.getUid(), mShiftTypesList.get(spinnerPos).getId(), cal.getTime(), "","");
                                 newShifts.add(shift);
                             }
