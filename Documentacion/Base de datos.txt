@@ -14,12 +14,12 @@ users {
 				role: "[manager, user, guest]"
 
 				shifts{
-                    shiftID{
+                    shiftId{
+                        userId: "uid"
                         date: 01/05/2018
                         start: "6:00"
                         end: "14:00"
-
-                        type: "type"
+                        type: "typeId"
                         info "extra info"
                     }
                     .
@@ -32,19 +32,31 @@ users {
 	}
 	.
 	.
-
 }
 
 workgroups {
-	groupID{
+	groupId{
 		workgroupId: "id"
 		displayName:"name"
 		info:"group info"
 
-
         users{
             userId{
                 uid: "uid"
+                active: state
+            }
+            .
+            .
+        }
+        shifttypes {
+            typeId {
+                Id: "id"
+                name: "name"
+                tag: "tag"
+                color: color
+                startTime: "07:00"
+                endTime: "15:00"
+                active: state
             }
             .
             .
@@ -59,4 +71,27 @@ invites {
         email: "email"
         workgroupId: "id"
     }
+}
+
+messaging {
+    userId {
+        userId: "userId"
+        devices {
+            deviceId {
+                deviceId: "deviceId"
+                token: "token"
+            }
+            .
+            .
+        }
+        workgroups {
+            workgroupId {
+                displayName: "name"
+            }
+            .
+            .
+        }
+    }
+    .
+    .
 }
