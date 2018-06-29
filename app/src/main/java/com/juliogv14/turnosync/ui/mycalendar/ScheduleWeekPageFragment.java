@@ -12,19 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Toast;
 
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
-import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.CreateShiftDialog;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.EditShiftDialog;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -197,23 +196,103 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     }
 
     @Override
-    public void onCreateShiftCreate(ArrayList<Shift> newShifts) {
-        for (Shift shift : newShifts) {
-            mUsersShiftsMap.get(shift.getUserId()).add(shift);
-            Collections.sort(mUsersShiftsMap.get(shift.getUserId()));
-            mShiftChanges.get(getString(R.string.data_changes_added)).add(shift);
-        }
+    public void onCreateShiftCreate(final ArrayList<Shift> newShifts) {
+        //TODO: consider other weeks
+        /*Date dateFrom = newShifts.get(0).getDate();
+        Date dateTo = newShifts.get(newShifts.size()-1).getDate();
 
-        mGridAdapter.notifyDataSetChanged();
+        String dateKey = getString(R.string.data_key_date);
+        CollectionReference shiftsColl = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users)).document(newShifts.get(0).getUserId())
+                .collection(getString(R.string.data_ref_workgroups)).document("udDHaY6rNMg0bi8koxxl").collection(getString(R.string.data_ref_shifts));
+        shiftsColl.whereGreaterThanOrEqualTo(dateKey, dateFrom).whereLessThanOrEqualTo(dateKey, dateTo)
+                .orderBy(dateKey, Query.Direction.ASCENDING)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    int i = 0;
+                    int j = 0;
+                    List<Shift> userList = task.getResult().toObjects(Shift.class);
+
+                    while (i < newShifts.size()) {
+                        Shift newShift = newShifts.get(i);
+                        if (j == userList.size()) {
+                            mUsersShiftsMap.get(newShift.getUserId()).add(0,newShift);
+                            mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
+                            i++;
+                        } else if (j < userList.size()) {
+                            if (newShift.getDate().getTime() < userList.get(j).getDate().getTime()) {
+                                mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
+                                mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
+                                i++;
+                            } else if (newShift.getDate().getTime() == userList.get(j).getDate().getTime()) {
+                                i++;
+                                j++;
+                            } else {
+                                while (j+1 != userList.size() && newShift.getDate().getTime() > userList.get(j).getDate().getTime()) {
+                                    j++;
+                                }
+                            }
+                        }
+                    }
+                    Collections.sort(mUsersShiftsMap.get(newShifts.get(0).getUserId()));
+                    notifyGridDataSetChanged();
+                }
+            }
+        });*/
+
+        int i = 0;
+        int j = 0;
+        List<Shift> userList = mUsersShiftsMap.get(newShifts.get(0).getUserId());
+
+        while (i < newShifts.size()) {
+            Shift newShift = newShifts.get(i);
+            if (j == userList.size()) {
+                userList.add(newShift);
+                mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
+                i++;
+            } else if (j < userList.size()) {
+                if (newShift.getDate().getTime() < userList.get(j).getDate().getTime()) {
+                    userList.add(0,newShift);
+                    mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
+                    i++;
+                    j++;
+                } else if (newShift.getDate().getTime() == userList.get(j).getDate().getTime()) {
+                    i++;
+                    j++;
+                } else {
+                    while (j+1 != userList.size() && newShift.getDate().getTime() > userList.get(j).getDate().getTime()) {
+                        j++;
+                    }
+                }
+            }
+        }
+        Collections.sort(mUsersShiftsMap.get(newShifts.get(0).getUserId()));
+        notifyGridDataSetChanged();
 
     }
 
     @Override
     public void onEditShiftChange(Shift oldShift, Shift newShift) {
         if(oldShift != newShift){
-            mUsersShiftsMap.get(oldShift.getUserId()).remove(oldShift);
-            mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
-            Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
+            //Check if target user has already a shift that date
+            List<Shift> userList = mUsersShiftsMap.get(newShift.getUserId());
+            boolean exists = false;
+            for (Shift shift : userList) {
+                if (shift.getDate().getTime() == newShift.getDate().getTime()){
+                    exists = true;
+                    break;
+                }
+            }
+            if(!exists){
+                mUsersShiftsMap.get(oldShift.getUserId()).remove(oldShift);
+                mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
+                Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
+            } else {
+                // TODO: 29/06/2018 notify shift exists
+                Toast.makeText(mContext, "Can't assign shift to target user, date conflict", Toast.LENGTH_SHORT).show();
+            }
+
         }
 
         //If undo change
