@@ -240,15 +240,15 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
     @Override
     public void onDialogPositiveClick(String email) {
-        CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
 
+        CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
         Map<String, String> inviteData = new HashMap<>();
         inviteData.put(getString(R.string.data_key_email), email);
         inviteData.put(getString(R.string.data_key_workgroupid), mWorkgroup.getWorkgroupId());
-        invitesColl.add(inviteData)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        invitesColl.document(email).set(inviteData)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                    public void onComplete(@NonNull Task<Void> task) {
                         if (!task.isSuccessful()) {
                             if (task.getException() != null) {
                                 Log.e(TAG, task.getException().getMessage());

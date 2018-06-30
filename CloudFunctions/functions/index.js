@@ -19,23 +19,6 @@ exports.onCreateUser =
 
 		console.log("User: " + uid + "|" + userRecord.displayName);
 
-
-		//TODO test if necessary
-		const usrToDb = admin.auth().getUser(uid)
-  		.then(function(userRecordName){
-  			const displayName = userRecordName.displayName;
-			console.log("DisplayName: " + displayName);
-			db.collection("users").doc(uid).set({
-				'uid': uid,
-				'email' : email,
-				'displayName' : displayName
-			});
-		
-		})
-		.catch(function(error){
-    		console.log("Error get email:", error);
-  		});
-
 		const resolveInvite = db.collection("invites").where("email", "==", email).get()
 		.then(snapshot =>{
 			snapshot.forEach(inv =>{
@@ -58,7 +41,7 @@ exports.onCreateUser =
 		.catch(function(error){
     		console.log("Error fetching user data:", error);
   		});
-		return Promise.all([usrToDb, resolveInvite]);
+		return resolveInvite;
 
 	});
 
@@ -117,8 +100,54 @@ exports.onInvite =
 	 });
 
 	 function userToGlobal(userUid, wkId){
-	 	return db.collection('workgroups').doc(wkId).collection('users').doc(userUid).set({uid: userUid, active: true});
+
+	 	return admin.auth().getUser(userUid)
+          		.then(function(userRecordName){
+          			const displayName = userRecordName.displayName;
+        			console.log("DisplayName: " + displayName);
+        			db.collection("users").doc(userUid).set({
+        				'displayName' : displayName
+        			});
+
+        			var shortName = slugify(displayName);
+        			var split = shortName.trim().split(/\s+/);
+
+                    if(split.length == 1){
+                        shortName = shortName.substring(0,3);
+                    } else if(split.length == 2){
+        			    shortName = split[0].substring(0,2);
+        			    shortName +=split[1].substring(0,1);
+        			} else {
+        			    shortName = split[0].substring(0,2);
+                        shortName +=split[1].substring(0,1);
+                        shortName +=split[2].substring(0,1);
+        			}
+
+        			return db.collection('workgroups').doc(wkId).collection('users').doc(userUid).set({uid: userUid, shortName: shortName, active: true});
+
+        		})
+        		.catch(function(error){
+            		console.log("Error get email:", error);
+          		});
 	 }
+
+    function slugify (str) {
+        var map = {
+            'a' : 'á|à|ã|â|À|Á|Ã|Â',
+            'e' : 'é|è|ê|É|È|Ê',
+            'i' : 'í|ì|î|Í|Ì|Î',
+            'o' : 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+            'u' : 'ú|ù|û|ü|Ú|Ù|Û|Ü',
+            'c' : 'ç|Ç',
+            'n' : 'ñ|Ñ'
+        };
+
+        for (var pattern in map) {
+            str = str.replace(new RegExp(map[pattern], 'g'), pattern);
+        };
+
+        return str;
+    };
 
 	 function workgroupToUser(userRef, workgroup){
 	 	return userRef.collection('workgroups').doc(workgroup.workgroupId).set({
