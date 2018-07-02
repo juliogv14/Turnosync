@@ -42,6 +42,7 @@
                 android:id="@+id/editText_createType_tag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLength="3"
                 android:hint="@string/dialog_createType_tag" />
         </android.support.design.widget.TextInputLayout>
 

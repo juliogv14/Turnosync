@@ -38,6 +38,7 @@ public class CreateTypeDialog extends DialogFragment {
 
     //Constants
     private static final String TYPE_KEY = "mode";
+
     //Binding
     private DialogCreateShiftypeBinding mViewBinding;
 
@@ -286,11 +287,6 @@ public class CreateTypeDialog extends DialogFragment {
         if (TextUtils.isEmpty(mTag)) {
             mViewBinding.editTextLayoutCreateTypeTag
                     .setError(getString(R.string.form_error_field_required));
-            if (focusView == null) focusView = mViewBinding.editTextCreateTypeTag;
-            isReadyToClose = false;
-        } else if (!FormUtils.isTagValid(mTag)) {
-            mViewBinding.editTextLayoutCreateTypeTag
-                    .setError(getString(R.string.dialog_createType_error_tag));
             if (focusView == null) focusView = mViewBinding.editTextCreateTypeTag;
             isReadyToClose = false;
         }

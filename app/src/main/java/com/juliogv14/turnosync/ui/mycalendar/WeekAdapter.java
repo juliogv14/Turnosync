@@ -71,18 +71,18 @@ public class WeekAdapter extends BaseAdapter {
         mItems.add(""); //First item
         mItems.addAll(Arrays.asList(mDays));
 
-        /*for (Map<String, String> userUid : mGroupUsers) {
+        for (UserRef userRef : mGroupUsers) {
             //User name item
-            mItems.add(userUid.get(mContext.getString(R.string.data_key_uid)));
+            mItems.add(userRef.getShortName());
 
             //Week days
             for (int i = 0; i < 7; i++) {
                 mItems.add("");
             }
 
-        }*/
+        }
 
-        for (Map.Entry<String, ArrayList<Shift>> entry : mUserShiftMap.entrySet()) {
+        /*for (Map.Entry<String, ArrayList<Shift>> entry : mUserShiftMap.entrySet()) {
             //User name item
             mItems.add(entry.getKey());
 
@@ -90,7 +90,7 @@ public class WeekAdapter extends BaseAdapter {
             for (int i = 0; i < 7; i++) {
                 mItems.add("");
             }
-        }
+        }*/
 
         mShiftIterator = mUserShiftMap.entrySet().iterator();
         mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
@@ -118,7 +118,7 @@ public class WeekAdapter extends BaseAdapter {
                 //TODO set name to display
                 if (mShiftIterator.hasNext()) {
                     Map.Entry<String, ArrayList<Shift>> entry = mShiftIterator.next();
-                    names.setText(entry.getKey());
+                    names.setText(mItems.get(position));
                     mCurrentUid = entry.getKey();
 
                 }

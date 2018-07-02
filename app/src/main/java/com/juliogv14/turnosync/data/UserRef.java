@@ -12,6 +12,7 @@ import com.google.firebase.firestore.Exclude;
 
 public class UserRef implements Parcelable {
     private String uid;
+    private String shortName;
     private boolean active;
 
     public UserRef() {
@@ -31,6 +32,14 @@ public class UserRef implements Parcelable {
         this.uid = uid;
     }
 
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -42,6 +51,7 @@ public class UserRef implements Parcelable {
     //Parcelable implementation
     private UserRef(Parcel in) {
         this.uid = in.readString();
+        this.shortName = in.readString();
         this.active = in.readByte() != 0;
     }
 
@@ -66,6 +76,7 @@ public class UserRef implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int i) {
         out.writeString(uid);
+        out.writeString(shortName);
         out.writeByte((byte)(active ? 1 : 0 ));
     }
 }

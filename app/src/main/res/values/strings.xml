@@ -73,6 +73,14 @@
     <string name="dialog_adduser_button_add">Invite</string>
     <string name="dialog_adduser_button_cancel">Cancel</string>
 
+    <!--EDIT INITIALS DIALOG-->
+    <string name="dialog_editinitials_title">Edit user initials</string>
+    <string name="dialog_editinitials_initials">Initials</string>
+    <string name="dialog_editinitials_button_edit">Edit</string>
+    <string name="dialog_editinitials_button_cancel">Cancel</string>
+
+    <string name="dialog_editinitials_error">Only lowercase and uppercase allowed</string>
+
     <!--CONFIRM REMOVE USER DIALOG-->
     <string name="dialog_removeUser_title">Are you sure to remove this user?</string>
     <string name="dialog_removeUser_message">You will no longer be able to set shifts to this user, existing shift will be preserved</string>

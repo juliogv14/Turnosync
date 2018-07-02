@@ -19,7 +19,7 @@ import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
  * Created by Julio on 26/02/2018.
- * CreateWorkgroupDialog
+ * AddUserDialog
  */
 
 public class AddUserDialog extends DialogFragment {
@@ -86,7 +86,7 @@ public class AddUserDialog extends DialogFragment {
                         boolean isReadyToClose = attemptAddUser();
                         if (isReadyToClose) {
                             FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
-                            mListener.onDialogPositiveClick(mEmail);
+                            mListener.onClickAddUser(mEmail);
                             dialog.dismiss();
                         }
                     }
@@ -130,6 +130,6 @@ public class AddUserDialog extends DialogFragment {
     }
 
     public interface AddUserListener {
-        void onDialogPositiveClick(String email);
+        void onClickAddUser(String email);
     }
 }

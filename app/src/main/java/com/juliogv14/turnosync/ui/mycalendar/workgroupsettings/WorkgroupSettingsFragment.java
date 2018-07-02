@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,7 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAdapter.UserOnClickListener, AddUserDialog.AddUserListener {
+public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAdapter.UserOnClickListener, AddUserDialog.AddUserListener, EditInitialsDialog.EditInitialsListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -198,7 +199,13 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                                 if(!userData.isActive()){
                                     mUserList.remove(docChange.getOldIndex());
                                 } else {
-                                    mUserList.add(docChange.getNewIndex(), userData);
+                                    UserRef userRef = mUserList.get(docChange.getNewIndex());
+                                    if(TextUtils.equals(userRef.getUid(), userData.getUid())){
+                                        mUserList.set(docChange.getNewIndex(), userData);
+                                    } else {
+                                        mUserList.add(docChange.getNewIndex(), userData);
+                                    }
+
                                 }
                                 break;
                             case REMOVED:
@@ -239,7 +246,22 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     }
 
     @Override
-    public void onDialogPositiveClick(String email) {
+    public void onClickEditUser(int pos) {
+        UserRef userRef = mUserList.get(pos);
+        EditInitialsDialog dialog = EditInitialsDialog.newInstance(userRef);
+        dialog.show(getChildFragmentManager(), "editInitials");
+    }
+
+    @Override
+    public void onInitialsName(UserRef userRef) {
+        CollectionReference workgroupUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups))
+                .document(mWorkgroup.getWorkgroupId()).collection(getString(R.string.data_ref_users));
+        workgroupUsersColl.document(userRef.getUid()).set(userRef);
+        mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClickAddUser(String email) {
 
         CollectionReference invitesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_invites));
         Map<String, String> inviteData = new HashMap<>();
@@ -257,8 +279,6 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                     }
                 });
     }
-
-
 
     public interface WorkgroupSettingsListener extends OnFragmentInteractionListener {
         void swapFragment(int fragmentId);

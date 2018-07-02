@@ -44,9 +44,9 @@ public class FormUtils {
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
 
-    public static boolean isTagValid(String tag){
-        String regEx = "^[\\p{L}\\p{N}-' ]{1,3}$";
-        return Pattern.compile(regEx).matcher(tag).matches();
+    public static boolean isInitialsValid(String initials){
+        String regEx = "^[\\p{L}\\p{N}]+$";
+        return Pattern.compile(regEx).matcher(initials).matches();
     }
 
     public static void showLoadingIndicator(View indicatorView, boolean show) {

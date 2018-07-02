@@ -445,6 +445,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
 
             calend.add(Calendar.MONTH, mCurrentPosition);
+            calend.set(Calendar.WEEK_OF_MONTH, 1);
+            calend.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
             int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
             int endWeek = calend.get(Calendar.WEEK_OF_YEAR);

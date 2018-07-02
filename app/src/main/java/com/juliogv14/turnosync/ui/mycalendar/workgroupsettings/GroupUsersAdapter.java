@@ -38,7 +38,7 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-        holder.bind(mUserList.get(position).getUid());
+        holder.bind(mUserList.get(position).getShortName());
     }
 
     @Override
@@ -48,6 +48,7 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
 
     public interface UserOnClickListener {
         void onClickRemoveUser(String uid);
+        void onClickEditUser(int pos);
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
@@ -65,11 +66,19 @@ public class GroupUsersAdapter extends RecyclerView.Adapter<GroupUsersAdapter.Us
                     mUserOnClickListener.onClickRemoveUser(uid);
                 }
             });
+
+            this.binding.buttonSettingsEditUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserOnClickListener.onClickEditUser(getAdapterPosition());
+                }
+            });
         }
 
         public void bind(String name){
             if (!mRole.equals(UserRoles.MANAGER.toString())){
                 binding.buttonSettingsRemoveUser.setVisibility(View.GONE);
+                binding.buttonSettingsEditUser.setVisibility(View.GONE);
             }
             binding.textViewUserListName.setText(name);
             binding.executePendingBindings();
