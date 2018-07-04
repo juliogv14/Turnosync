@@ -11,10 +11,11 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.databinding.ItemShifttypeBinding;
 
-import java.text.SimpleDateFormat;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.ShiftTypeViewHolder>{
 
@@ -87,9 +88,10 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
             binding.textViewShiftTypeLong.setText(shiftType.getName());
             binding.textViewShiftTypeShort.setText(shiftType.getTag());
             binding.imageViewTypeColor.setBackgroundColor(shiftType.getColor());
-            SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String startHour = formatDayHour.format(shiftType.getStartTime());
-            String endHour = formatDayHour.format(shiftType.getEndTime());
+
+            DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+            String startHour = fmt.print(shiftType.getJodaStartTime());
+            String endHour = fmt.print(shiftType.getJodaStartTime().plus(shiftType.getJodaPeriod()));
             String timeInterval = startHour + " - " + endHour;
             binding.textViewShiftTypeInterval.setText(timeInterval);
             binding.executePendingBindings();

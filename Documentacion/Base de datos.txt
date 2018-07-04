@@ -55,7 +55,7 @@ workgroups {
                 tag: "tag"
                 color: color
                 startTime: "07:00"
-                endTime: "15:00"
+                period: "15:00"
                 active: state
             }
             .

@@ -88,7 +88,7 @@
     <string name="dialog_removeUser_button_cancel">Cancel</string>
 
     <!--CREATE NEW TYPE DIALOG-->
-    <string name="dialog_createType_title">Are you sure to remove this type?</string>
+    <string name="dialog_createType_title">Create new shift type</string>
     <string name="dialog_createType_button_create">Create</string>
     <string name="dialog_createType_button_edit">Edit</string>
     <string name="dialog_createType_button_cancel">Cancel</string>
@@ -101,8 +101,8 @@
     <string name="dialog_createType_to">to</string>
     <string name="dialog_createType_end">End</string>
     <string name="dialog_createType_defaultTime">00:00</string>
+    <string name="dialog_createType_duration">Duration:</string>
     <string name="dialog_createType_color">Background color:</string>
-    <string name="dialog_createType_error_tag">Max 3 characters.</string>
     <string name="dialog_createType_error_time">You cannot set the end time to a time earlier than the start time.</string>
 
     <!--TIME PICKER DIALOG-->
@@ -122,6 +122,7 @@
     <string name="dialog_createShift_type">Shift type</string>
     <string name="dialog_createShift_schedule">Schedule</string>
     <string name="dialog_createShift_repeat">Repeat:</string>
+    <string name="dialog_createShift_weekly">Weekly hours:</string>
 
     <!--EDIT SHIFT DIALOG-->
     <string name="dialog_editShift_title">Edit or remove shifts</string>

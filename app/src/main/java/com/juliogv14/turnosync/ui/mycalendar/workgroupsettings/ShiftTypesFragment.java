@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,8 +38,6 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.Create
 import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftTypesAdapter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Created by Julio on 08/06/2018.
@@ -170,41 +167,6 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         }
 
         return false;
-    }
-
-    //TODO: remove
-    private void loadTest() {
-        CollectionReference shiftTypesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                .collection(getString(R.string.data_ref_shiftTypes));
-        DocumentReference docRef;
-        ShiftType st;
-        Calendar cal;
-        docRef = shiftTypesColl.document("type1");
-        st = new ShiftType();
-        st.setId(docRef.getId());
-        st.setName("Mañana");
-        st.setTag("M");
-        st.setActive(true);
-        st.setColor(Color.CYAN);
-        cal = new GregorianCalendar();
-        st.setStartTime(cal.getTime());
-        cal.add(Calendar.HOUR_OF_DAY, 8);
-        st.setEndTime(cal.getTime());
-        docRef.set(st);
-
-        docRef = shiftTypesColl.document("type2");
-        st = new ShiftType();
-        st.setId(docRef.getId());
-        st.setName("Tarde");
-        st.setTag("T");
-        st.setActive(true);
-        st.setColor(Color.CYAN);
-        cal = new GregorianCalendar();
-        st.setStartTime(cal.getTime());
-        cal.add(Calendar.HOUR_OF_DAY, 8);
-        st.setEndTime(cal.getTime());
-        docRef.set(st);
-
     }
 
     private void attatchShiftTypesListener() {

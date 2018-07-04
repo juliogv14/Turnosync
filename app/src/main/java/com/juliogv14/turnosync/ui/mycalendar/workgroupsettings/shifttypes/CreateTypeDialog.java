@@ -24,8 +24,13 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.databinding.DialogCreateShiftypeBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -49,14 +54,16 @@ public class CreateTypeDialog extends DialogFragment {
     //Edit type
     private ShiftType mShiftType;
 
-    //Strings
+    //Variables
     private String mName;
     private String mTag;
-    private String mTimeStart;
-    private String mTimeEnd;
-    private int mColor;
+    private LocalTime mTimeStart;
+    private LocalTime mTimeEnd;
+    private Period mPeriod;
 
+    private int mColor;
     ArrayList<ToggleButton> mColorButtons;
+    ToggleButton mSelectedButton;
 
     public static CreateTypeDialog newInstance(ShiftType type) {
         CreateTypeDialog fragment = new CreateTypeDialog();
@@ -98,18 +105,30 @@ public class CreateTypeDialog extends DialogFragment {
 
         mViewBinding.buttonCreateTypeStart.setText(getString(R.string.dialog_createType_defaultTime));
         mViewBinding.buttonCreateTypeEnd.setText(getString(R.string.dialog_createType_defaultTime));
+        mTimeStart = new LocalTime(0, 0);
+        mTimeEnd = new LocalTime(0, 0);
+        updateTimeCount();
         View.OnClickListener timeListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Button button = (Button) v;
                 TimePickerDialog timePicker;
+                String[] timeSet = button.getText().toString().split(":");
+
                 timePicker = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
                         button.setText(time);
+                        if(button == mViewBinding.buttonCreateTypeStart){
+                            mTimeStart = new LocalTime(hourOfDay, minute);
+                        } else if(button == mViewBinding.buttonCreateTypeEnd){
+                            mTimeEnd = new LocalTime(hourOfDay, minute);
+                        }
+
+                        updateTimeCount();
                     }
-                }, 0, 0, false);
+                }, Integer.parseInt(timeSet[0]), Integer.parseInt(timeSet[1]), false);
                 timePicker.setTitle(getString(R.string.dialog_timePicker_title));
                 timePicker.show();
             }
@@ -124,7 +143,6 @@ public class CreateTypeDialog extends DialogFragment {
         mColorButtons.add(mViewBinding.buttonCreateTypeColor4);
         mColorButtons.add(mViewBinding.buttonCreateTypeColor5);
         mColorButtons.add(mViewBinding.buttonCreateTypeColor6);
-        mColor = getResources().getColor(R.color.customToggle1);
 
         int positiveButton;
         //Create or edit mode
@@ -134,22 +152,17 @@ public class CreateTypeDialog extends DialogFragment {
             positiveButton = R.string.dialog_createType_button_edit;
         } else {
             positiveButton = R.string.dialog_createType_button_create;
+            mSelectedButton = mColorButtons.get(0);
+            mColor = getResources().getColor(R.color.customToggle1);
         }
 
         View.OnClickListener colorButtonListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ToggleButton clickedButton = (ToggleButton) v;
-                int pos = 0;
-                for (int i = 0; i < mColorButtons.size(); i++) {
-                    ToggleButton button = mColorButtons.get(i);
-                    if(button.getId() == clickedButton.getId()){
-                        clickedButton.setChecked(true);
-                        pos = i;
-                    } else {
-                        button.setChecked(false);
-                    }
-                }
+                mSelectedButton.setChecked(false);
+                mSelectedButton = clickedButton;
+                int pos = mColorButtons.indexOf(mSelectedButton);
                 //Get color
                 TypedArray ta = mContext.getResources().obtainTypedArray(R.array.shiftType_colors);
                 int[] colors = new int[ta.length()];
@@ -196,23 +209,15 @@ public class CreateTypeDialog extends DialogFragment {
                         boolean isReadyToClose = attemptCreateType();
                         if (isReadyToClose) {
                             FormUtils.closeKeyboard(mContext, mViewBinding.editTextLayoutCreateTypeName);
-
                             if(mShiftType == null){
                                 mShiftType = new ShiftType();
                             }
+                            mShiftType.setJodaStartTime(mTimeStart);
+                            mShiftType.setJodaPeriod(mPeriod);
                             mShiftType.setActive(true);
                             mShiftType.setName(mName);
                             mShiftType.setTag(mTag);
-
-                            SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                            try {
-                                mShiftType.setStartTime(formatDayHour.parse(mTimeStart));
-                                mShiftType.setEndTime(formatDayHour.parse(mTimeEnd));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
                             mShiftType.setColor(mColor);
-
                             mListener.onDialogPositiveClick(mShiftType);
                             dialog.dismiss();
                         }
@@ -232,13 +237,19 @@ public class CreateTypeDialog extends DialogFragment {
     }
 
     private void fillDialog(){
+
+        mTimeStart = mShiftType.getJodaStartTime();
+        mPeriod = mShiftType.getJodaPeriod();
+        mTimeEnd = mShiftType.getJodaStartTime().plus(mPeriod);
+        mColor = mShiftType.getColor();
+
         mViewBinding.editTextCreateTypeName.setText(mShiftType.getName());
         mViewBinding.editTextCreateTypeTag.setText(mShiftType.getTag());
-        SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        mViewBinding.buttonCreateTypeStart.setText(formatDayHour.format(mShiftType.getStartTime()));
-        mViewBinding.buttonCreateTypeEnd.setText(formatDayHour.format(mShiftType.getEndTime()));
+        updateTimeCount();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+        mViewBinding.buttonCreateTypeStart.setText(fmt.print(mTimeStart));
+        mViewBinding.buttonCreateTypeEnd.setText(fmt.print(mTimeEnd));
 
-        int typeColor = mShiftType.getColor();
         TypedArray ta = mContext.getResources().obtainTypedArray(R.array.shiftType_colors);
         int[] colors = new int[ta.length()];
         for (int i = 0; i < ta.length(); i++) {
@@ -247,9 +258,9 @@ public class CreateTypeDialog extends DialogFragment {
         ta.recycle();
 
         for (int i = 0; i < colors.length; i++) {
-
-            if (typeColor == colors[i]) {
-                mColorButtons.get(i).setChecked(true);
+            if (mColor == colors[i]) {
+                mSelectedButton = mColorButtons.get(i);
+                mSelectedButton.setChecked(true);
             } else {
                 mColorButtons.get(i).setChecked(false);
             }
@@ -265,8 +276,6 @@ public class CreateTypeDialog extends DialogFragment {
         //Get strings from editText
         mName = mViewBinding.editTextCreateTypeName.getText().toString();
         mTag = mViewBinding.editTextCreateTypeTag.getText().toString();
-        mTimeStart = mViewBinding.buttonCreateTypeStart.getText().toString();
-        mTimeEnd = mViewBinding.buttonCreateTypeEnd.getText().toString();
 
         Boolean isReadyToClose = true;
         View focusView = null;
@@ -295,6 +304,20 @@ public class CreateTypeDialog extends DialogFragment {
             focusView.requestFocus();
         }
         return isReadyToClose;
+    }
+
+    private void updateTimeCount (){
+        mPeriod = new Period(mTimeStart, mTimeEnd);
+        if(mTimeStart.isAfter(mTimeEnd)) mPeriod = mPeriod.plusHours(24);
+        PeriodFormatter formatter = new PeriodFormatterBuilder()
+                .appendHours()
+                .appendSuffix(" h")
+                .appendMinutes()
+                .appendSuffix(" min")
+                .toFormatter();
+        String hourCountDisplay = formatter.print(mPeriod);
+        mViewBinding.textViewCreateTypeDuration.setText(hourCountDisplay);
+
     }
 
     public interface CreateTypeListener {

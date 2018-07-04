@@ -20,13 +20,14 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogEditShiftBinding;
 
-import org.w3c.dom.Text;
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -57,6 +58,8 @@ public class EditShiftDialog extends DialogFragment {
     private ArrayList<ShiftType> mShiftTypesList;
     private Shift mSelectedShift;
     private ArrayList<UserRef> mWorkgroupUsers;
+
+    private Period mShiftPeriod;
 
     public static EditShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, ArrayList<UserRef> userList, Shift shift) {
         EditShiftDialog fragment = new EditShiftDialog();
@@ -171,9 +174,13 @@ public class EditShiftDialog extends DialogFragment {
                 mViewBinding.textViewEditShiftTag.setBackgroundColor(mShiftTypesList.get(position).getColor());
 
                 //Time interval
-                SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
-                String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                LocalTime startTime = mShiftTypesList.get(position).getJodaStartTime();
+                mShiftPeriod = mShiftTypesList.get(position).getJodaPeriod();
+                LocalTime endTime = startTime.plus(mShiftPeriod);
+
+                String startHour = fmt.print(startTime);
+                String endHour = fmt.print(endTime);
                 String timeInterval = getString(R.string.dialog_editShift_schedule) + ": " + startHour + " - " + endHour;
                 mViewBinding.textViewEditShiftTime.setText(timeInterval);
             }

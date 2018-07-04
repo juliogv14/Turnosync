@@ -109,7 +109,7 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             //Time interval
             SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
             String startHour = formatDayHour.format(shiftType.getStartTime());
-            String endHour = formatDayHour.format(shiftType.getEndTime());
+            String endHour = formatDayHour.format(shiftType.getPeriod());
             String timeInterval = startHour + " - " + endHour;
             binding.textViewChangeTime.setText(timeInterval);
             //Tag and color

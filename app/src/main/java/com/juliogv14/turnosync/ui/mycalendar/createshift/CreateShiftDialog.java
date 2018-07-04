@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,13 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogCreateShiftBinding;
 
-import java.text.SimpleDateFormat;
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,6 +46,7 @@ public class CreateShiftDialog extends DialogFragment {
     private static final String DATE_KEY = "date";
     private static final String USER_REF_KEY = "userRef";
     private static final String SHIFT_TYPES_KEY = "shiftTypes";
+    private static final String CURRENT_HOURS_KEY = "currentHours";
 
     //Binding
     private DialogCreateShiftBinding mViewBinding;
@@ -54,15 +60,20 @@ public class CreateShiftDialog extends DialogFragment {
     private UserRef mUserRef;
     private ArrayList<ShiftType> mShiftTypesList;
 
+    private Period mSetHours;
+    private Period mShiftPeriod;
+    private int mAddDays = 1;
+
     //Layout
     private ArrayList<ToggleButton> mDayButtons;
 
-    public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes) {
+    public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours) {
         CreateShiftDialog fragment = new CreateShiftDialog();
         Bundle args = new Bundle();
         args.putLong(DATE_KEY, date.getTime());
         args.putParcelable(USER_REF_KEY, userRef);
         args.putParcelableArrayList(SHIFT_TYPES_KEY, new ArrayList<>(shiftTypes.values()));
+        args.putLong(CURRENT_HOURS_KEY, currentHours);
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,6 +99,7 @@ public class CreateShiftDialog extends DialogFragment {
             mDay = new Date(args.getLong(DATE_KEY));
             mUserRef = args.getParcelable(USER_REF_KEY);
             mShiftTypesList = args.getParcelableArrayList(SHIFT_TYPES_KEY);
+            mSetHours = new Period(args.getLong(CURRENT_HOURS_KEY));
         }
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_create_shift, null);
         mViewBinding = DialogCreateShiftBinding.bind(view);
@@ -108,6 +120,19 @@ public class CreateShiftDialog extends DialogFragment {
         if(buttonPos == -1) buttonPos = 6;
         mDayButtons.get(buttonPos).setChecked(true);
 
+        View.OnClickListener buttonClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleButton clickedButton = (ToggleButton) v;
+                if(clickedButton.isChecked()){
+                    mAddDays++;
+                } else {
+                    mAddDays--;
+                }
+                updateTimeCount();
+            }
+        };
+
         //Togglebutton setup
         String[] weekDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
         for (int i = 0; i < mDayButtons.size(); i++) {
@@ -117,7 +142,10 @@ public class CreateShiftDialog extends DialogFragment {
             button.setTextOff(null);
             ViewGroup.LayoutParams buttonParams = button.getLayoutParams();
             buttonParams.height = buttonParams.width;
+            button.setOnClickListener(buttonClick);
         }
+
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_createShift_title)
@@ -139,8 +167,6 @@ public class CreateShiftDialog extends DialogFragment {
                                 newShifts.add(shift);
                             }
                         }
-
-
                         mListener.onCreateShiftCreate(newShifts);
                     }
                 })
@@ -171,11 +197,17 @@ public class CreateShiftDialog extends DialogFragment {
                 mViewBinding.textViewCreateShiftTag.setBackgroundColor(mShiftTypesList.get(position).getColor());
 
                 //Time interval
-                SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                String startHour = formatDayHour.format(mShiftTypesList.get(position).getStartTime());
-                String endHour = formatDayHour.format(mShiftTypesList.get(position).getEndTime());
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                LocalTime startTime = mShiftTypesList.get(position).getJodaStartTime();
+                mShiftPeriod = mShiftTypesList.get(position).getJodaPeriod();
+                LocalTime endTime = startTime.plus(mShiftPeriod);
+
+                String startHour = fmt.print(startTime);
+                String endHour = fmt.print(endTime);
                 String timeInterval = getString(R.string.dialog_createShift_schedule) + ": " + startHour + " - " + endHour;
                 mViewBinding.textViewCreateShiftTime.setText(timeInterval);
+                //Added hours
+                updateTimeCount();
             }
 
             @Override
@@ -192,6 +224,20 @@ public class CreateShiftDialog extends DialogFragment {
         super.onDetach();
         mContext = null;
         mListener = null;
+    }
+
+    private void updateTimeCount(){
+
+        Period addedTime = mShiftPeriod.multipliedBy(mAddDays);
+
+        PeriodFormatter formatter = new PeriodFormatterBuilder()
+                .appendHours()
+                .appendSuffix(" h")
+                .appendMinutes()
+                .appendSuffix(" min")
+                .toFormatter();
+        String hourCountDisplay = formatter.print(mSetHours) + " +" + formatter.print(addedTime);
+        mViewBinding.textViewCreateShiftHours.setText(hourCountDisplay);
     }
 
     public interface CreateShiftListener {

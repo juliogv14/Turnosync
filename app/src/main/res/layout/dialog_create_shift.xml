@@ -52,6 +52,26 @@
             tools:text="Schedule: 8:00 - 16:00 " />
 
         <TextView
+            android:id="@+id/textView_createShift_weekly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/dialog_createShift_weekly"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_createShift_time" />
+
+        <TextView
+            android:id="@+id/textView_createShift_hours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintStart_toEndOf="@+id/textView_createShift_weekly"
+            app:layout_constraintTop_toTopOf="@+id/textView_createShift_weekly" />
+
+        <TextView
             android:id="@+id/textView_createShift_repeat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,7 +80,7 @@
             android:text="@string/dialog_createShift_repeat"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_createShift_time" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_createShift_weekly" />
 
         <ImageView
             android:layout_width="0dp"

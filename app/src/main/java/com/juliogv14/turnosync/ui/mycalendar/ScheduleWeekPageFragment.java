@@ -23,6 +23,8 @@ import com.juliogv14.turnosync.ui.mycalendar.createshift.CreateShiftDialog;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.EditShiftDialog;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
+import org.joda.time.Period;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -66,6 +68,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     private Map<String, ArrayList<Shift>> mUsersShiftsMap;
     private Map<String, ShiftType> mShiftTypesMap;
     private Map<String, ArrayList<Shift>> mShiftChanges;
+    private Map<String, Period> mUsersHourCount;
 
     //GridAdapter
     private BaseAdapter mGridAdapter;
@@ -165,13 +168,18 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                             break;
                         }
                     }
-
-                    if(shiftSelected != null){
-                        EditShiftDialog dialog = EditShiftDialog.newInstance(date, userRef, mShiftTypesMap, mWorkgroupUsers, shiftSelected);
-                        dialog.show(getChildFragmentManager(), "esd");
+                    if(!mShiftTypesMap.isEmpty()){
+                        if(shiftSelected != null){
+                            EditShiftDialog dialog = EditShiftDialog.newInstance(date, userRef, mShiftTypesMap, mWorkgroupUsers, shiftSelected);
+                            dialog.show(getChildFragmentManager(), "esd");
+                        } else {
+                            recalculateHours();
+                            CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap, mUsersHourCount.get(userRef.getUid()).toStandardDuration().getMillis());
+                            dialog.show(getChildFragmentManager(), "csd");
+                        }
                     } else {
-                        CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap);
-                        dialog.show(getChildFragmentManager(), "csd");
+                        // TODO: 04/07/2018 set to strings
+                        Toast.makeText(mContext, "You need to create a shift type before setting shifts", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -192,6 +200,20 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                     mGridAdapter.notifyDataSetChanged();
                 }
             });
+        }
+    }
+
+    private void recalculateHours(){
+        mUsersHourCount = new HashMap<>();
+        for (Map.Entry<String, ArrayList<Shift>> entry : mUsersShiftsMap.entrySet()) {
+            Period weekHours = new Period();
+            for (Shift shift : entry.getValue()) {
+                ShiftType type = mShiftTypesMap.get(shift.getType());
+
+                weekHours = weekHours.plus(type.getJodaPeriod());
+            }
+            mUsersHourCount.put(entry.getKey(), weekHours);
+
         }
     }
 
@@ -251,6 +273,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                 userList.add(newShift);
                 mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
                 i++;
+                j++;
             } else if (j < userList.size()) {
                 if (newShift.getDate().getTime() < userList.get(j).getDate().getTime()) {
                     userList.add(0,newShift);
@@ -261,8 +284,9 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                     i++;
                     j++;
                 } else {
-                    while (j+1 != userList.size() && newShift.getDate().getTime() > userList.get(j).getDate().getTime()) {
+                    while (newShift.getDate().getTime() > userList.get(j).getDate().getTime()) {
                         j++;
+                        if(j == userList.size()) break;
                     }
                 }
             }
