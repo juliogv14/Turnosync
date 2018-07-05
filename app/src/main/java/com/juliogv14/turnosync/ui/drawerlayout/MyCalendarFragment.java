@@ -262,7 +262,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                         + mShiftChanges.get(getString(R.string.data_changes_editedNew)).size()
                         + mShiftChanges.get(getString(R.string.data_changes_editedOld)).size();
                     if(changesSize > 0){
-                        ConfirmChangesDialog dialog = ConfirmChangesDialog.newInstance(mShiftChanges, mShiftTypes);
+                        ConfirmChangesDialog dialog = ConfirmChangesDialog.newInstance(mShiftChanges, mShiftTypes, mGroupUsersRef);
                         dialog.show(getChildFragmentManager(),"confirmChanges");
                     } else {
                         mEditMode.set(!mEditMode.get());

@@ -9,7 +9,13 @@ import android.view.ViewGroup;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.ItemChangeBinding;
+
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,11 +28,13 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
     private Context mContext;
     private HashMap<String, ArrayList<Shift>> mShiftChanges;
     private HashMap<String, ShiftType> mShiftTypes;
+    private HashMap<String, UserRef> mUserRefs;
 
-    public ShiftChangesAdapter(Context context, HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes) {
+    public ShiftChangesAdapter(Context context, HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes, HashMap<String, UserRef> userRefs) {
         this.mContext = context;
         this.mShiftChanges = shiftChanges;
         this.mShiftTypes = shiftTypes;
+        this.mUserRefs = userRefs;
     }
 
     @NonNull
@@ -94,8 +102,9 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             }
 
             //Label
-            changeLabel = changeLabel + " " + shift.getUserId();
+            changeLabel = changeLabel + " " + mUserRefs.get(shift.getUserId()).getShortName();
             binding.textViewChangeLabel.setText(changeLabel);
+
             //Date
             SimpleDateFormat formatDate = new SimpleDateFormat("dd MMMM", Locale.getDefault());
             SimpleDateFormat formatWeekDay = new SimpleDateFormat("EEEE", Locale.getDefault());
@@ -103,15 +112,21 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             String weekDay = formatWeekDay.format(shift.getDate());
             binding.textViewChangeDate.setText(date);
             binding.textViewChangeWeekDay.setText(weekDay);
+
             //Shift name
             String shiftName = mContext.getString(R.string.dialog_shiftChanges_shift) + ": " + shiftType.getName();
             binding.textViewChangeName.setText(shiftName);
+
             //Time interval
-            SimpleDateFormat formatDayHour = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String startHour = formatDayHour.format(shiftType.getStartTime());
-            String endHour = formatDayHour.format(shiftType.getPeriod());
+            DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+            LocalTime startTime = shiftType.getJodaStartTime();
+            Period period = shiftType.getJodaPeriod();
+            LocalTime endTime = startTime.plus(period);
+            String startHour = fmt.print(startTime);
+            String endHour = fmt.print(endTime);
             String timeInterval = startHour + " - " + endHour;
             binding.textViewChangeTime.setText(timeInterval);
+
             //Tag and color
             binding.textViewChangeTag.setText(shiftType.getTag());
             binding.textViewChangeTag.setBackgroundColor(shiftType.getColor());

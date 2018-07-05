@@ -15,18 +15,18 @@ import android.view.View;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
+import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogShiftChangesBinding;
-import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftTypesAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ConfirmChangesDialog extends DialogFragment {
 
     //Keys
     private static final String CHANGES_MAP = "changesMap";
     private static final String SHIFT_TYPES_MAP = "shiftTypesMap";
+    private static final String USER_REF_LIST = "userRefList";
 
     //Binding
     private DialogShiftChangesBinding mViewBinding;
@@ -36,14 +36,16 @@ public class ConfirmChangesDialog extends DialogFragment {
     private ConfirmChangesListener mListener;
 
     //Variables
-    private HashMap<String, ArrayList<Shift>> mShiftChanges;
-    private HashMap<String, ShiftType> mShiftTypes;
+    private HashMap<String, ArrayList<Shift>> mShiftChangesMap;
+    private HashMap<String, ShiftType> mShiftTypesMap;
+    private ArrayList<UserRef> mUserRefList;
 
-    public static ConfirmChangesDialog newInstance(HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes){
+    public static ConfirmChangesDialog newInstance(HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes, ArrayList<UserRef> userRefs){
         ConfirmChangesDialog fragment = new ConfirmChangesDialog();
         Bundle args = new Bundle();
         args.putSerializable(CHANGES_MAP, shiftChanges);
         args.putSerializable(SHIFT_TYPES_MAP, shiftTypes);
+        args.putParcelableArrayList(USER_REF_LIST, userRefs);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,8 +69,14 @@ public class ConfirmChangesDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
         if(args!= null){
-            mShiftChanges = (HashMap<String, ArrayList<Shift>>) args.getSerializable(CHANGES_MAP);
-            mShiftTypes = (HashMap<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP);
+            mShiftChangesMap = (HashMap<String, ArrayList<Shift>>) args.getSerializable(CHANGES_MAP);
+            mShiftTypesMap = (HashMap<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP);
+            mUserRefList = args.getParcelableArrayList(USER_REF_LIST);
+        }
+
+        HashMap<String, UserRef> userRefMap = new HashMap<>();
+        for (UserRef userRef : mUserRefList) {
+            userRefMap.put(userRef.getUid(), userRef);
         }
 
 
@@ -98,7 +106,7 @@ public class ConfirmChangesDialog extends DialogFragment {
         mViewBinding.recyclerShiftChanges.setLayoutManager(layoutManager);
         mViewBinding.recyclerShiftChanges.setHasFixedSize(true);
         mViewBinding.recyclerShiftChanges.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
-        ShiftChangesAdapter adapter = new ShiftChangesAdapter(mContext, mShiftChanges, mShiftTypes);
+        ShiftChangesAdapter adapter = new ShiftChangesAdapter(mContext, mShiftChangesMap, mShiftTypesMap, userRefMap);
         mViewBinding.recyclerShiftChanges.setAdapter(adapter);
 
 
