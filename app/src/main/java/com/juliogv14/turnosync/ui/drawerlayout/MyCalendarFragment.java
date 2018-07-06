@@ -58,6 +58,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Julio on 20/01/2018.
@@ -100,6 +101,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     private boolean mPersonalSchedule = true;
     private AtomicBoolean mEditMode;
     private boolean mMadeChanges;
+    private AtomicLong mWeeklyHours;
 
     //Data lists
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
@@ -169,6 +171,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        queryWeeklyHours();
         queryWorkgroupUsers();
         queryShiftTypes();
 
@@ -292,6 +295,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 Intent workgroupSettingsIntent = new Intent((Context) mListener, WorkgroupSettingsActivity.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
+                workgroupSettingsIntent.putExtra(getString(R.string.data_int_hours), mWeeklyHours);
                 //workgroupSettingsIntent.putExtra(getString(R.string.data_int_users), mGroupUsersRef);
                 startActivity(workgroupSettingsIntent);
                 return true;
@@ -537,6 +541,19 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         });
     }
 
+    private void queryWeeklyHours(){
+        mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    Map<String, Object> data = task.getResult().getData();
+                    mWeeklyHours = new AtomicLong((long)data.get(getString(R.string.data_key_weeklyhours)));
+                }
+            }
+        });
+    }
+
     @Override
     public void onConfirmChanges() {
         applyChanges();
@@ -634,7 +651,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
 
             if(fragmentsRef[position] == null){
-                fragmentsRef[position] = ScheduleWeekPageFragment.newInstance(cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode);
+                fragmentsRef[position] = ScheduleWeekPageFragment.newInstance(cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode, mWeeklyHours);
                 queryScheduleData(fragmentsRef[position], cal.getTime(), shiftListMap);
             }
 

@@ -11,6 +11,8 @@ import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityWorkgroupSettingsBinding;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class WorkgroupSettingsActivity extends AppCompatActivity implements WorkgroupSettingsFragment.WorkgroupSettingsListener, ShiftTypesFragment.OnShiftTypesListener {
 
     //Log TAG
@@ -21,6 +23,7 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
 
     //Intent data
     private UserWorkgroup mWorkgroup;
+    private AtomicLong mWeeklyHours;
 
     //WorkgroupSettingsFragment mSettingsFragment;
 
@@ -33,9 +36,10 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
         //Init
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_workgroup_settings);
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
+        mWeeklyHours = (AtomicLong) getIntent().getSerializableExtra(getString(R.string.data_int_hours));
         //ArrayList<UserRef> userlist = getIntent().getParcelableArrayListExtra(getString(R.string.data_int_users));
         //mSettingsFragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, userlist);
-        Fragment fragment = WorkgroupSettingsFragment.newInstance(mWorkgroup);
+        Fragment fragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, mWeeklyHours);
         displaySelectedScreen(fragment);
     }
 

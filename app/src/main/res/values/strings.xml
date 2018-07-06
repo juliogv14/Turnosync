@@ -23,6 +23,7 @@
     <string name="data_key_info" translatable="false">info</string>
     <string name="data_key_role" translatable="false">role</string>
     <string name="data_key_date" translatable="false">date</string>
+    <string name="data_key_weeklyhours" translatable="false">weeklyHours</string>
 
 
     <!--SHIFT CHANGES KEYS-->
@@ -34,6 +35,7 @@
     <!--INTENT KEYS-->
     <string name="data_int_workgroup" translatable="false">intentWorkgroup</string>
     <string name="data_int_users" translatable="false">intentUsers</string>
+    <string name="data_int_hours" translatable="false">intentWeeklyHours</string>
 
     <!--TOASTS MESSAGES-->
     <string name="toast_profile_displayname">Display name successfully updated</string>
@@ -146,6 +148,11 @@
     <string name="dialog_shiftChanges_shift">Shift</string>
     <string name="dialog_shiftChanges_schedule">Schedule</string>
 
+    <!--SHIFT CHANGES DIALOG-->
+    <string name="dialog_weeklyHours_title">Set max hours per week</string>
+    <string name="dialog_weeklyHours_button_set">Set</string>
+    <string name="dialog_weeklyHours_button_cancel">Cancel</string>
+
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_calendar">My calendar</string>
@@ -214,6 +221,11 @@
     <!--DRAWER STRINGS-->
     <string name="a11y_navigation_drawer_open">Open navigation drawer</string>
     <string name="a11y_navigation_drawer_close">Close navigation drawer</string>
+
+    <!--WORKGROUP SETTINGS-->
+    <string name="wkSettings_label_users">USERS</string>
+    <string name="wkSettings_label_shiftTypes">Shift types</string>
+    <string name="wkSettings_label_weeklyHours">Weekly hours: </string>
 
     <!--CALENDAR STRINGS-->
     <string-array name="calendar_days_of_week">

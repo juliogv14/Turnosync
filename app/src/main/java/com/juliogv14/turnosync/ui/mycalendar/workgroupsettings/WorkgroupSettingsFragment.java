@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +25,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,14 +41,17 @@ import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAdapter.UserOnClickListener, AddUserDialog.AddUserListener, EditInitialsDialog.EditInitialsListener {
+public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAdapter.UserOnClickListener,
+        AddUserDialog.AddUserListener, EditInitialsDialog.EditInitialsListener, WeeklyHoursDialog.WeeklyHoursDialogListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
 
     //Constants
     private static final String WORKGROUP_KEY = "workgroup";
+    private static final String WEEKLY_HOURS_KEY = "weeklyHours";
 
     //Listener
     WorkgroupSettingsListener mListener;
@@ -60,16 +63,17 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
 
-    //Workgroup
+    //Variables
     private UserWorkgroup mWorkgroup;
-
+    private AtomicLong mWeeklyHours;
     ArrayList<UserRef> mUserList;
 
-    public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup) {
+    public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup, AtomicLong weeklyHours) {
         WorkgroupSettingsFragment f = new WorkgroupSettingsFragment();
 
         Bundle args = new Bundle();
         args.putParcelable(WORKGROUP_KEY, workgroup);
+        args.putSerializable(WEEKLY_HOURS_KEY, weeklyHours);
         f.setArguments(args);
         return f;
     }
@@ -90,6 +94,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         Bundle args = getArguments();
         if (args != null) {
             mWorkgroup = args.getParcelable(WORKGROUP_KEY);
+            mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
         }
     }
 
@@ -110,6 +115,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         //Init
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         attatchWorkgroupUsersListener();
+        updateWeeklyHours();
 
         //RecyclerView
         LinearLayoutManager layoutManager =
@@ -123,6 +129,14 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
             @Override
             public void onClick(View v) {
                 mListener.swapFragment(R.string.fragment_shiftTypes);
+            }
+        });
+
+        mViewBinding.settingsItemShiftWeekly.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WeeklyHoursDialog dialog = WeeklyHoursDialog.newInstance(mWeeklyHours.get());
+                dialog.show(getChildFragmentManager(), "weeklyHours");
             }
         });
 
@@ -221,6 +235,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
     }
 
+    private void updateWeeklyHours (){
+        String weeklyHours = getString(R.string.wkSettings_label_weeklyHours);
+        mViewBinding.settingsItemShiftWeekly.setText(Html.fromHtml(weeklyHours + " <b>" + mWeeklyHours.get() + " h</b>" ));
+    }
+
     //Interfaces implementation
     @Override
     public void onClickRemoveUser(final String uid) {
@@ -278,6 +297,14 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onSetWeekyHours(long hours) {
+        mWeeklyHours.set(hours);
+        updateWeeklyHours();
+        mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .update(getString(R.string.data_key_weeklyhours), mWeeklyHours.get());
     }
 
     public interface WorkgroupSettingsListener extends OnFragmentInteractionListener {

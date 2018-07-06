@@ -17,7 +17,29 @@
             android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
             android:paddingStart="?android:attr/listPreferredItemPaddingStart"
             android:paddingTop="?android:attr/listPreferredItemPaddingEnd"
-            android:text="Shift types"
+            android:text="@string/wkSettings_label_shiftTypes"
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@android:drawable/divider_horizontal_bright"
+            android:contentDescription="divider"
+            android:scaleType="matrix"
+            android:src="@android:drawable/divider_horizontal_bright" />
+
+        <TextView
+            android:id="@+id/settingsItem_shift_weekly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="?android:attr/listPreferredItemPaddingEnd"
+            android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+            android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+            android:paddingTop="?android:attr/listPreferredItemPaddingEnd"
+            android:text="@string/wkSettings_label_weeklyHours"
             android:textAppearance="@style/TextAppearance.AppCompat.Menu"
             android:clickable="true"
             android:focusable="true"
@@ -37,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_settings_margin"
             android:layout_marginTop="8dp"
-            android:text="USERS"
+            android:text="@string/wkSettings_label_users"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.PopupMenu.Header"
             android:textStyle="bold" />
 

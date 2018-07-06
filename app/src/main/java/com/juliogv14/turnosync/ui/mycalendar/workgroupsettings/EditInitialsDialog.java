@@ -15,7 +15,6 @@ import android.view.WindowManager;
 
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRef;
-import com.juliogv14.turnosync.databinding.DialogAddUserBinding;
 import com.juliogv14.turnosync.databinding.DialogEditInitialsBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
@@ -37,8 +36,8 @@ public class EditInitialsDialog extends DialogFragment {
     private EditInitialsListener mListener;
 
     //Variables
-    UserRef userRef;
-    String mInitials;
+    private UserRef userRef;
+    private String mInitials;
 
     public static EditInitialsDialog newInstance(UserRef user) {
         EditInitialsDialog fragment = new EditInitialsDialog();

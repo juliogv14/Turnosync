@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Julio on 11/05/2018.
@@ -50,6 +51,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     private static final String SHIFT_TYPES_MAP_KEY = "shiftTypesMap";
     private static final String SHIFT_CHANGES_MAP_KEY = "shiftChangesMap";
     private static final String EDIT_MODE_KEY = "editMode";
+    private static final String WEEKLY_HOURS_KEY = "weeklyHours";
 
 
     private final String TAG = this.getClass().getSimpleName();
@@ -62,6 +64,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     //Variables
     private Date mWeekDate;
     private AtomicBoolean mEditMode;
+    private AtomicLong mWeeklyHours;
 
     //Data lists
     private ArrayList<UserRef> mWorkgroupUsers;
@@ -78,7 +81,8 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                                                        LinkedHashMap<String, ArrayList<Shift>> userShifts,
                                                        HashMap<String, ShiftType> shiftTypes,
                                                        HashMap<String, ArrayList<Shift>> shiftChanges,
-                                                       AtomicBoolean editMode) {
+                                                       AtomicBoolean editMode,
+                                                       AtomicLong weeklyHours) {
 
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
@@ -89,6 +93,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         args.putSerializable(SHIFT_TYPES_MAP_KEY, shiftTypes);
         args.putSerializable(SHIFT_CHANGES_MAP_KEY, shiftChanges);
         args.putSerializable(EDIT_MODE_KEY, editMode);
+        args.putSerializable(WEEKLY_HOURS_KEY, weeklyHours);
         f.setArguments(args);
         return f;
     }
@@ -112,6 +117,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             mShiftTypesMap = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP_KEY);
             mShiftChanges = (Map<String, ArrayList<Shift>>) args.getSerializable(SHIFT_CHANGES_MAP_KEY);
             mEditMode = (AtomicBoolean) args.getSerializable(EDIT_MODE_KEY);
+            mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
         }
     }
 
@@ -168,13 +174,13 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                             break;
                         }
                     }
-                    if(!mShiftTypesMap.isEmpty()){
+                    if(!mShiftTypesMap.isEmpty() && mWeeklyHours != null){
                         if(shiftSelected != null){
                             EditShiftDialog dialog = EditShiftDialog.newInstance(date, userRef, mShiftTypesMap, mWorkgroupUsers, shiftSelected);
                             dialog.show(getChildFragmentManager(), "esd");
                         } else {
                             recalculateHours();
-                            CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap, mUsersHourCount.get(userRef.getUid()).toStandardDuration().getMillis());
+                            CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap, mUsersHourCount.get(userRef.getUid()).toStandardDuration().getMillis(), mWeeklyHours.get());
                             dialog.show(getChildFragmentManager(), "csd");
                         }
                     } else {

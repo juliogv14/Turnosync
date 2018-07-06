@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.juliogv14.turnosync.R;
@@ -47,6 +48,7 @@ public class CreateShiftDialog extends DialogFragment {
     private static final String USER_REF_KEY = "userRef";
     private static final String SHIFT_TYPES_KEY = "shiftTypes";
     private static final String CURRENT_HOURS_KEY = "currentHours";
+    private static final String WEEKLY_HOURS_KEY = "weeklyHours";
 
     //Binding
     private DialogCreateShiftBinding mViewBinding;
@@ -60,20 +62,23 @@ public class CreateShiftDialog extends DialogFragment {
     private UserRef mUserRef;
     private ArrayList<ShiftType> mShiftTypesList;
 
+    private long mWeeklyHours;
     private Period mSetHours;
     private Period mShiftPeriod;
     private int mAddDays = 1;
 
+
     //Layout
     private ArrayList<ToggleButton> mDayButtons;
 
-    public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours) {
+    public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours, long weeklyHours) {
         CreateShiftDialog fragment = new CreateShiftDialog();
         Bundle args = new Bundle();
         args.putLong(DATE_KEY, date.getTime());
         args.putParcelable(USER_REF_KEY, userRef);
         args.putParcelableArrayList(SHIFT_TYPES_KEY, new ArrayList<>(shiftTypes.values()));
         args.putLong(CURRENT_HOURS_KEY, currentHours);
+        args.putLong(WEEKLY_HOURS_KEY, weeklyHours);
         fragment.setArguments(args);
         return fragment;
     }
@@ -100,6 +105,7 @@ public class CreateShiftDialog extends DialogFragment {
             mUserRef = args.getParcelable(USER_REF_KEY);
             mShiftTypesList = args.getParcelableArrayList(SHIFT_TYPES_KEY);
             mSetHours = new Period(args.getLong(CURRENT_HOURS_KEY));
+            mWeeklyHours = args.getLong(WEEKLY_HOURS_KEY);
         }
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_create_shift, null);
         mViewBinding = DialogCreateShiftBinding.bind(view);
@@ -238,6 +244,9 @@ public class CreateShiftDialog extends DialogFragment {
                 .toFormatter();
         String hourCountDisplay = formatter.print(mSetHours) + " +" + formatter.print(addedTime);
         mViewBinding.textViewCreateShiftHours.setText(hourCountDisplay);
+        if(mSetHours.plus(addedTime).getHours() > mWeeklyHours){
+            Toast.makeText(mContext, "Current weekly hours are above the limit. Limit: " + mWeeklyHours, Toast.LENGTH_LONG).show();
+        }
     }
 
     public interface CreateShiftListener {

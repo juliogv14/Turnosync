@@ -24,13 +24,15 @@ import com.juliogv14.turnosync.utils.FormUtils;
 
 public class AddUserDialog extends DialogFragment {
 
-    //Strings
-    String mEmail;
+    //Binding
     private DialogAddUserBinding mViewBinding;
 
     //Parent fragment
     private Context mContext;
     private AddUserListener mListener;
+
+    //Variables
+    private String mEmail;
 
     @Override
     public void onAttach(Context context) {
@@ -43,12 +45,6 @@ public class AddUserDialog extends DialogFragment {
                     + " must implement AddUserListener");
         }
 
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mViewBinding.editTextEmail.requestFocus();
     }
 
     @NonNull
@@ -95,6 +91,12 @@ public class AddUserDialog extends DialogFragment {
         });
 
         return dialog;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewBinding.editTextEmail.requestFocus();
     }
 
     @Override
