@@ -215,7 +215,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             Period weekHours = new Period();
             for (Shift shift : entry.getValue()) {
                 ShiftType type = mShiftTypesMap.get(shift.getType());
-
                 weekHours = weekHours.plus(type.getJodaPeriod());
             }
             mUsersHourCount.put(entry.getKey(), weekHours);

@@ -19,13 +19,23 @@
 
         <GridView
             android:id="@+id/gridView_calendar"
-            tools:listitem="@layout/item_shift"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:horizontalSpacing="2dp"
+            android:verticalSpacing="2dp"
             android:numColumns="7"
-            android:stretchMode="columnWidth" />
+            android:stretchMode="columnWidth"
+            tools:listitem="@layout/item_shift" />
+
+        <TextView
+            android:id="@+id/textView_total_hours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="start"
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
+
     </LinearLayout>
 </layout>
