@@ -41,14 +41,6 @@
                 android:value=".ui.account.LoginActivity" />
         </activity>
         <activity
-            android:name=".ui.account.ResetPasswordActivity"
-            android:label="@string/activity_reset_password"
-            android:parentActivityName=".ui.account.LoginActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.account.LoginActivity" />
-        </activity>
-        <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/activity_settings" />
         <activity

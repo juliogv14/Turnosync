@@ -48,6 +48,9 @@
     <string name="toast_register_failed">This email is already in use</string>
     <string name="toast_update_services">Please update Google Play Services</string>
     <string name="toast_generic_error">An error occurred:</string>
+    <string name="toast_schedule_noShiftTypes">You need to create a shift type before setting shifts</string>
+    <string name="toast_schedule_conflict">Can\'t assign shift to target user, date conflict</string>
+
 
     <!--ACTIVITY LABELS-->
     <string name="activity_signin">Sign in</string>
@@ -153,6 +156,12 @@
     <string name="dialog_weeklyHours_button_set">Set</string>
     <string name="dialog_weeklyHours_button_cancel">Cancel</string>
 
+    <!--RESET PASSWORD DIALOG-->
+    <string name="dialog_resetpassword_title">Forgot your account password? </string>
+    <string name="dialog_resetpassword_message">Enter your email below to reset your password</string>
+    <string name="dialog_resetpassword_button_send">Send</string>
+    <string name="dialog_resetpassword_button_cancel">Cancel</string>
+
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_calendar">My calendar</string>
@@ -208,11 +217,6 @@
     <!--REGISTER ERROR STRINGS-->
     <string name="register_error_password">This password is too weak. Need at least one uppercase, one lowercase and one number.</string>
     <string name="register_error_repeat">Passwords doesn\'t match</string>
-
-    <!--RESET PASSWORD STRINGS-->
-    <string name="resetpassword_label_question">Forgot your account password? </string>
-    <string name="resetpassword_label_instructions">Enter your email below to reset your password</string>
-    <string name="resetpassword_action_sendemail">Send email</string>
 
     <!--SETTINGS ITEM TITLES-->
     <string name="pref_displayname_title">Display name</string>

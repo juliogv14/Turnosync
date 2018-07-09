@@ -582,7 +582,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
             final ArrayList<Shift> shiftList = new ArrayList<>();
 
-            MonthPageFragment pageFragment = MonthPageFragment.newInstance(mWorkgroup, cal.getTime(), shiftList, mShiftTypes);
+            MonthPageFragment pageFragment = MonthPageFragment.newInstance(cal.getTime(), shiftList, mShiftTypes);
             queryShiftData(pageFragment, cal.getTime(), shiftList);
 
             return pageFragment;

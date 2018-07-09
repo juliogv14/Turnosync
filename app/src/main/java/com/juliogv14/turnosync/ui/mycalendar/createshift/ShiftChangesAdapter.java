@@ -83,7 +83,7 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             super(viewBinding.getRoot());
             this.binding = viewBinding;
         }
-        //TODO: set usernames
+
         public void bind (int change, Shift shift, ShiftType shiftType){
             String changeLabel = "";
             switch (change) {

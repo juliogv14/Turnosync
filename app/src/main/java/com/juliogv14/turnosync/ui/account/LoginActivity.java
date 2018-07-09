@@ -45,7 +45,7 @@ import com.juliogv14.turnosync.utils.FormUtils;
  * LoginActivity.java
  */
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements ResetPasswordDialog.ResetPasswordListener {
 
     //Constants
     private final String TAG = this.getClass().getSimpleName();
@@ -111,7 +111,8 @@ public class LoginActivity extends AppCompatActivity {
         span.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+                ResetPasswordDialog dialog = new ResetPasswordDialog();
+                dialog.show(getSupportFragmentManager(), "resetPassword");
             }
 
             @Override
@@ -260,5 +261,22 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(LoginActivity.this,
                 R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
         super.onBackPressed();
+    }
+
+    @Override
+    public void onResetPassword(String email) {
+        mFirebaseAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Sent successful");
+                            Toast.makeText(LoginActivity.this, R.string.toast_resetpassword_successfully, Toast.LENGTH_LONG).show();
+                        } else {
+                            Log.d(TAG, "Failed to send email" + task.getException().getMessage());
+                            Toast.makeText(LoginActivity.this, R.string.toast_resetpassword_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

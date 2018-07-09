@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.ui.mycalendar.workgroupsettings;
+package com.juliogv14.turnosync.ui.account;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.juliogv14.turnosync.R;
-import com.juliogv14.turnosync.databinding.DialogAddUserBinding;
+import com.juliogv14.turnosync.databinding.DialogResetPasswordBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
@@ -22,14 +22,14 @@ import com.juliogv14.turnosync.utils.FormUtils;
  * AddUserDialog
  */
 
-public class AddUserDialog extends DialogFragment {
+public class ResetPasswordDialog extends DialogFragment {
 
     //Binding
-    private DialogAddUserBinding mViewBinding;
+    private DialogResetPasswordBinding mViewBinding;
 
     //Parent fragment
     private Context mContext;
-    private AddUserListener mListener;
+    private ResetPasswordListener mListener;
 
     //Variables
     private String mEmail;
@@ -38,8 +38,8 @@ public class AddUserDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (getParentFragment() instanceof AddUserListener) {
-            mListener = (AddUserListener) getParentFragment();
+        if (mContext instanceof ResetPasswordListener) {
+            mListener = (ResetPasswordListener) mContext;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement AddUserListener");
@@ -50,19 +50,19 @@ public class AddUserDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_user, null);
-        mViewBinding = DialogAddUserBinding.bind(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_reset_password, null);
+        mViewBinding = DialogResetPasswordBinding.bind(view);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.dialog_adduser_title)
+                .setTitle(R.string.dialog_resetpassword_title)
                 .setView(view)
-                .setPositiveButton(R.string.dialog_adduser_button_add, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.dialog_resetpassword_button_send, new DialogInterface.OnClickListener() {
                     //Add user to workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                     }
                 })
-                .setNegativeButton(R.string.dialog_adduser_button_cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.dialog_resetpassword_button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
@@ -82,7 +82,7 @@ public class AddUserDialog extends DialogFragment {
                         boolean isReadyToClose = attemptAddUser();
                         if (isReadyToClose) {
                             FormUtils.closeKeyboard(mContext, mViewBinding.editTextEmail);
-                            mListener.onClickAddUser(mEmail);
+                            mListener.onResetPassword(mEmail);
                             dialog.dismiss();
                         }
                     }
@@ -129,7 +129,7 @@ public class AddUserDialog extends DialogFragment {
         return isReadyToClose;
     }
 
-    public interface AddUserListener {
-        void onClickAddUser(String email);
+    public interface ResetPasswordListener {
+        void onResetPassword(String email);
     }
 }

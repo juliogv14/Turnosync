@@ -15,7 +15,6 @@ import android.widget.BaseAdapter;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
-import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
@@ -62,12 +61,10 @@ public class MonthPageFragment extends Fragment {
     private Period mMonthHours;
 
 
-    public static MonthPageFragment newInstance(UserWorkgroup workgroup, Date monthCalendar, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
+    public static MonthPageFragment newInstance(Date monthCalendar, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
         MonthPageFragment f = new MonthPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
-        //TODO: workgroup needed?
-        args.putParcelable(CURRENT_WORKGROUP_KEY, workgroup);
         args.putLong(CURRENT_MONTH_DATE_KEY, monthCalendar.getTime());
         args.putParcelableArrayList(MONTH_SHIFT_LIST_KEY, shiftList);
         args.putSerializable(MONTH_SHIFT_TYPES_MAP_KEY, shiftTypes);

@@ -115,7 +115,6 @@ public class WeekAdapter extends BaseAdapter {
                     names = (TextView) convertView;
                 }
 
-                //TODO set name to display
                 if (mShiftIterator.hasNext()) {
                     Map.Entry<String, ArrayList<Shift>> entry = mShiftIterator.next();
                     names.setText(mItems.get(position));

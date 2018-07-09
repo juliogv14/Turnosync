@@ -184,8 +184,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                             dialog.show(getChildFragmentManager(), "csd");
                         }
                     } else {
-                        // TODO: 04/07/2018 set to strings
-                        Toast.makeText(mContext, "You need to create a shift type before setting shifts", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.toast_schedule_noShiftTypes, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -318,8 +317,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                 mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
                 Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
             } else {
-                // TODO: 29/06/2018 notify shift exists
-                Toast.makeText(mContext, "Can't assign shift to target user, date conflict", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.toast_schedule_conflict, Toast.LENGTH_SHORT).show();
             }
 
         }
