@@ -113,7 +113,7 @@
 
                 <Button
                     android:id="@+id/button_register"
-                    style="@style/FirebaseUI.Button"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/register_button_horizontal_margin"

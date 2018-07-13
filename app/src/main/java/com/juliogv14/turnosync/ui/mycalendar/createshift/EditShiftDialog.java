@@ -143,7 +143,7 @@ public class EditShiftDialog extends DialogFragment {
         //Users spinner adapter
         List<String> displayUsers = new ArrayList<>();
         for (UserRef user : mWorkgroupUsers) {
-            displayUsers.add(user.getUid());
+            displayUsers.add(user.getShortName());
         }
 
         ArrayAdapter<String> spinnerUsersAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, displayUsers);

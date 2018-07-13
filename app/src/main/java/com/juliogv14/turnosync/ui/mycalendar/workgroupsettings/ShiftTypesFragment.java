@@ -173,7 +173,7 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         CollectionReference shiftTypesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
 
-        mShiftTypesListener = shiftTypesColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mShiftTypesListener = shiftTypesColl.orderBy("name").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                 if (e != null){
