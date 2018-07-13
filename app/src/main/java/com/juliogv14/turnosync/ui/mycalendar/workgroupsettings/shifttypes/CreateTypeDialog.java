@@ -311,7 +311,7 @@ public class CreateTypeDialog extends DialogFragment {
         if(mTimeStart.isAfter(mTimeEnd)) mPeriod = mPeriod.plusHours(24);
         PeriodFormatter formatter = new PeriodFormatterBuilder()
                 .appendHours()
-                .appendSuffix(" h")
+                .appendSuffix(" h ")
                 .appendMinutes()
                 .appendSuffix(" min")
                 .toFormatter();

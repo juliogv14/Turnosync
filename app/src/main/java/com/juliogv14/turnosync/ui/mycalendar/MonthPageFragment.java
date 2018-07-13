@@ -134,9 +134,9 @@ public class MonthPageFragment extends Fragment {
                         calculateMonthHours();
                         PeriodFormatter formatter = new PeriodFormatterBuilder()
                                 .appendHours()
-                                .appendSuffix(" h")
+                                .appendSuffix("h ")
                                 .appendMinutes()
-                                .appendSuffix(" min")
+                                .appendSuffix("min")
                                 .toFormatter();
                         String totalHours = getString(R.string.calendar_total_hours) + " " +formatter.print(mMonthHours);
                         mViewBinding.textViewTotalHours.setText(totalHours);

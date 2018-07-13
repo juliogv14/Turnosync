@@ -52,8 +52,6 @@ import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.ConfirmChangesDialog;
 import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
 
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -468,7 +466,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
             calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
             calend.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-            mCurrentPosition = calend.get(Calendar.MONTH);
+            mCurrentPosition = calend.get(Calendar.MONTH)-1;
 
             pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         } else {
