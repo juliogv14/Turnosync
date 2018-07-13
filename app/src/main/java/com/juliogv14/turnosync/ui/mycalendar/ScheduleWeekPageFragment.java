@@ -47,7 +47,7 @@ import java.util.Map;
  * ScheduleWeekPageFragment
  */
 
-public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener, EditShiftDialog.EditShiftListener {
+public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener, EditShiftDialog.EditShiftListener, RequestChangeDialog.RequestChangeListener {
 
     //Keys
     private static final String POSITION_KEY = "position";
@@ -67,7 +67,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
     //Context and listener
     private Context mContext;
-    private Fragment mParentFragment;
+    private WeekPageListener mListener;
 
     //Parent ViewModel
     MyCalendarVM mParentViewModel;
@@ -78,7 +78,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     private Date mWeekDate;
     private boolean mEditMode;
     private long mWeeklyHours = -1;
-    private ShiftChangeRequest mChangeRequest;
+    private RequestChangeDialog requestChangeDialog;
 
     //Data lists
     private ArrayList<UserRef> mWorkgroupUsers;
@@ -117,7 +117,12 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        mParentFragment = getParentFragment();
+        if (getParentFragment() instanceof WeekPageListener) {
+            mListener = (WeekPageListener) getParentFragment();
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement WeekPageListener");
+        }
     }
 
     @Override
@@ -137,7 +142,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             //mEditMode = (AtomicBoolean) args.getSerializable(EDIT_MODE_KEY);
             //mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
         }
-        mParentViewModel = ViewModelProviders.of(mParentFragment).get(MyCalendarVM.class);
+        mParentViewModel = ViewModelProviders.of((Fragment)mListener).get(MyCalendarVM.class);
         mParentViewModel.getEditMode().observe(this, new Observer<Boolean>() {
 
             @Override
@@ -158,8 +163,9 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                 if(ownShift != null){
                     mGridAdapter.notifyDataSetChanged();
                     Shift otherShift = mParentViewModel.getOtherShift().getValue();
-                    if(otherShift != null){
-                        mChangeRequest = new ShiftChangeRequest(ownShift, otherShift);
+                    if(otherShift != null && requestChangeDialog == null && !mEditMode){
+                        requestChangeDialog = RequestChangeDialog.newInstance(ownShift, otherShift, (HashMap<String, ShiftType>) mShiftTypesMap, mWorkgroupUsers);
+                        requestChangeDialog.show(getChildFragmentManager(), "requestChange");
                         mParentViewModel.setOwnShift(null);
                         mParentViewModel.setOtherShift(null);
                     }
@@ -171,9 +177,10 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             public void onChanged(@Nullable Shift otherShift) {
                 if(otherShift != null){
                     mGridAdapter.notifyDataSetChanged();
-                    Shift ownShift = mParentViewModel.getOtherShift().getValue();
-                    if(ownShift != null){
-                        mChangeRequest = new ShiftChangeRequest(ownShift, otherShift);
+                    Shift ownShift = mParentViewModel.getOwnShift().getValue();
+                    if(ownShift != null && requestChangeDialog == null && !mEditMode){
+                        requestChangeDialog = RequestChangeDialog.newInstance(ownShift, otherShift, (HashMap<String, ShiftType>) mShiftTypesMap, mWorkgroupUsers);
+                        requestChangeDialog.show(getChildFragmentManager(), "requestChange");
                         mParentViewModel.setOwnShift(null);
                         mParentViewModel.setOtherShift(null);
                     }
@@ -228,20 +235,19 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
                     int row = position / 8;
                     UserRef userRef = mWorkgroupUsers.get(row-1);
-                    if(!mEditMode || mWeeklyHours == -1){
+                    if(!mEditMode || mWeeklyHours == -1 || date.before(new GregorianCalendar().getTime())){
                         return;
                     }
-                    if(!mShiftTypesMap.isEmpty()){
+                    if(!mShiftTypesMap.isEmpty()) {
                         //Check if there is a shift there
                         Shift shiftSelected = null;
                         for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
-                            if (shift.getDate().getTime() == date.getTime()){
+                            if (shift.getDate().getTime() == date.getTime()) {
                                 shiftSelected = shift;
                                 break;
                             }
                         }
-
-                        if(shiftSelected != null){
+                        if(shiftSelected != null) {
                             EditShiftDialog dialog = EditShiftDialog.newInstance(date, userRef, mShiftTypesMap, mWorkgroupUsers, shiftSelected);
                             dialog.show(getChildFragmentManager(), "esd");
                         } else {
@@ -269,6 +275,8 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
                     int row = position / 8;
                     UserRef userRef = mWorkgroupUsers.get(row - 1);
+
+                    if(date.before(new GregorianCalendar().getTime())) return false;
 
                     if (!mShiftTypesMap.isEmpty()) {
                         Shift shiftSelected = null;
@@ -456,6 +464,16 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         }
 
         mGridAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onConfirmShiftChange(ShiftChangeRequest changeRequest) {
+        requestChangeDialog = null;
+        mListener.onNewChangeRequest(changeRequest);
+    }
+
+    public interface WeekPageListener {
+        void onNewChangeRequest(ShiftChangeRequest request);
     }
 
 }

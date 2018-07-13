@@ -10,6 +10,7 @@
     <string name="data_ref_shiftTypes" translatable="false">shifttypes</string>
     <string name="data_ref_messaging" translatable="false">messaging</string>
     <string name="data_ref_devices" translatable="false">devices</string>
+    <string name="data_ref_changeRequests">changerequests</string>
 
     <!--CLOUD FIRESTORE KEYS-->
     <string name="data_key_displayname" translatable="false">displayName</string>
@@ -152,7 +153,7 @@
     <string name="dialog_shiftChanges_shift">Shift</string>
     <string name="dialog_shiftChanges_schedule">Schedule</string>
 
-    <!--SHIFT CHANGES DIALOG-->
+    <!--WEEKLY HOURS DIALOG-->
     <string name="dialog_weeklyHours_title">Set max hours per week</string>
     <string name="dialog_weeklyHours_button_set">Set</string>
     <string name="dialog_weeklyHours_button_cancel">Cancel</string>
@@ -162,6 +163,13 @@
     <string name="dialog_resetpassword_message">Enter your email below to reset your password</string>
     <string name="dialog_resetpassword_button_send">Send</string>
     <string name="dialog_resetpassword_button_cancel">Cancel</string>
+
+    <!--REQUEST SHIFT CHANGE DIALOG-->
+    <string name="dialog_requestChange_title">Confirm change request</string>
+    <string name="dialog_requestChange_button_confirm">Confirm</string>
+    <string name="dialog_requestChange_button_cancel">Cancel</string>
+
+    <string name="dialog_requestChange_user">User</string>
 
     <!--DRAWER NAV ITEM TITLES-->
     <string name="nav_item_home">Home</string>

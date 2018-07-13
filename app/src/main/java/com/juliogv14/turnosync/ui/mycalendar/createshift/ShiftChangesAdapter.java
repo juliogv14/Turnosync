@@ -54,16 +54,16 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
         //Order of displaying
         if (position < listAdded.size()){
             Shift shift = listAdded.get(position);
-            holder.bind(R.string.data_changes_added, shift, mShiftTypes.get(shift.getType()));
+            holder.bind(R.string.data_changes_added, shift);
         } else if (position < listAdded.size() + listRemoved.size()){
             Shift shift = listRemoved.get(position-listAdded.size());
-            holder.bind(R.string.data_changes_removed, shift, mShiftTypes.get(shift.getType()));
+            holder.bind(R.string.data_changes_removed, shift);
         } else if (position < listAdded.size() + listRemoved.size() + listEditedNew.size()){
             Shift shift = listEditedNew.get(position-listAdded.size()-listRemoved.size());
-            holder.bind(R.string.data_changes_editedNew, shift, mShiftTypes.get(shift.getType()));
+            holder.bind(R.string.data_changes_editedNew, shift);
         } else if (position < listAdded.size() + listRemoved.size() + listEditedNew.size() + listEditedOld.size()){
             Shift shift = listEditedOld.get(position-listAdded.size()-listRemoved.size()-listEditedNew.size());
-            holder.bind(R.string.data_changes_editedOld, shift, mShiftTypes.get(shift.getType()));
+            holder.bind(R.string.data_changes_editedOld, shift);
         }
     }
 
@@ -84,7 +84,8 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             this.binding = viewBinding;
         }
 
-        public void bind (int change, Shift shift, ShiftType shiftType){
+        public void bind (int change, Shift shift){
+            //Label
             String changeLabel = "";
             switch (change) {
                 case R.string.data_changes_added:
@@ -100,8 +101,6 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
                     changeLabel = mContext.getString(R.string.dialog_shiftChanges_editedOld);
                     break;
             }
-
-            //Label
             changeLabel = changeLabel + " " + mUserRefs.get(shift.getUserId()).getShortName();
             binding.textViewChangeLabel.setText(changeLabel);
 
@@ -114,6 +113,7 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             binding.textViewChangeWeekDay.setText(weekDay);
 
             //Shift name
+            ShiftType shiftType = mShiftTypes.get(shift.getType());
             String shiftName = mContext.getString(R.string.dialog_shiftChanges_shift) + ": " + shiftType.getName();
             binding.textViewChangeName.setText(shiftName);
 

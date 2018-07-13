@@ -40,6 +40,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.ShiftChangeRequest;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
@@ -50,6 +51,8 @@ import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.ConfirmChangesDialog;
 import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
+
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,7 +71,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * MyCalendarFragment.java
  */
 
-public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog.ConfirmChangesListener {
+public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog.ConfirmChangesListener, ScheduleWeekPageFragment.WeekPageListener {
 
 
     //Log TAG
@@ -152,7 +155,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mViewBinding = FragmentMycalendarBinding.inflate(inflater, container, false);
         setHasOptionsMenu(true);
 
-        mGroupUsersRef = new ArrayList<>();
         Calendar cal = new GregorianCalendar();
         mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 
@@ -161,7 +163,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mInitMonth = new GregorianCalendar();
         mInitMonth.add(Calendar.MONTH, -mInitMonthOffset);
         mInitMonth.set(Calendar.WEEK_OF_MONTH, 1);
-        mInitMonth.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        mInitMonth.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
         mViewModel = ViewModelProviders.of(this).get(MyCalendarVM.class);
         mViewModel.setEditMode(false);
@@ -475,7 +477,14 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
 
             calend.add(Calendar.MONTH, mCurrentPosition);
-            calend.set(Calendar.WEEK_OF_MONTH, 1);
+            //Current month set week to current week
+            Calendar today = new GregorianCalendar();
+            if(calend.get(Calendar.MONTH) == today.get(Calendar.MONTH)){
+                calend.set(Calendar.WEEK_OF_MONTH, today.get(Calendar.WEEK_OF_MONTH));
+            } else {
+                calend.set(Calendar.WEEK_OF_MONTH, 1);
+            }
+
             calend.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
             int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
@@ -506,7 +515,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     private void queryWorkgroupUsers() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
-
+        mGroupUsersRef = new ArrayList<>();
         mGroupUsersListener = workgroupsUsersColl.orderBy(getString(R.string.data_key_shortname))
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -573,6 +582,16 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mViewModel.setEditMode(false);
         ((AppCompatActivity) mListener).invalidateOptionsMenu();
 
+    }
+
+    @Override
+    public void onNewChangeRequest(ShiftChangeRequest request) {
+        CollectionReference changeRequestsColl = mFirebaseFirestore
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .collection(getString(R.string.data_ref_changeRequests));
+        DocumentReference docRef = changeRequestsColl.document();
+        request.setId(docRef.getId());
+        docRef.set(request);
     }
 
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
@@ -658,7 +677,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         public Fragment getItem(int position) {
 
             Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-            cal.set(Calendar.WEEK_OF_YEAR, cal.get(Calendar.WEEK_OF_YEAR) + position);
+            cal.add(Calendar.WEEK_OF_YEAR, position);
+            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
             shiftListMapRef.put(position, shiftListMap);
