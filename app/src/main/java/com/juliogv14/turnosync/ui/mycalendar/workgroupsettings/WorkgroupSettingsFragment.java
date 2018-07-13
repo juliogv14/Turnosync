@@ -1,6 +1,8 @@
 package com.juliogv14.turnosync.ui.mycalendar.workgroupsettings;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -10,9 +12,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,22 +26,19 @@ import android.view.ViewGroup;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
+import com.juliogv14.turnosync.data.viewmodels.UserRefsVM;
 import com.juliogv14.turnosync.databinding.FragmentWorkgroupSettingsBinding;
 import com.juliogv14.turnosync.ui.drawerlayout.OnFragmentInteractionListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -115,6 +114,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         //Init
         mFirebaseFirestore = FirebaseFirestore.getInstance();
         attatchWorkgroupUsersListener();
+
         updateWeeklyHours();
 
         //RecyclerView
@@ -189,8 +189,8 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     private void attatchWorkgroupUsersListener() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
-
-        mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        // TODO: 10/07/2018 Change to viewmodel
+        /*mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                 if(e != null){
@@ -229,6 +229,16 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                         }
                     }
                 }
+                mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
+            }
+        });*/
+
+        UserRefsVM userRefsVM = ViewModelProviders.of((AppCompatActivity) mListener).get(UserRefsVM.class);
+        mGroupUsersListener = userRefsVM.loadUserRefs(workgroupsUsersColl, getString(R.string.data_key_shortname));
+        mUserList = (ArrayList<UserRef>) userRefsVM.getUserRefs().getValue();
+        userRefsVM.getUserRefs().observe(this, new Observer<List<UserRef>>() {
+            @Override
+            public void onChanged(@Nullable List<UserRef> userRefs) {
                 mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
             }
         });

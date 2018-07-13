@@ -13,6 +13,7 @@
 
     <!--CLOUD FIRESTORE KEYS-->
     <string name="data_key_displayname" translatable="false">displayName</string>
+    <string name="data_key_shortname" translatable="false">shortName</string>
     <string name="data_key_email" translatable="false">email</string>
     <string name="data_key_uid" translatable="false">uid</string>
     <string name="data_key_active" translatable="false">active</string>

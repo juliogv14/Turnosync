@@ -1,5 +1,7 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +44,7 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
+import com.juliogv14.turnosync.data.viewmodels.MyCalendarVM;
 import com.juliogv14.turnosync.databinding.FragmentMycalendarBinding;
 import com.juliogv14.turnosync.ui.mycalendar.MonthPageFragment;
 import com.juliogv14.turnosync.ui.mycalendar.ScheduleWeekPageFragment;
@@ -57,7 +61,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -87,6 +90,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
     private ListenerRegistration mGroupUsersListener;
+    private ListenerRegistration mShiftTypesListener;
+    private ArrayList<ListenerRegistration> mUserShiftsListeners;
 
     //Firebase Auth
     private FirebaseUser mFirebaseUser;
@@ -97,16 +102,18 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     private int mCurrentPosition;
     private Calendar mInitMonth;
 
+    //ViewModel
+    private MyCalendarVM mViewModel;
+
     //Runtime variables
     private boolean mPersonalSchedule = true;
-    private AtomicBoolean mEditMode;
     private boolean mMadeChanges;
     private AtomicLong mWeeklyHours;
+    private boolean mEditMode;
 
     //Data lists
-    private ArrayList<ListenerRegistration> mUserShiftsListeners;
     private ArrayList<UserRef> mGroupUsersRef;
-    private HashMap<String, ShiftType> mShiftTypes;
+    private Map<String, ShiftType> mShiftTypes;
     private HashMap<String, ArrayList<Shift>> mShiftChanges;
 
     public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
@@ -156,10 +163,26 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mInitMonth.set(Calendar.WEEK_OF_MONTH, 1);
         mInitMonth.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
+        mViewModel = ViewModelProviders.of(this).get(MyCalendarVM.class);
+        mViewModel.setEditMode(false);
+        mViewModel.getEditMode().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null) mEditMode = aBoolean;
+            }
+        });
+        mWeeklyHours = new AtomicLong(0);
+        mViewModel.setWeeklyHours(0);
+        mViewModel.getWeeklyHours().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable Long aLong) {
+                if(aLong != null) mWeeklyHours.set(aLong);
+            }
+        });
         mUserShiftsListeners = new ArrayList<>();
         mShiftTypes = new HashMap<>();
         mShiftChanges = new HashMap<>();
-        mEditMode = new AtomicBoolean(false);
+
         mMadeChanges = false;
         return mViewBinding.getRoot();
     }
@@ -203,6 +226,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         if (mGroupUsersListener != null) {
             mGroupUsersListener.remove();
         }
+        if(mShiftTypesListener != null){
+            mShiftTypesListener.remove();
+        }
         for (Iterator<ListenerRegistration> iterator = mUserShiftsListeners.iterator(); iterator.hasNext(); ) {
             ListenerRegistration userShiftListener = iterator.next();
             if (userShiftListener != null) {
@@ -238,7 +264,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 if (!mWorkgroup.getRole().equals(UserRoles.MANAGER.toString()) || mPersonalSchedule) {
                     menuItem.setVisible(false);
                 } else {
-                    if(mEditMode.get()){
+                    if(mEditMode){
                         menuItem.setIcon(R.drawable.ic_save_black_24dp);
                     } else {
                         menuItem.setIcon(R.drawable.ic_mode_edit_black_24dp);
@@ -259,20 +285,20 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             case R.id.action_mycalendar_edit:
                 //loadTestData();
 
-                if(mEditMode.get()){
+                if(mEditMode){
                     int changesSize = mShiftChanges.get(getString(R.string.data_changes_added)).size()
                         + mShiftChanges.get(getString(R.string.data_changes_removed)).size()
                         + mShiftChanges.get(getString(R.string.data_changes_editedNew)).size()
                         + mShiftChanges.get(getString(R.string.data_changes_editedOld)).size();
                     if(changesSize > 0){
-                        ConfirmChangesDialog dialog = ConfirmChangesDialog.newInstance(mShiftChanges, mShiftTypes, mGroupUsersRef);
+                        ConfirmChangesDialog dialog = ConfirmChangesDialog.newInstance(mShiftChanges, (HashMap<String, ShiftType>) mShiftTypes, mGroupUsersRef);
                         dialog.show(getChildFragmentManager(),"confirmChanges");
                     } else {
-                        mEditMode.set(!mEditMode.get());
+                        mViewModel.setEditMode(false);
                         ((AppCompatActivity) mListener).invalidateOptionsMenu();
                     }
                 } else {
-                    mEditMode.set(!mEditMode.get());
+                    mViewModel.setEditMode(true);
                     ((AppCompatActivity) mListener).invalidateOptionsMenu();
                 }
 
@@ -434,7 +460,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     private PagerAdapter changeAdapter() {
         PagerAdapter pagerAdapter;
-        mEditMode.set(false);
+        mViewModel.setEditMode(false);
         if (mPersonalSchedule) {
 
             Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
@@ -481,7 +507,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
 
-        mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mGroupUsersListener = workgroupsUsersColl.orderBy(getString(R.string.data_key_shortname))
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                 if(e != null){
@@ -522,23 +549,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
 
-        workgroupsUsersColl.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot doc : task.getResult()) {
-                        if (doc != null && doc.exists()) {
-                            ShiftType type = doc.toObject(ShiftType.class);
-                            mShiftTypes.put(type.getId(), type);
-                        }
-                    }
-                } else {
-                    if (task.getException() != null) {
-                        Log.e(TAG, task.getException().getMessage());
-                    }
-                }
-            }
-        });
+        mShiftTypesListener = mViewModel.loadShiftTypes(workgroupsUsersColl);
+        mShiftTypes = mViewModel.getShiftTypes().getValue();
     }
 
     private void queryWeeklyHours(){
@@ -548,7 +560,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
                     Map<String, Object> data = task.getResult().getData();
-                    mWeeklyHours = new AtomicLong((long)data.get(getString(R.string.data_key_weeklyhours)));
+                    mViewModel.setWeeklyHours((long) data.get(getString(R.string.data_key_weeklyhours)));
                 }
             }
         });
@@ -558,7 +570,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     public void onConfirmChanges() {
         applyChanges();
         mMadeChanges = true;
-        mEditMode.set(false);
+        mViewModel.setEditMode(false);
         ((AppCompatActivity) mListener).invalidateOptionsMenu();
 
     }
@@ -582,7 +594,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
             final ArrayList<Shift> shiftList = new ArrayList<>();
 
-            MonthPageFragment pageFragment = MonthPageFragment.newInstance(cal.getTime(), shiftList, mShiftTypes);
+            MonthPageFragment pageFragment = MonthPageFragment.newInstance(cal.getTime(), shiftList, (HashMap<String, ShiftType>) mShiftTypes);
             queryShiftData(pageFragment, cal.getTime(), shiftList);
 
             return pageFragment;
@@ -636,8 +648,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     private class WeekSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        ScheduleWeekPageFragment[] fragmentsRef = new ScheduleWeekPageFragment[mTotalWeeks];
-
+        SparseArray<ScheduleWeekPageFragment> fragmentsRef = new SparseArray<>();
+        SparseArray<LinkedHashMap<String, ArrayList<Shift>>> shiftListMapRef = new SparseArray<>();
         WeekSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -649,13 +661,14 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             cal.set(Calendar.WEEK_OF_YEAR, cal.get(Calendar.WEEK_OF_YEAR) + position);
 
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
-
-            if(fragmentsRef[position] == null){
-                fragmentsRef[position] = ScheduleWeekPageFragment.newInstance(cal.getTime(), mGroupUsersRef, shiftListMap, mShiftTypes, mShiftChanges, mEditMode, mWeeklyHours);
-                queryScheduleData(fragmentsRef[position], cal.getTime(), shiftListMap);
+            shiftListMapRef.put(position, shiftListMap);
+            if(fragmentsRef.get(position) == null){
+                fragmentsRef.put(position, ScheduleWeekPageFragment.newInstance(position, mWorkgroup.getRole(), cal.getTime(), mGroupUsersRef,
+                        shiftListMap, mShiftChanges));
+                queryScheduleData(fragmentsRef.get(position), cal.getTime(), shiftListMap);
             }
 
-            return fragmentsRef[position];
+            return fragmentsRef.get(position);
         }
 
         @Override
@@ -685,6 +698,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
                 String dateKey = getString(R.string.data_key_date);
                 mMadeChanges = false;
+
                 ListenerRegistration userShiftListener =
                         userShiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay)
                                 .orderBy(dateKey, Query.Direction.ASCENDING)
@@ -721,7 +735,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                                                         userShifts.remove(docChange.getOldIndex());
                                                         break;
                                                 }
-
                                             }
                                         }
                                         pageFragment.notifyGridDataSetChanged();

@@ -1,11 +1,14 @@
 package com.juliogv14.turnosync.ui.mycalendar;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SupportActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +17,14 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.Shift;
+import com.juliogv14.turnosync.data.ShiftChangeRequest;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
+import com.juliogv14.turnosync.data.UserRoles;
+import com.juliogv14.turnosync.data.viewmodels.MyCalendarVM;
 import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.CreateShiftDialog;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.EditShiftDialog;
@@ -34,8 +41,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Julio on 11/05/2018.
@@ -45,7 +50,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener, EditShiftDialog.EditShiftListener {
 
     //Keys
-    private static final String CURRENT_WEEK_DATE_KEY = "currentCalendar";
+    private static final String POSITION_KEY = "position";
+    private static final String ROLE_KEY = "currentCalendar";
+    private static final String CURRENT_WEEK_DATE_KEY = "weekDate";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private static final String USERS_SHIFT_MAP_KEY = "userShiftMap";
     private static final String SHIFT_TYPES_MAP_KEY = "shiftTypesMap";
@@ -60,11 +67,18 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
     //Context and listener
     private Context mContext;
+    private Fragment mParentFragment;
+
+    //Parent ViewModel
+    MyCalendarVM mParentViewModel;
 
     //Variables
+    private int mPosition;
+    private UserRoles mRole;
     private Date mWeekDate;
-    private AtomicBoolean mEditMode;
-    private AtomicLong mWeeklyHours;
+    private boolean mEditMode;
+    private long mWeeklyHours = -1;
+    private ShiftChangeRequest mChangeRequest;
 
     //Data lists
     private ArrayList<UserRef> mWorkgroupUsers;
@@ -76,24 +90,25 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     //GridAdapter
     private BaseAdapter mGridAdapter;
 
-    public static ScheduleWeekPageFragment newInstance(Date weekDate,
+    public static ScheduleWeekPageFragment newInstance(int position,
+                                                       String role,
+                                                       Date weekDate,
                                                        ArrayList<UserRef> workgroupUsers,
                                                        LinkedHashMap<String, ArrayList<Shift>> userShifts,
-                                                       HashMap<String, ShiftType> shiftTypes,
-                                                       HashMap<String, ArrayList<Shift>> shiftChanges,
-                                                       AtomicBoolean editMode,
-                                                       AtomicLong weeklyHours) {
+                                                       HashMap<String, ArrayList<Shift>> shiftChanges) {
 
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
+        args.putInt(POSITION_KEY, position);
+        args.putString(ROLE_KEY, role);
         args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
         args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         args.putSerializable(USERS_SHIFT_MAP_KEY, userShifts);
-        args.putSerializable(SHIFT_TYPES_MAP_KEY, shiftTypes);
+        //args.putSerializable(SHIFT_TYPES_MAP_KEY, shiftTypes);
         args.putSerializable(SHIFT_CHANGES_MAP_KEY, shiftChanges);
-        args.putSerializable(EDIT_MODE_KEY, editMode);
-        args.putSerializable(WEEKLY_HOURS_KEY, weeklyHours);
+        //args.putSerializable(EDIT_MODE_KEY, editMode);
+        //args.putSerializable(WEEKLY_HOURS_KEY, weeklyHours);
         f.setArguments(args);
         return f;
     }
@@ -102,6 +117,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        mParentFragment = getParentFragment();
     }
 
     @Override
@@ -111,14 +127,61 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         Bundle args = getArguments();
         setRetainInstance(true);
         if (args != null) {
+            mPosition = args.getInt(POSITION_KEY);
+            mRole = UserRoles.valueOf(args.getString(ROLE_KEY));
             mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
             mUsersShiftsMap = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_MAP_KEY);
             mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
-            mShiftTypesMap = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP_KEY);
+            //mShiftTypesMap = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP_KEY);
             mShiftChanges = (Map<String, ArrayList<Shift>>) args.getSerializable(SHIFT_CHANGES_MAP_KEY);
-            mEditMode = (AtomicBoolean) args.getSerializable(EDIT_MODE_KEY);
-            mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
+            //mEditMode = (AtomicBoolean) args.getSerializable(EDIT_MODE_KEY);
+            //mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
         }
+        mParentViewModel = ViewModelProviders.of(mParentFragment).get(MyCalendarVM.class);
+        mParentViewModel.getEditMode().observe(this, new Observer<Boolean>() {
+
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null) mEditMode = aBoolean;
+            }
+        });
+
+        mParentViewModel.getWeeklyHours().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable Long aLong) {
+                if(aLong != null) mWeeklyHours = aLong;
+            }
+        });
+        mParentViewModel.getOwnShift().observe(this, new Observer<Shift>() {
+            @Override
+            public void onChanged(@Nullable Shift ownShift) {
+                if(ownShift != null){
+                    mGridAdapter.notifyDataSetChanged();
+                    Shift otherShift = mParentViewModel.getOtherShift().getValue();
+                    if(otherShift != null){
+                        mChangeRequest = new ShiftChangeRequest(ownShift, otherShift);
+                        mParentViewModel.setOwnShift(null);
+                        mParentViewModel.setOtherShift(null);
+                    }
+                }
+            }
+        });
+        mParentViewModel.getOtherShift().observe(this, new Observer<Shift>() {
+            @Override
+            public void onChanged(@Nullable Shift otherShift) {
+                if(otherShift != null){
+                    mGridAdapter.notifyDataSetChanged();
+                    Shift ownShift = mParentViewModel.getOtherShift().getValue();
+                    if(ownShift != null){
+                        mChangeRequest = new ShiftChangeRequest(ownShift, otherShift);
+                        mParentViewModel.setOwnShift(null);
+                        mParentViewModel.setOtherShift(null);
+                    }
+                }
+            }
+        });
+        mShiftTypesMap = mParentViewModel.getShiftTypes().getValue();
+
     }
 
     //Inflate view
@@ -157,7 +220,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int day = position % 8;
-                if(position > 7 && day > 0 && mEditMode.get()){
+                if(position > 7 && day > 0 ){
                     Calendar cal = new GregorianCalendar();
                     cal.setTime(mWeekDate);
                     cal.add(Calendar.DAY_OF_MONTH, + day-1);
@@ -165,28 +228,70 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
                     int row = position / 8;
                     UserRef userRef = mWorkgroupUsers.get(row-1);
-
-                    //Check if there is a shift there
-                    Shift shiftSelected = null;
-                    for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
-                        if (shift.getDate().getTime() == date.getTime()){
-                            shiftSelected = shift;
-                            break;
-                        }
+                    if(!mEditMode || mWeeklyHours == -1){
+                        return;
                     }
-                    if(!mShiftTypesMap.isEmpty() && mWeeklyHours != null){
+                    if(!mShiftTypesMap.isEmpty()){
+                        //Check if there is a shift there
+                        Shift shiftSelected = null;
+                        for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
+                            if (shift.getDate().getTime() == date.getTime()){
+                                shiftSelected = shift;
+                                break;
+                            }
+                        }
+
                         if(shiftSelected != null){
                             EditShiftDialog dialog = EditShiftDialog.newInstance(date, userRef, mShiftTypesMap, mWorkgroupUsers, shiftSelected);
                             dialog.show(getChildFragmentManager(), "esd");
                         } else {
                             recalculateHours();
-                            CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap, mUsersHourCount.get(userRef.getUid()).toStandardDuration().getMillis(), mWeeklyHours.get());
+                            CreateShiftDialog dialog = CreateShiftDialog.newInstance(date, userRef, mShiftTypesMap, mUsersHourCount.get(userRef.getUid()).toStandardDuration().getMillis(), mWeeklyHours);
                             dialog.show(getChildFragmentManager(), "csd");
                         }
                     } else {
                         Toast.makeText(mContext, R.string.toast_schedule_noShiftTypes, Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+
+        mViewBinding.gridViewWeek.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: 10/07/2018 Redundance code
+                int day = position % 8;
+                if(position > 7 && day > 0 ) {
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTime(mWeekDate);
+                    cal.add(Calendar.DAY_OF_MONTH, +day - 1);
+                    Date date = cal.getTime();
+
+                    int row = position / 8;
+                    UserRef userRef = mWorkgroupUsers.get(row - 1);
+
+                    if (!mShiftTypesMap.isEmpty()) {
+                        Shift shiftSelected = null;
+                        String ownUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        boolean ownShift = TextUtils.equals(userRef.getUid(), ownUid);
+
+                        for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
+                            if (shift.getDate().getTime() == date.getTime()) {
+                                shiftSelected = shift;
+                                break;
+                            }
+                        }
+                        if(shiftSelected != null){
+                            if(ownShift){
+                                mParentViewModel.setOwnShift(shiftSelected);
+                            } else {
+                                mParentViewModel.setOtherShift(shiftSelected);
+                            }
+                        }
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }
@@ -352,4 +457,5 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
         mGridAdapter.notifyDataSetChanged();
     }
+
 }
