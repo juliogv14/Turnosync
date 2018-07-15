@@ -19,8 +19,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.ChangeRequest;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.ShiftChangeRequest;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
@@ -467,13 +467,13 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     }
 
     @Override
-    public void onConfirmShiftChange(ShiftChangeRequest changeRequest) {
+    public void onConfirmShiftChange(ChangeRequest changeRequest) {
         requestChangeDialog = null;
         mListener.onNewChangeRequest(changeRequest);
     }
 
     public interface WeekPageListener {
-        void onNewChangeRequest(ShiftChangeRequest request);
+        void onNewChangeRequest(ChangeRequest request);
     }
 
 }

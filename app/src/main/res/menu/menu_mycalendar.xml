@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_mycalendar_edit"
-        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:id="@+id/action_mycalendar_requests"
+        android:icon="@drawable/ic_swap_horiz_black_24dp"
         android:title="@string/menu_schedule_edit"
         app:showAsAction="ifRoom" />
 

@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -65,7 +66,7 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     //Variables
     private UserWorkgroup mWorkgroup;
     private AtomicLong mWeeklyHours;
-    ArrayList<UserRef> mUserList;
+    private ArrayList<UserRef> mUserList;
 
     public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup, AtomicLong weeklyHours) {
         WorkgroupSettingsFragment f = new WorkgroupSettingsFragment();
@@ -135,8 +136,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         mViewBinding.settingsItemShiftWeekly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WeeklyHoursDialog dialog = WeeklyHoursDialog.newInstance(mWeeklyHours.get());
-                dialog.show(getChildFragmentManager(), "weeklyHours");
+                if(TextUtils.equals(mWorkgroup.getRole(),UserRoles.MANAGER.toString())){
+                    WeeklyHoursDialog dialog = WeeklyHoursDialog.newInstance(mWeeklyHours.get());
+                    dialog.show(getChildFragmentManager(), "weeklyHours");
+                }
+
             }
         });
 
@@ -189,49 +193,6 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
     private void attatchWorkgroupUsersListener() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
-        // TODO: 10/07/2018 Change to viewmodel
-        /*mGroupUsersListener = workgroupsUsersColl.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-                if(e != null){
-                    return;
-                }
-                for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
-                    DocumentSnapshot doc = docChange.getDocument();
-                    if (doc.exists()) {
-                        UserRef userData = doc.toObject(UserRef.class);
-
-                        switch (docChange.getType()) {
-                            case ADDED:
-                                //Added
-                                if(userData.isActive()){
-                                    mUserList.add(userData);
-                                }
-                                break;
-                            case MODIFIED:
-                                //Active modified
-                                if(!userData.isActive()){
-                                    mUserList.remove(docChange.getOldIndex());
-                                } else {
-                                    UserRef userRef = mUserList.get(docChange.getNewIndex());
-                                    if(TextUtils.equals(userRef.getUid(), userData.getUid())){
-                                        mUserList.set(docChange.getNewIndex(), userData);
-                                    } else {
-                                        mUserList.add(docChange.getNewIndex(), userData);
-                                    }
-
-                                }
-                                break;
-                            case REMOVED:
-                                //Removed
-                                mUserList.remove(docChange.getOldIndex());
-                                break;
-                        }
-                    }
-                }
-                mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
-            }
-        });*/
 
         UserRefsVM userRefsVM = ViewModelProviders.of((AppCompatActivity) mListener).get(UserRefsVM.class);
         mGroupUsersListener = userRefsVM.loadUserRefs(workgroupsUsersColl, getString(R.string.data_key_shortname));

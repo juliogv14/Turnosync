@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.ChangeRequest;
 import com.juliogv14.turnosync.data.Shift;
-import com.juliogv14.turnosync.data.ShiftChangeRequest;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogRequestChangeBinding;
@@ -25,6 +25,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -102,7 +103,7 @@ public class RequestChangeDialog extends DialogFragment {
                     //Add user to workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mListener.onConfirmShiftChange(new ShiftChangeRequest(mOwnShift, mOtherShift));
+                        mListener.onConfirmShiftChange(new ChangeRequest(mOwnShift, mOtherShift, new GregorianCalendar().getTime()));
                     }
                 })
                 .setNegativeButton(R.string.dialog_requestChange_button_cancel, new DialogInterface.OnClickListener() {
@@ -154,6 +155,6 @@ public class RequestChangeDialog extends DialogFragment {
     }
 
     public interface RequestChangeListener {
-        void onConfirmShiftChange(ShiftChangeRequest changeRequest);
+        void onConfirmShiftChange(ChangeRequest changeRequest);
     }
 }

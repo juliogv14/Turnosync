@@ -23,7 +23,6 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
 
     //Intent data
     private UserWorkgroup mWorkgroup;
-    private AtomicLong mWeeklyHours;
 
     //WorkgroupSettingsFragment mSettingsFragment;
 
@@ -31,15 +30,14 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workgroup_settings);
-        setTitle("Workgroup settings");
 
         //Init
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_workgroup_settings);
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
-        mWeeklyHours = (AtomicLong) getIntent().getSerializableExtra(getString(R.string.data_int_hours));
+        AtomicLong weeklyHours = (AtomicLong) getIntent().getSerializableExtra(getString(R.string.data_int_hours));
         //ArrayList<UserRef> userlist = getIntent().getParcelableArrayListExtra(getString(R.string.data_int_users));
         //mSettingsFragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, userlist);
-        Fragment fragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, mWeeklyHours);
+        Fragment fragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, weeklyHours);
         displaySelectedScreen(fragment);
     }
 
