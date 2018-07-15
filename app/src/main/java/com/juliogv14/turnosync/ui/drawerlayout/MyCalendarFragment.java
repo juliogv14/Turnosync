@@ -411,11 +411,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
         Calendar calendar;
         calendar = new GregorianCalendar(2018, 4, 1);
-        Shift shift1 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
+        Shift shift1 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
         calendar = new GregorianCalendar(2018, 4, 6);
-        Shift shift2 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
+        Shift shift2 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
         calendar = new GregorianCalendar(2018, 4, 29);
-        Shift shift3 = new Shift(mFirebaseUser.getUid(), "M", calendar.getTime(), "", "");
+        Shift shift3 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
 
         CollectionReference shiftsColl = mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())

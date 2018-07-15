@@ -120,7 +120,7 @@ public class EditShiftDialog extends DialogFragment {
                             mSelectedShift.setType(mShiftTypesList.get(typePos).getId());
                             mListener.onEditShiftChange(mSelectedShift, mSelectedShift);
                         } else if (!oldUserId.equals(newUserId)) {
-                            Shift newShift = new Shift(newUserId, mShiftTypesList.get(typePos).getId(), mDay, "","");
+                            Shift newShift = new Shift(newUserId, mDay, mShiftTypesList.get(typePos).getId());
                             mListener.onEditShiftChange(mSelectedShift, newShift);
                         }
                     }

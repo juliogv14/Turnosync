@@ -169,7 +169,7 @@ public class CreateShiftDialog extends DialogFragment {
                             if(toggleButton.isChecked()){
                                 cal.set(Calendar.DAY_OF_WEEK, j+2);
                                 if(j==6) cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                                Shift shift = new Shift(mUserRef.getUid(), mShiftTypesList.get(spinnerPos).getId(), cal.getTime(), "","");
+                                Shift shift = new Shift(mUserRef.getUid(), cal.getTime(), mShiftTypesList.get(spinnerPos).getId());
                                 newShifts.add(shift);
                             }
                         }

@@ -18,18 +18,14 @@ public class Shift implements Parcelable, Comparable<Shift> {
     private String type;
 
     private Date date;
-    private String start;
-    private String end;
 
     public Shift() {
     }
 
-    public Shift(String userId, String type, Date date, String start, String end) {
+    public Shift(String userId, Date date, String type) {
         this.type = type;
         this.userId = userId;
         this.date = date;
-        this.start = start;
-        this.end = end;
     }
 
     public String getId() {
@@ -64,30 +60,12 @@ public class Shift implements Parcelable, Comparable<Shift> {
         this.date = date;
     }
 
-    public String getStart() {
-        return start;
-    }
-
-    public void setStart(String start) {
-        this.start = start;
-    }
-
-    public String getEnd() {
-        return end;
-    }
-
-    public void setEnd(String end) {
-        this.end = end;
-    }
-
 
     //Parcelable implementation
     private Shift(Parcel in) {
         this.userId = in.readString();
         this.type = in.readString();
         this.date = new Date(in.readLong());
-        this.start = in.readString();
-        this.end = in.readString();
     }
 
     public static final Creator<Shift> CREATOR = new Creator<Shift>() {
@@ -112,8 +90,6 @@ public class Shift implements Parcelable, Comparable<Shift> {
         out.writeString(userId);
         out.writeString(type);
         out.writeLong(date.getTime());
-        out.writeString(start);
-        out.writeString(end);
     }
 
     @Override
