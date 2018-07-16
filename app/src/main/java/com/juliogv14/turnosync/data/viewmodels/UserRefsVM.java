@@ -54,9 +54,19 @@ public class UserRefsVM extends ViewModel {
                                 if(!userData.isActive()){
                                     users.remove(docChange.getOldIndex());
                                 } else {
-                                    UserRef userRef = users.get(docChange.getNewIndex());
-                                    if(TextUtils.equals(userRef.getUid(), userData.getUid())){
-                                        users.set(docChange.getNewIndex(), userData);
+
+                                    boolean exist = false;
+                                    int pos = 0;
+                                    for (int i = 0; i < users.size(); i++) {
+                                        UserRef userRef = users.get(i);
+                                        if (TextUtils.equals(userRef.getUid(), userData.getUid())) {
+                                            exist = true;
+                                            pos = i;
+                                            break;
+                                        }
+                                    }
+                                    if(exist){
+                                        users.set(pos, userData);
                                     } else {
                                         users.add(docChange.getNewIndex(), userData);
                                     }

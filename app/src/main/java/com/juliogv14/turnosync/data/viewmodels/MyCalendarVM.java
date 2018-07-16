@@ -17,17 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyCalendarVM extends ViewModel {
-    private MutableLiveData<Boolean> mEditMode;
-    private MutableLiveData<Long> mWeeklyHours;
+    private MutableLiveData<Boolean> mEditMode = new MutableLiveData<>();;
+    private MutableLiveData<Long> mWeeklyHours = new MutableLiveData<>();
+    private MutableLiveData<Shift> mOwnShift = new MutableLiveData<>();
+    private MutableLiveData<Shift> mOtherShift = new MutableLiveData<>();
     private MutableLiveData<Map<String, ShiftType>> mShiftTypes;
-    private MutableLiveData<Shift> mOwnShift;
-    private MutableLiveData<Shift> mOtherShift;
 
     //Setter getter editMode
     public void setEditMode(boolean value){
-        if (mEditMode == null){
-            mEditMode = new MutableLiveData<>();
-        }
         mEditMode.setValue(value);
     }
     public MutableLiveData<Boolean> getEditMode() {
@@ -36,9 +33,6 @@ public class MyCalendarVM extends ViewModel {
 
     //Setter getter weeklyhours
     public void setWeeklyHours(long value){
-        if (mWeeklyHours == null){
-            mWeeklyHours = new MutableLiveData<>();
-        }
         mWeeklyHours.setValue(value);
     }
     public MutableLiveData<Long> getWeeklyHours() {
@@ -99,31 +93,19 @@ public class MyCalendarVM extends ViewModel {
 
     //Setter and getter ownShift
     public void setOwnShift(Shift shift){
-        if(mOwnShift == null){
-            mOwnShift = new MutableLiveData<>();
-        }
         mOwnShift.setValue(shift);
     }
 
     public MutableLiveData<Shift> getOwnShift() {
-        if(mOwnShift == null){
-            mOwnShift = new MutableLiveData<>();
-        }
         return mOwnShift;
     }
 
     //Setter and getter otherShift
     public void setOtherShift(Shift shift){
-        if(mOtherShift == null){
-            mOtherShift = new MutableLiveData<>();
-        }
         mOtherShift.setValue(shift);
     }
 
     public MutableLiveData<Shift> getOtherShift() {
-        if(mOtherShift == null){
-            mOtherShift = new MutableLiveData<>();
-        }
         return mOtherShift;
     }
 }
