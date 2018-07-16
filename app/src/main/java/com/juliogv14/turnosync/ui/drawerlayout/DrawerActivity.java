@@ -3,7 +3,6 @@ package com.juliogv14.turnosync.ui.drawerlayout;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -53,8 +52,7 @@ import java.util.Map;
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        HomeFragment.OnHomeFragmentInteractionListener,
-        MyCalendarFragment.OnCalendarFragmentInteractionListener {
+        HomeFragment.OnHomeFragmentInteractionListener {
 
     //Log TAG
     private final String TAG = this.getClass().getSimpleName();
@@ -205,10 +203,6 @@ public class DrawerActivity extends AppCompatActivity
         outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentID);
         outState.putParcelable(CURRENT_WORKGROUP_KEY, mCurrentWorkgroup);
 
-        /*if(mMyCalendarFragment instanceof MyCalendarFragment ){
-            getSupportFragmentManager().putFragment(outState, RESTORED_FRAGMENT_KEY, mMyCalendarFragment);
-        }*/
-
     }
 
     @Override
@@ -248,34 +242,28 @@ public class DrawerActivity extends AppCompatActivity
         mCurrentFragmentID = itemId;
         //creating fragment object
         Fragment fragment = null;
-
+        String tag = "";
         //initializing the fragment object which is selected
         switch (itemId) {
             case R.string.fragment_home:
                 mHomeFragment = HomeFragment.newInstance(mWorkgroupsList);
                 fragment = mHomeFragment;
-
+                tag = "home";
                 break;
             case R.string.fragment_mycalendar:
-                //TODO: improve saved state, bug using menu
-                /*if(mMyCalendarFragment != null){
-                    fragment = mMyCalendarFragment;
-                } else {
+                tag = "mycalendar";
+                fragment = getSupportFragmentManager().findFragmentByTag(tag);
+                if(fragment == null){
                     mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
-                    fragment = mMyCalendarFragment;
-
-                }*/
-
-                mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                }
                 fragment = mMyCalendarFragment;
-
                 break;
         }
 
         //replacing the fragment
         if (fragment != null && !fromSavedInstanceState) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
+            ft.replace(R.id.content_frame, fragment, tag);
             ft.commit();
         }
     }

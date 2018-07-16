@@ -89,8 +89,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
     private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
 
-    //Listener DrawerActivity
-    private OnCalendarFragmentInteractionListener mListener;
+    //Context and Listener
+    private Context mContext;
+    private OnFragmentInteractionListener mListener;
 
     //Binding and viewModel
     private FragmentMycalendarBinding mViewBinding;
@@ -136,17 +137,19 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnCalendarFragmentInteractionListener) {
-            mListener = (OnCalendarFragmentInteractionListener) context;
+        mContext = context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnCalendarFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         Bundle args = getArguments();
         if (args != null) {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
@@ -210,7 +213,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             @Override
             public void onClick(View v) {
                 if(mEditMode){
-                    //mViewBinding.floatingButtonEdit.setImageDrawable(ContextCompat.getDrawable((AppCompatActivity)mListener, R.drawable.ic_save_black_24dp));
                     int changesSize = mShiftChanges.get(getString(R.string.data_changes_added)).size()
                             + mShiftChanges.get(getString(R.string.data_changes_removed)).size()
                             + mShiftChanges.get(getString(R.string.data_changes_editedNew)).size()
@@ -223,7 +225,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                     }
                 } else {
                     mViewModel.setEditMode(true);
-                    ((AppCompatActivity) mListener).invalidateOptionsMenu();
+                    ((AppCompatActivity) mContext).invalidateOptionsMenu();
                 }
             }
         });
@@ -285,6 +287,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
@@ -317,7 +320,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.action_mycalendar_requests:
-                Intent changeRequestsIntent = new Intent((Context) mListener, ChangeRequestsActivity.class);
+                Intent changeRequestsIntent = new Intent(mContext, ChangeRequestsActivity.class);
                 changeRequestsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 changeRequestsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
                 changeRequestsIntent.putExtra(getString(R.string.data_int_shiftTypes), (HashMap<String, ShiftType>)mShiftTypes);
@@ -327,7 +330,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 return true;
             case R.id.action_mycalendar_switch:
                 mPersonalSchedule = !mPersonalSchedule;
-                ((AppCompatActivity) mListener).invalidateOptionsMenu();
+                ((AppCompatActivity) mContext).invalidateOptionsMenu();
 
                 mCurrentPosition = mViewBinding.viewPagerMonths.getCurrentItem();
                 mPagerAdapter = changeAdapter();
@@ -339,7 +342,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 return true;
             case R.id.action_mycalendar_settings:
 
-                Intent workgroupSettingsIntent = new Intent((Context) mListener, WorkgroupSettingsActivity.class);
+                Intent workgroupSettingsIntent = new Intent(mContext, WorkgroupSettingsActivity.class);
                 workgroupSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_workgroup), mWorkgroup);
                 workgroupSettingsIntent.putExtra(getString(R.string.data_int_hours), mWeeklyHours);
@@ -414,71 +417,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
-    private void loadTestData() {
-
-        Calendar calendar;
-        calendar = new GregorianCalendar(2018, 4, 1);
-        Shift shift1 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
-        calendar = new GregorianCalendar(2018, 4, 6);
-        Shift shift2 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
-        calendar = new GregorianCalendar(2018, 4, 29);
-        Shift shift3 = new Shift(mFirebaseUser.getUid(), calendar.getTime(), "M");
-
-        CollectionReference shiftsColl = mFirebaseFirestore
-                .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
-                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                .collection(getString(R.string.data_ref_shifts));
-
-        shiftsColl.document("testshift1").set(shift1);
-        shiftsColl.document("testshift2").set(shift2);
-        shiftsColl.document("testshift3").set(shift3);
-
-        CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                .collection(getString(R.string.data_ref_users));
-        HashMap<String, String> userdata = new HashMap<>();
-        userdata.put("uid", mFirebaseUser.getUid());
-        workgroupsUsersColl.document(mFirebaseUser.getUid()).set(userdata);
-
-        /*CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                .collection(getString(R.string.data_ref_users));
-        CollectionReference usersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users));
-
-        List<HashMap<String, String>> testUsers = new ArrayList<>();
-
-        for (int i = 0; i < 3; i++) {
-            User user = new User("testuser" + i, "testuser" + i + "@test.com", "testuser" + i);
-            HashMap<String, String> userdata = new HashMap<>();
-            userdata.put("uid", user.getUid());
-
-            usersColl.document(user.getUid()).set(user);
-            workgroupsUsersColl.document(user.getUid()).set(userdata);
-
-            shiftsColl = mFirebaseFirestore
-                    .collection(getString(R.string.data_ref_users)).document(user.getUid())
-                    .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
-                    .collection(getString(R.string.data_ref_shifts));
-
-            Shift[] testShifts = new Shift[3];
-
-            testShifts[0] = new Shift("M", testUsers.get(i).get("uid"), 2018, 4, i * 2, "", "");
-            testShifts[1] = new Shift("M", testUsers.get(i).get("uid"), 2018, 4, i * 3, "", "");
-            testShifts[2] = new Shift("M", testUsers.get(i).get("uid"), 2018, 4, i * 4, "", "");
-
-            for (int j = 0; j < testShifts.length; j++) {
-                shiftsColl.document("testusershift" + j * i).set(testShifts[j]);
-            }
-        }*/
-
-        /*CollectionReference usersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users));
-        Map<String,String> data = new HashMap<>();
-        data.put("displayName", "test1");
-        data.put("info", "");
-        data.put("role", "MANAGER");
-        data.put("workgroupId", "VOBMWlT3iP0t9x5fq37X");
-        usersColl.document(mFirebaseUser.getUid()).collection(getString(R.string.data_ref_workgroups)).document("VOBMWlT3iP0t9x5fq37X").set(data);*/
-
-    }
-
     private PagerAdapter changeAdapter() {
         PagerAdapter pagerAdapter;
         mViewModel.setEditMode(false);
@@ -501,9 +439,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             }
             start = start.withDayOfWeek(DateTimeConstants.MONDAY);
             end = end.withDayOfWeek(DateTimeConstants.MONDAY);
-            int weeks = Weeks.weeksBetween(start,end).getWeeks();
 
-            mCurrentPosition = weeks;          //Position 0 + firstweek
+            mCurrentPosition = Weeks.weeksBetween(start,end).getWeeks();
 
             //Reset changes map
             mShiftChanges.put(getString(R.string.data_changes_added), new ArrayList<Shift>());
@@ -585,7 +522,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         applyChanges();
         mMadeChanges = true;
         mViewModel.setEditMode(false);
-        ((AppCompatActivity) mListener).invalidateOptionsMenu();
+        ((AppCompatActivity) mContext).invalidateOptionsMenu();
 
     }
 
@@ -614,10 +551,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             }
         }
         return hasShift;
-    }
-
-    public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
-
     }
 
     private class MonthSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -767,7 +700,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             }
         }
 
-        public SparseArray<LinkedHashMap<String, ArrayList<Shift>>> getShiftListMapRef() {
+        SparseArray<LinkedHashMap<String, ArrayList<Shift>>> getShiftListMapRef() {
             return shiftListMapRef;
         }
     }
