@@ -19,17 +19,17 @@ import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class WeekAdapter extends BaseAdapter {
-    private GregorianCalendar mCalendar;
+    private DateTime mDisplayDay;
     private Context mContext;
     private DisplayMetrics mDisplayMetrics;
     private List<String> mItems;
@@ -56,9 +56,8 @@ public class WeekAdapter extends BaseAdapter {
         mUserShiftMap = userShifts;
         mShiftsTypesMap = shiftTypes;
 
-        mCalendar = new GregorianCalendar();
-        mCalendar.setTime(weekDate);
         mWeekDate = weekDate;
+        mDisplayDay = new DateTime(mWeekDate);
         mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
 
         populateMonth();
@@ -125,7 +124,7 @@ public class WeekAdapter extends BaseAdapter {
                     mShiftIterator = mUserShiftMap.entrySet().iterator();
                 }
 
-                mCalendar.setTime(mWeekDate);
+                mDisplayDay = new DateTime(mWeekDate);
                 mCurrentShiftIndex = 0;
                 convertView.setBackgroundColor(Color.GRAY);
 
@@ -153,16 +152,11 @@ public class WeekAdapter extends BaseAdapter {
 
                 if (mCurrentShiftIndex < mUserShiftMap.get(mCurrentUid).size() && !mShiftsTypesMap.isEmpty()) {
 
-                    int month = mCalendar.get(Calendar.MONTH);
-                    int day = mCalendar.get(Calendar.DAY_OF_MONTH);
-
                     Shift shift = mUserShiftMap.get(mCurrentUid).get(mCurrentShiftIndex);
-                    Calendar calShift = new GregorianCalendar();
-                    calShift.setTime(shift.getDate());
+                    DateTime shiftDate = new DateTime(shift.getDate());
 
-                    if (day == calShift.get(Calendar.DAY_OF_MONTH) && month == calShift.get(Calendar.MONTH)) {
+                    if (mDisplayDay.getDayOfMonth() == shiftDate.getDayOfMonth() && mDisplayDay.getDayOfMonth()== shiftDate.getDayOfMonth()) {
                         mCurrentShiftIndex++;
-                        //mItemShiftBinding.textViewDayMonth.setText(String.valueOf(day));
                         mItemShiftBinding.textViewDayMonth.setVisibility(View.GONE);
                         ShiftType type = mShiftsTypesMap.get(shift.getType());
                         mItemShiftBinding.textViewShiftType.setText(type.getTag());
@@ -170,7 +164,7 @@ public class WeekAdapter extends BaseAdapter {
 
                     }
                 }
-                mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+                mDisplayDay = mDisplayDay.plusDays(1);
 
                 return convertView;
             default:

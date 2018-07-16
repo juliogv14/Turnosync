@@ -2,12 +2,18 @@ package com.juliogv14.turnosync.ui.mycalendar.changerequests;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,6 +26,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.ChangeRequest;
+import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -112,21 +119,36 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                         switch (docChange.getType()) {
                             case ADDED:
                                 //Added
-                                mChangeRequestList.add(changeRequest);
+                                if(!TextUtils.equals(changeRequest.getState(), ChangeRequest.APPROVED)){
+                                    mChangeRequestList.add(changeRequest);
+                                }
                                 break;
                             case MODIFIED:
-                                if (docChange.getOldIndex() == docChange.getNewIndex()) {
-                                    //Modified, same position
-                                    mChangeRequestList.set(docChange.getOldIndex(), changeRequest);
+                                boolean exist = false;
+                                int pos = 0;
+                                for (int i = 0; i < mChangeRequestList.size(); i++) {
+                                    ChangeRequest change = mChangeRequestList.get(i);
+                                    if (TextUtils.equals(change.getId(), change.getId())) {
+                                        exist = true;
+                                        pos = i;
+                                        break;
+                                    }
+                                }
+                                if(exist){
+                                    mChangeRequestList.set(pos, changeRequest);
                                 } else {
-                                    //Modified, differnt position
-                                    mChangeRequestList.remove(docChange.getOldIndex());
                                     mChangeRequestList.add(docChange.getNewIndex(), changeRequest);
                                 }
                                 break;
                             case REMOVED:
                                 //Removed
-                                mChangeRequestList.remove(docChange.getOldIndex());
+                                for (int i = 0; i < mChangeRequestList.size(); i++) {
+                                    ChangeRequest change = mChangeRequestList.get(i);
+                                    if (TextUtils.equals(change.getId(), change.getId())) {
+                                        mChangeRequestList.remove(i);
+                                        break;
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -144,8 +166,81 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
 
     @Override
     public void onApproveAccepted(ChangeRequest changeRequest) {
-        DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
-        docRef.update(getString(R.string.data_key_state), ChangeRequest.APPROVED);
+        final DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
+        //Proceed to make the change
+        final Shift ownShift = changeRequest.getOwnShift();
+        final Shift otherShift = changeRequest.getOtherShift();
+
+        final boolean[] sameShifts = new boolean[2];
+        Task<QuerySnapshot> ownShiftQuery = getShiftRef(ownShift, sameShifts, 0);
+        Task<QuerySnapshot> otherShiftQuery = getShiftRef(otherShift, sameShifts, 1);
+
+        Tasks.whenAll(ownShiftQuery, otherShiftQuery).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    if (sameShifts[0] && sameShifts[1]){
+                        //Shifts schedule hasnt change
+                        Shift newOwnShift = new Shift(ownShift.getUserId(), otherShift.getDate(), otherShift.getType());
+                        Shift newOtherShift = new Shift(otherShift.getUserId(), ownShift.getDate(), ownShift.getType());
+                        removeShift(ownShift);
+                        writeShift(newOwnShift);
+                        removeShift(otherShift);
+                        writeShift(newOtherShift);
+                        docRef.update(getString(R.string.data_key_state), ChangeRequest.APPROVED);
+                    }
+                } else {
+                    if (task.getException() != null) {
+                        Log.e(TAG, task.getException().getMessage());
+                    }
+                }
+            }
+        });
+
+    }
+
+    private Task<QuerySnapshot> getShiftRef(Shift shift, final boolean[] sameShifts, final int pos){
+        Task<QuerySnapshot> shiftQuery =  mFirebaseFirestore
+                .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .collection(getString(R.string.data_ref_shifts)).whereEqualTo(getString(R.string.data_key_date), shift.getDate()).get();
+
+        shiftQuery.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        if (doc != null && doc.exists()) {
+                            Shift shift = doc.toObject(Shift.class);
+                            //Same shift
+                            sameShifts[pos] = TextUtils.equals(shift.getType(), shift.getType());
+                        }
+                    }
+                } else {
+                    if (task.getException() != null) {
+                        Log.e(TAG, task.getException().getMessage());
+                    }
+                }
+            }
+        });
+        return shiftQuery;
+    }
+
+    private void writeShift(Shift shift){
+        DocumentReference shiftRef =  mFirebaseFirestore
+                .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .collection(getString(R.string.data_ref_shifts)).document();
+        shift.setId(shiftRef.getId());
+        shiftRef.set(shift);
+    }
+
+    private void removeShift(Shift shift){
+        DocumentReference shiftRef =  mFirebaseFirestore
+                .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
+                .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
+                .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
+        shiftRef.delete();
     }
 
     @Override

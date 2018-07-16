@@ -149,7 +149,7 @@ public class EditShiftDialog extends DialogFragment {
         ArrayAdapter<String> spinnerUsersAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, displayUsers);
         spinnerUsersAdapter .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mViewBinding.spinnerEditShiftUser.setAdapter(spinnerUsersAdapter);
-        mViewBinding.spinnerEditShiftUser.setSelection(displayUsers.indexOf(mUserRef.getUid()));
+        mViewBinding.spinnerEditShiftUser.setSelection(displayUsers.indexOf(mUserRef.getShortName()));
 
         //Types spinner adapter
         List<String> displayTypes = new ArrayList<>();

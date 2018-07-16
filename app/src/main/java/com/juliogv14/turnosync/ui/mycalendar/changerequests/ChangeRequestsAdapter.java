@@ -99,18 +99,21 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
                 case ChangeRequest.ACCEPTED:
                     binding.textViewRequestState.setText(mContext.getString(R.string.requests_change_accepted));
                     break;
+                case ChangeRequest.APPROVED:
+                    binding.textViewRequestState.setText(mContext.getString(R.string.requests_change_approved));
+                    break;
             }
             // TODO: 14/07/2018 Consider argument
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             //Buttons
             if ((TextUtils.equals(state, ChangeRequest.ACCEPTED) && TextUtils.equals(mRole, UserRoles.MANAGER.toString()))
-                    || TextUtils.equals(otherShift.getUserId(), userId)) {
+                    ||(TextUtils.equals(state, ChangeRequest.REQUESTED) && TextUtils.equals(otherShift.getUserId(), userId))) {
                 //Manager or user who can accept
                 binding.buttonRequestAccept.setVisibility(View.VISIBLE);
                 binding.buttonRequestDeny.setVisibility(View.VISIBLE);
             } else if((TextUtils.equals(state, ChangeRequest.REQUESTED) && TextUtils.equals(mRole, UserRoles.MANAGER.toString()))
-                    || TextUtils.equals(otherShift.getUserId(), userId) || TextUtils.equals(ownShift.getUserId(), userId)){
+                    || (!TextUtils.equals(state, ChangeRequest.APPROVED) && (TextUtils.equals(otherShift.getUserId(), userId) || TextUtils.equals(ownShift.getUserId(), userId)))){
                 binding.buttonRequestAccept.setVisibility(View.INVISIBLE);
                 binding.buttonRequestDeny.setVisibility(View.VISIBLE);
             } else {

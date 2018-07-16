@@ -54,6 +54,10 @@ import com.juliogv14.turnosync.ui.mycalendar.changerequests.ChangeRequestsActivi
 import com.juliogv14.turnosync.ui.mycalendar.createshift.ConfirmChangesDialog;
 import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettingsActivity;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Weeks;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -63,6 +67,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -87,8 +92,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     //Listener DrawerActivity
     private OnCalendarFragmentInteractionListener mListener;
 
-    //Binding
+    //Binding and viewModel
     private FragmentMycalendarBinding mViewBinding;
+    private MyCalendarVM mViewModel;
 
     //Firebase Firestore
     private FirebaseFirestore mFirebaseFirestore;
@@ -103,10 +109,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     //Calendar var
     private int mTotalWeeks;
     private int mCurrentPosition;
-    private Calendar mInitMonth;
+    private DateTime mInitMonth;
 
-    //ViewModel
-    private MyCalendarVM mViewModel;
+    PagerAdapter mPagerAdapter;
 
     //Runtime variables
     private boolean mPersonalSchedule = true;
@@ -159,11 +164,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 
         //Init month date
-        int mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 - 1);
-        mInitMonth = new GregorianCalendar();
-        mInitMonth.add(Calendar.MONTH, -mInitMonthOffset);
-        mInitMonth.set(Calendar.WEEK_OF_MONTH, 1);
-        mInitMonth.set(Calendar.DAY_OF_MONTH, 1);
+        int mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 -1);
+        mInitMonth = DateTime.now().withMillisOfDay(0);
+        mInitMonth = mInitMonth.minusMonths(mInitMonthOffset).withDayOfMonth(1);
 
         //Init variables
         mUserShiftsListeners = new ArrayList<>();
@@ -177,7 +180,14 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mViewModel.getEditMode().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean != null) mEditMode = aBoolean;
+                if(aBoolean != null){
+                    mEditMode = aBoolean;
+                    if(mEditMode){
+                        mViewBinding.floatingButtonEdit.setImageResource(R.drawable.ic_save_black_24dp);
+                    } else {
+                        mViewBinding.floatingButtonEdit.setImageResource(R.drawable.ic_mode_edit_black_24dp);
+                    }
+                }
             }
         });
         mWeeklyHours = new AtomicLong(0);
@@ -195,13 +205,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         } else {
             mViewBinding.floatingButtonEdit.setVisibility(View.GONE);
         }
-        mViewBinding.floatingButtonEdit.setImageResource(R.drawable.ic_mode_edit_black_24dp);
         mViewBinding.floatingButtonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mEditMode){
                     //mViewBinding.floatingButtonEdit.setImageDrawable(ContextCompat.getDrawable((AppCompatActivity)mListener, R.drawable.ic_save_black_24dp));
-                    mViewBinding.floatingButtonEdit.setImageResource(R.drawable.ic_mode_edit_black_24dp);
                     int changesSize = mShiftChanges.get(getString(R.string.data_changes_added)).size()
                             + mShiftChanges.get(getString(R.string.data_changes_removed)).size()
                             + mShiftChanges.get(getString(R.string.data_changes_editedNew)).size()
@@ -211,10 +219,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                         dialog.show(getChildFragmentManager(),"confirmChanges");
                     } else {
                         mViewModel.setEditMode(false);
-                        ((AppCompatActivity) mListener).invalidateOptionsMenu();
                     }
                 } else {
-                    mViewBinding.floatingButtonEdit.setImageResource(R.drawable.ic_save_black_24dp);
                     mViewModel.setEditMode(true);
                     ((AppCompatActivity) mListener).invalidateOptionsMenu();
                 }
@@ -242,10 +248,10 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        PagerAdapter pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
+        mPagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
 
-        mViewBinding.viewPagerMonths.setAdapter(pagerAdapter);
+        mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
     }
 
@@ -323,9 +329,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 ((AppCompatActivity) mListener).invalidateOptionsMenu();
 
                 mCurrentPosition = mViewBinding.viewPagerMonths.getCurrentItem();
-                PagerAdapter pagerAdapter = changeAdapter();
+                mPagerAdapter = changeAdapter();
 
-                mViewBinding.viewPagerMonths.setAdapter(pagerAdapter);
+                mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
                 mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
 
 
@@ -477,7 +483,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mViewModel.setEditMode(false);
         if (mPersonalSchedule) {
             mViewBinding.floatingButtonEdit.setVisibility(View.GONE);
-            Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
+            Calendar calend =  mInitMonth.toCalendar(Locale.getDefault());
             calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
             calend.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
             mCurrentPosition = calend.get(Calendar.MONTH)-1;
@@ -487,33 +493,18 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             if (TextUtils.equals(mWorkgroup.getRole(), UserRoles.MANAGER.toString())) {
                 mViewBinding.floatingButtonEdit.setVisibility(View.VISIBLE);
             }
-            Calendar calinit = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-            Calendar calend = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
 
-            calend.add(Calendar.MONTH, mCurrentPosition);
-            //Current month set week to current week
-            Calendar today = new GregorianCalendar();
-            if(calend.get(Calendar.MONTH) == today.get(Calendar.MONTH)){
-                calend.set(Calendar.WEEK_OF_MONTH, today.get(Calendar.WEEK_OF_MONTH));
-            } else {
-                calend.set(Calendar.WEEK_OF_MONTH, 1);
+            DateTime start = mInitMonth.toDateTime();
+            DateTime end = start.plusMonths(mCurrentPosition);
+            DateTime todayd = DateTime.now();
+            if(todayd.getMonthOfYear() == end.getMonthOfYear()){
+                end = end.withWeekOfWeekyear(todayd.getWeekOfWeekyear());
             }
+            start = start.withDayOfWeek(DateTimeConstants.MONDAY);
+            end = end.withDayOfWeek(DateTimeConstants.MONDAY);
+            int weeks = Weeks.weeksBetween(start,end).getWeeks();
 
-            calend.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-
-            int startWeek = calinit.get(Calendar.WEEK_OF_YEAR);
-            int endWeek = calend.get(Calendar.WEEK_OF_YEAR);
-
-            int diff = calend.get(Calendar.YEAR) - mInitMonth.get(Calendar.YEAR);
-
-            int deltaYears = 0;
-            for (int i = 0; i < diff; i++) {
-                deltaYears += calinit.getActualMaximum(Calendar.WEEK_OF_YEAR);
-                calinit.add(Calendar.YEAR, 1);
-            }
-            diff = (endWeek + deltaYears) - startWeek;
-
-            mCurrentPosition = diff;          //Position 0 + firstweek
+            mCurrentPosition = weeks;          //Position 0 + firstweek
 
             //Reset changes map
             mShiftChanges.put(getString(R.string.data_changes_added), new ArrayList<Shift>());
@@ -577,13 +568,14 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     }
 
     private void queryWeeklyHours(){
+        final String weeeklyHoursKey = getString(R.string.data_key_weeklyhours);
         mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
                     Map<String, Object> data = task.getResult().getData();
-                    mViewModel.setWeeklyHours((long) data.get(getString(R.string.data_key_weeklyhours)));
+                    mViewModel.setWeeklyHours((long) data.get(weeeklyHoursKey));
                 }
             }
         });
@@ -608,6 +600,23 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         docRef.set(request);
     }
 
+    @Override
+    public boolean hasShiftOnDate(String uid, Date date) {
+        DateTime shiftWeek = new DateTime(date).withDayOfWeek(DateTimeConstants.MONDAY);
+        DateTime firstWeek = mInitMonth.withDayOfWeek(DateTimeConstants.MONDAY);
+        int weekPos = Weeks.weeksBetween(firstWeek, shiftWeek).getWeeks();
+        LinkedHashMap<String, ArrayList<Shift>> shiftListMap = ((WeekSlidePagerAdapter)mPagerAdapter).getShiftListMapRef().get(weekPos);
+        List<Shift> shiftList =  shiftListMap.get(uid);
+        boolean hasShift = false;
+        for (Shift sh : shiftList) {
+            if(sh.getDate().getTime() == date.getTime()){
+                hasShift = true;
+                break;
+            }
+        }
+        return hasShift;
+    }
+
     public interface OnCalendarFragmentInteractionListener extends OnFragmentInteractionListener {
 
     }
@@ -621,7 +630,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         @Override
         public Fragment getItem(int position) {
 
-            Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
+            Calendar cal = mInitMonth.toCalendar(Locale.getDefault());
             cal.add(Calendar.MONTH, position);
             cal.set(Calendar.DAY_OF_MONTH, 1);
 
@@ -690,16 +699,14 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         @Override
         public Fragment getItem(int position) {
 
-            Calendar cal = new GregorianCalendar(mInitMonth.get(Calendar.YEAR), mInitMonth.get(Calendar.MONTH), mInitMonth.get(Calendar.DATE));
-            cal.add(Calendar.WEEK_OF_YEAR, position);
-            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            DateTime weekStart = mInitMonth.plusWeeks(position).withDayOfWeek(DateTimeConstants.MONDAY);
 
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
             shiftListMapRef.put(position, shiftListMap);
             if(fragmentsRef.get(position) == null){
-                fragmentsRef.put(position, ScheduleWeekPageFragment.newInstance(position, mWorkgroup.getRole(), cal.getTime(), mGroupUsersRef,
+                fragmentsRef.put(position, ScheduleWeekPageFragment.newInstance(position, mWorkgroup.getRole(), weekStart.toDate(), mGroupUsersRef,
                         shiftListMap, mShiftChanges));
-                queryScheduleData(fragmentsRef.get(position), cal.getTime(), shiftListMap);
+                queryScheduleData(fragmentsRef.get(position), weekStart.toDate(), shiftListMap);
             }
 
             return fragmentsRef.get(position);
@@ -714,7 +721,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
             for (UserRef userUid : mGroupUsersRef) {
                 final ArrayList<Shift> userShifts = new ArrayList<>();
-                final String uid = userUid.getUid();
+                String uid = userUid.getUid();
                 shiftListMap.put(uid, userShifts);
 
                 CollectionReference userShiftsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(userUid.getUid())
@@ -776,6 +783,10 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                                 });
                 mUserShiftsListeners.add(userShiftListener);
             }
+        }
+
+        public SparseArray<LinkedHashMap<String, ArrayList<Shift>>> getShiftListMapRef() {
+            return shiftListMapRef;
         }
     }
 

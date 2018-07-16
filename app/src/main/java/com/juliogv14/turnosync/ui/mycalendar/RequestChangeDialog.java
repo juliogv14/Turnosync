@@ -99,7 +99,7 @@ public class RequestChangeDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_requestChange_title)
                 .setView(view)
-                .setPositiveButton(R.string.dialog_requestChange_button_confirm, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.Request, new DialogInterface.OnClickListener() {
                     //Add user to workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
