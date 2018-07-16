@@ -56,6 +56,7 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettings
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.Months;
 import org.joda.time.Weeks;
 
 import java.util.ArrayList;
@@ -67,7 +68,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -151,6 +151,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         if (args != null) {
             mWorkgroup = args.getParcelable(CURRENT_WORKGROUP_KEY);
         }
+
     }
 
     //Inflate view
@@ -483,10 +484,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mViewModel.setEditMode(false);
         if (mPersonalSchedule) {
             mViewBinding.floatingButtonEdit.setVisibility(View.GONE);
-            Calendar calend =  mInitMonth.toCalendar(Locale.getDefault());
-            calend.add(Calendar.WEEK_OF_YEAR, mCurrentPosition);
-            calend.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-            mCurrentPosition = calend.get(Calendar.MONTH)-1;
+            DateTime lastMonth = mInitMonth.plusWeeks(mCurrentPosition).withDayOfWeek(DateTimeConstants.SUNDAY);
+            mCurrentPosition = Months.monthsBetween(mInitMonth, lastMonth).getMonths();
 
             pagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
         } else {
@@ -630,14 +629,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         @Override
         public Fragment getItem(int position) {
 
-            Calendar cal = mInitMonth.toCalendar(Locale.getDefault());
-            cal.add(Calendar.MONTH, position);
-            cal.set(Calendar.DAY_OF_MONTH, 1);
-
+            DateTime month = mInitMonth.plusMonths(position).withDayOfMonth(1);
             final ArrayList<Shift> shiftList = new ArrayList<>();
 
-            MonthPageFragment pageFragment = MonthPageFragment.newInstance(cal.getTime(), shiftList, (HashMap<String, ShiftType>) mShiftTypes);
-            queryShiftData(pageFragment, cal.getTime(), shiftList);
+            MonthPageFragment pageFragment = MonthPageFragment.newInstance(month, shiftList, (HashMap<String, ShiftType>) mShiftTypes);
+            queryShiftData(pageFragment, month, shiftList);
 
             return pageFragment;
         }
@@ -647,24 +643,16 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             return QUERY_MONTH_NUMBER;
         }
 
-        private void queryShiftData(final MonthPageFragment pageFragment, Date date, final ArrayList<Shift> shiftList) {
+        private void queryShiftData(final MonthPageFragment pageFragment, DateTime month, final ArrayList<Shift> shiftList) {
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
             if (mFirebaseUser != null) {
                 CollectionReference shiftsColl = mFirebaseFirestore
                         .collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
                         .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                         .collection(getString(R.string.data_ref_shifts));
 
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                Date firstDay = calendar.getTime();
-
-                calendar.add(Calendar.MONTH, 1);
-
-                calendar.set(Calendar.WEEK_OF_MONTH, calendar.getActualMaximum(Calendar.WEEK_OF_MONTH));
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                Date lastDay = calendar.getTime();
+                Date firstDay = month.withDayOfWeek(DateTimeConstants.MONDAY).toDate();
+                Date lastDay =  month.dayOfMonth().withMaximumValue().withDayOfWeek(DateTimeConstants.SUNDAY).toDate();
                 String dateKey = getString(R.string.data_key_date);
                 shiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay).orderBy(dateKey, Query.Direction.ASCENDING).get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -704,9 +692,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             final LinkedHashMap<String, ArrayList<Shift>> shiftListMap = new LinkedHashMap<>();
             shiftListMapRef.put(position, shiftListMap);
             if(fragmentsRef.get(position) == null){
-                fragmentsRef.put(position, ScheduleWeekPageFragment.newInstance(position, mWorkgroup.getRole(), weekStart.toDate(), mGroupUsersRef,
+                fragmentsRef.put(position, ScheduleWeekPageFragment.newInstance(position, mWorkgroup.getRole(), weekStart, mGroupUsersRef,
                         shiftListMap, mShiftChanges));
-                queryScheduleData(fragmentsRef.get(position), weekStart.toDate(), shiftListMap);
+                queryScheduleData(fragmentsRef.get(position), weekStart, shiftListMap);
             }
 
             return fragmentsRef.get(position);
@@ -717,7 +705,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             return mTotalWeeks;
         }
 
-        private void queryScheduleData(final ScheduleWeekPageFragment pageFragment, Date date, Map<String, ArrayList<Shift>> shiftListMap) {
+        private void queryScheduleData(final ScheduleWeekPageFragment pageFragment, DateTime date, Map<String, ArrayList<Shift>> shiftListMap) {
 
             for (UserRef userUid : mGroupUsersRef) {
                 final ArrayList<Shift> userShifts = new ArrayList<>();
@@ -728,14 +716,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                         .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                         .collection(getString(R.string.data_ref_shifts));
 
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(date);
-
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                Date firstDay = calendar.getTime();
-
-                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                Date lastDay = calendar.getTime();
+                Date firstDay = date.withDayOfWeek(DateTimeConstants.MONDAY).toDate();
+                Date lastDay = date.withDayOfWeek(DateTimeConstants.SUNDAY).toDate();
 
                 String dateKey = getString(R.string.data_key_date);
                 mMadeChanges = false;

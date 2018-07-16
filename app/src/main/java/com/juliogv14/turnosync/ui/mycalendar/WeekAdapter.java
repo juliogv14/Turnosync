@@ -20,10 +20,9 @@ import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class WeekAdapter extends BaseAdapter {
     private Context mContext;
     private DisplayMetrics mDisplayMetrics;
     private List<String> mItems;
-    private Date mWeekDate;
+    private DateTime mWeekDate;
     private int mTitleHeight;
     private int mNamesWidth;
     private String[] mDays;
@@ -49,7 +48,7 @@ public class WeekAdapter extends BaseAdapter {
     private int mCurrentShiftIndex;
 
 
-    WeekAdapter(Context c, DisplayMetrics metrics, Date weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts, Map<String, ShiftType> shiftTypes) {
+    WeekAdapter(Context c, DisplayMetrics metrics, DateTime weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts, Map<String, ShiftType> shiftTypes) {
         mContext = c;
         mDisplayMetrics = metrics;
         mGroupUsers = groupUsers;
@@ -68,14 +67,18 @@ public class WeekAdapter extends BaseAdapter {
         /* Label items */
         mItems = new ArrayList<>();
         mItems.add(""); //First item
-        mItems.addAll(Arrays.asList(mDays));
+
+        for (int i = 0; i < mDays.length; i++) {
+            String day = mDisplayDay.plusDays(i).getDayOfMonth() + " " + mDays[i];
+            mItems.add(day);
+        }
 
         for (UserRef userRef : mGroupUsers) {
             //User name item
             mItems.add(userRef.getShortName());
 
             //Week days
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < DateTimeConstants.DAYS_PER_WEEK; i++) {
                 mItems.add("");
             }
 

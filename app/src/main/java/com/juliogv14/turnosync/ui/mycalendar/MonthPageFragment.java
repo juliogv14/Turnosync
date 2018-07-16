@@ -18,14 +18,14 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.databinding.PageMonthBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
 
+import org.joda.time.DateTime;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,15 +57,15 @@ public class MonthPageFragment extends Fragment {
     private Map<String, ShiftType> mShiftTypesMap;
 
     //Variables
-    private Date mMonthDate;
+    private DateTime mMonthDate;
     private Period mMonthHours;
 
 
-    public static MonthPageFragment newInstance(Date monthCalendar, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
+    public static MonthPageFragment newInstance(DateTime monthCalendar, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
         MonthPageFragment f = new MonthPageFragment();
         // Supply index input as an argument.
         Bundle args = new Bundle();
-        args.putLong(CURRENT_MONTH_DATE_KEY, monthCalendar.getTime());
+        args.putLong(CURRENT_MONTH_DATE_KEY, monthCalendar.getMillis());
         args.putParcelableArrayList(MONTH_SHIFT_LIST_KEY, shiftList);
         args.putSerializable(MONTH_SHIFT_TYPES_MAP_KEY, shiftTypes);
         f.setArguments(args);
@@ -84,7 +84,7 @@ public class MonthPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            mMonthDate = new Date(args.getLong(CURRENT_MONTH_DATE_KEY));
+            mMonthDate = new DateTime(args.getLong(CURRENT_MONTH_DATE_KEY));
             mShiftList = args.getParcelableArrayList(MONTH_SHIFT_LIST_KEY);
             mShiftTypesMap = (HashMap<String, ShiftType>)args.getSerializable(MONTH_SHIFT_TYPES_MAP_KEY);
         }
@@ -102,16 +102,10 @@ public class MonthPageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(mMonthDate);
-        cal.add(Calendar.DAY_OF_MONTH, 7);
-
-        mViewBinding.textViewMonth.setText(CalendarUtils.getMonthString(mContext, cal.get(Calendar.MONTH)));
-
-        cal.setTime(mMonthDate);
-
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("MMMM");
+        mViewBinding.textViewMonth.setText(fmt.print(mMonthDate));
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new MonthAdapter(mContext, mMonthDate, metrics, mShiftList, mShiftTypesMap);
+        mGridAdapter = new MonthAdapter(mContext, mMonthDate.toDate(), metrics, mShiftList, mShiftTypesMap);
         ViewGroup.LayoutParams params = mViewBinding.gridViewCalendar.getLayoutParams();
         params.height = (CalendarUtils.getDayCellHeight(metrics) * (mGridAdapter.getCount()/7));
         mViewBinding.gridViewCalendar.setLayoutParams(params);
@@ -148,17 +142,10 @@ public class MonthPageFragment extends Fragment {
 
     private void calculateMonthHours (){
         mMonthHours = new Period();
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(mMonthDate);
-        cal.set(Calendar.DAY_OF_MONTH,1);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        Date firstDay = cal.getTime();
-        cal.setTime(mMonthDate);
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        Date lastDay = cal.getTime();
+        DateTime firstDay = mMonthDate.toDateTime().withDayOfMonth(1).minusDays(1);
+        DateTime lastDay = mMonthDate.toDateTime().plusMonths(1).withDayOfMonth(1);
         for (Shift shift : mShiftList) {
-            if(shift.getDate().after(firstDay) && shift.getDate().before(lastDay)){
+            if(shift.getDate().after(firstDay.toDate()) && shift.getDate().before(lastDay.toDate())){
                 ShiftType type = mShiftTypesMap.get(shift.getType());
                 mMonthHours = mMonthHours.plus(type.getJodaPeriod());
             }

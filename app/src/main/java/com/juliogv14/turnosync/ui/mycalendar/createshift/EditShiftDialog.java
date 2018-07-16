@@ -20,13 +20,13 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogEditShiftBinding;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class EditShiftDialog extends DialogFragment {
     private EditShiftListener mListener;
 
     //Variables
-    private Date mDay;
+    private DateTime mDay;
     private UserRef mUserRef;
     private ArrayList<ShiftType> mShiftTypesList;
     private Shift mSelectedShift;
@@ -61,10 +61,10 @@ public class EditShiftDialog extends DialogFragment {
 
     private Period mShiftPeriod;
 
-    public static EditShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, ArrayList<UserRef> userList, Shift shift) {
+    public static EditShiftDialog newInstance(DateTime date, UserRef userRef, Map<String, ShiftType> shiftTypes, ArrayList<UserRef> userList, Shift shift) {
         EditShiftDialog fragment = new EditShiftDialog();
         Bundle args = new Bundle();
-        args.putLong(DATE_KEY, date.getTime());
+        args.putLong(DATE_KEY, date.getMillis());
         args.putParcelable(USER_REF_KEY, userRef);
         args.putParcelableArrayList(SHIFT_TYPES_KEY, new ArrayList<>(shiftTypes.values()));
         args.putParcelableArrayList(USERS_REF_LIST, userList);
@@ -96,7 +96,7 @@ public class EditShiftDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
-            mDay = new Date(args.getLong(DATE_KEY));
+            mDay = new DateTime(args.getLong(DATE_KEY));
             mUserRef = args.getParcelable(USER_REF_KEY);
             mShiftTypesList = args.getParcelableArrayList(SHIFT_TYPES_KEY);
             mWorkgroupUsers = args.getParcelableArrayList(USERS_REF_LIST);
@@ -120,7 +120,7 @@ public class EditShiftDialog extends DialogFragment {
                             mSelectedShift.setType(mShiftTypesList.get(typePos).getId());
                             mListener.onEditShiftChange(mSelectedShift, mSelectedShift);
                         } else if (!oldUserId.equals(newUserId)) {
-                            Shift newShift = new Shift(newUserId, mDay, mShiftTypesList.get(typePos).getId());
+                            Shift newShift = new Shift(newUserId, mDay.toDate(), mShiftTypesList.get(typePos).getId());
                             mListener.onEditShiftChange(mSelectedShift, newShift);
                         }
                     }

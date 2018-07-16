@@ -21,6 +21,7 @@ import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.databinding.DialogCreateShiftBinding;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
@@ -29,11 +30,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -58,7 +55,7 @@ public class CreateShiftDialog extends DialogFragment {
     private CreateShiftListener mListener;
 
     //Variables
-    private Date mDay;
+    private DateTime mDay;
     private UserRef mUserRef;
     private ArrayList<ShiftType> mShiftTypesList;
 
@@ -71,10 +68,10 @@ public class CreateShiftDialog extends DialogFragment {
     //Layout
     private ArrayList<ToggleButton> mDayButtons;
 
-    public static CreateShiftDialog newInstance(Date date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours, long weeklyHours) {
+    public static CreateShiftDialog newInstance(DateTime date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours, long weeklyHours) {
         CreateShiftDialog fragment = new CreateShiftDialog();
         Bundle args = new Bundle();
-        args.putLong(DATE_KEY, date.getTime());
+        args.putLong(DATE_KEY, date.getMillis());
         args.putParcelable(USER_REF_KEY, userRef);
         args.putParcelableArrayList(SHIFT_TYPES_KEY, new ArrayList<>(shiftTypes.values()));
         args.putLong(CURRENT_HOURS_KEY, currentHours);
@@ -101,7 +98,7 @@ public class CreateShiftDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
-            mDay = new Date(args.getLong(DATE_KEY));
+            mDay = new DateTime(args.getLong(DATE_KEY));
             mUserRef = args.getParcelable(USER_REF_KEY);
             mShiftTypesList = args.getParcelableArrayList(SHIFT_TYPES_KEY);
             mSetHours = new Period(args.getLong(CURRENT_HOURS_KEY));
@@ -120,9 +117,7 @@ public class CreateShiftDialog extends DialogFragment {
         mDayButtons.add(mViewBinding.buttonCreateShift7);
 
         //Set current day
-        Calendar cal = new GregorianCalendar(Locale.FRANCE);
-        cal.setTime(mDay);
-        int buttonPos = cal.get(Calendar.DAY_OF_WEEK)-2;
+        int buttonPos = mDay.getDayOfWeek()-1;
         if(buttonPos == -1) buttonPos = 6;
         mDayButtons.get(buttonPos).setChecked(true);
 
@@ -162,14 +157,11 @@ public class CreateShiftDialog extends DialogFragment {
                         ArrayList<Shift> newShifts = new ArrayList<>();
                         int spinnerPos = mViewBinding.spinnerCreateShiftType.getSelectedItemPosition();
 
-                        Calendar cal = new GregorianCalendar();
-                        cal.setTime(mDay);
                         for (int j = 0; j < mDayButtons.size(); j++) {
                             ToggleButton toggleButton = mDayButtons.get(j);
                             if(toggleButton.isChecked()){
-                                cal.set(Calendar.DAY_OF_WEEK, j+2);
-                                if(j==6) cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                                Shift shift = new Shift(mUserRef.getUid(), cal.getTime(), mShiftTypesList.get(spinnerPos).getId());
+                                DateTime day = mDay.withDayOfWeek(j+1);
+                                Shift shift = new Shift(mUserRef.getUid(), day.toDate(), mShiftTypesList.get(spinnerPos).getId());
                                 newShifts.add(shift);
                             }
                         }

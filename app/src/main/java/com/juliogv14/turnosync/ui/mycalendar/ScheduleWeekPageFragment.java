@@ -28,15 +28,16 @@ import com.juliogv14.turnosync.data.viewmodels.MyCalendarVM;
 import com.juliogv14.turnosync.databinding.PageWeekBinding;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.CreateShiftDialog;
 import com.juliogv14.turnosync.ui.mycalendar.createshift.EditShiftDialog;
-import com.juliogv14.turnosync.utils.CalendarUtils;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     //Variables
     private int mPosition;
     private UserRoles mRole;
-    private Date mWeekDate;
+    private DateTime mWeekDate;
     private boolean mEditMode;
     private long mWeeklyHours = -1;
     private RequestChangeDialog requestChangeDialog;
@@ -92,7 +93,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
     public static ScheduleWeekPageFragment newInstance(int position,
                                                        String role,
-                                                       Date weekDate,
+                                                       DateTime weekDate,
                                                        ArrayList<UserRef> workgroupUsers,
                                                        LinkedHashMap<String, ArrayList<Shift>> userShifts,
                                                        HashMap<String, ArrayList<Shift>> shiftChanges) {
@@ -102,13 +103,10 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         Bundle args = new Bundle();
         args.putInt(POSITION_KEY, position);
         args.putString(ROLE_KEY, role);
-        args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getTime());
+        args.putLong(CURRENT_WEEK_DATE_KEY, weekDate.getMillis());
         args.putParcelableArrayList(WORKGROUP_USERS_KEY, workgroupUsers);
         args.putSerializable(USERS_SHIFT_MAP_KEY, userShifts);
-        //args.putSerializable(SHIFT_TYPES_MAP_KEY, shiftTypes);
         args.putSerializable(SHIFT_CHANGES_MAP_KEY, shiftChanges);
-        //args.putSerializable(EDIT_MODE_KEY, editMode);
-        //args.putSerializable(WEEKLY_HOURS_KEY, weeklyHours);
         f.setArguments(args);
         return f;
     }
@@ -136,11 +134,8 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             mRole = UserRoles.valueOf(args.getString(ROLE_KEY));
             mWorkgroupUsers = args.getParcelableArrayList(WORKGROUP_USERS_KEY);
             mUsersShiftsMap = (Map<String, ArrayList<Shift>>) args.getSerializable(USERS_SHIFT_MAP_KEY);
-            mWeekDate = new Date(args.getLong(CURRENT_WEEK_DATE_KEY));
-            //mShiftTypesMap = (Map<String, ShiftType>) args.getSerializable(SHIFT_TYPES_MAP_KEY);
+            mWeekDate = new DateTime(args.getLong(CURRENT_WEEK_DATE_KEY));
             mShiftChanges = (Map<String, ArrayList<Shift>>) args.getSerializable(SHIFT_CHANGES_MAP_KEY);
-            //mEditMode = (AtomicBoolean) args.getSerializable(EDIT_MODE_KEY);
-            //mWeeklyHours = (AtomicLong) args.getSerializable(WEEKLY_HOURS_KEY);
         }
         mParentViewModel = ViewModelProviders.of((Fragment)mListener).get(MyCalendarVM.class);
         Boolean editmode = mParentViewModel.getEditMode().getValue();
@@ -195,18 +190,14 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(mWeekDate);
-
+        DateTime firstDay = mWeekDate.toDateTime();
+        DateTime lastDay = firstDay.withDayOfWeek(DateTimeConstants.SUNDAY);
         //Week label
-        int firstDay = calendar.get(Calendar.DAY_OF_MONTH);
-        int firstMonth = calendar.get(Calendar.MONTH);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        int lastDay = calendar.get(Calendar.DAY_OF_MONTH);
-        int lastMonth = calendar.get(Calendar.MONTH);
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MMMM");
+        String dateFrom = fmt.print(firstDay);
+        String dateTo = fmt.print(lastDay);
 
-        String week = "" + firstDay + "/" + CalendarUtils.getMonthString(mContext, firstMonth) + "-"
-                + lastDay + "/" + CalendarUtils.getMonthString(mContext, lastMonth);
+        String week = dateFrom + " - " + dateTo;
         mViewBinding.textViewWeek.setText(week);
 
         //Adapter
@@ -220,21 +211,18 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int day = position % 8;
                 if(position > 7 && day > 0 ){
-                    Calendar cal = new GregorianCalendar();
-                    cal.setTime(mWeekDate);
-                    cal.add(Calendar.DAY_OF_MONTH, + day-1);
-                    Date date = cal.getTime();
+                    DateTime date = mWeekDate.plusDays(day-1);
 
                     int row = position / 8;
                     UserRef userRef = mWorkgroupUsers.get(row-1);
-                    if(!mEditMode || mWeeklyHours == -1 || date.before(new GregorianCalendar().getTime())){
+                    if(!mEditMode || mWeeklyHours == -1 || date.isBefore(DateTime.now())){
                         return;
                     }
                     if(!mShiftTypesMap.isEmpty()) {
                         //Check if there is a shift there
                         Shift shiftSelected = null;
                         for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
-                            if (shift.getDate().getTime() == date.getTime()) {
+                            if (shift.getDate().getTime() == date.getMillis()) {
                                 shiftSelected = shift;
                                 break;
                             }
@@ -260,15 +248,12 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                 // TODO: 10/07/2018 Redundance code
                 int day = position % 8;
                 if(position > 7 && day > 0 ) {
-                    Calendar cal = new GregorianCalendar();
-                    cal.setTime(mWeekDate);
-                    cal.add(Calendar.DAY_OF_MONTH, +day - 1);
-                    Date date = cal.getTime();
+                    DateTime date = mWeekDate.plusDays(day-1);
 
                     int row = position / 8;
                     UserRef userRef = mWorkgroupUsers.get(row - 1);
 
-                    if(date.before(new GregorianCalendar().getTime())) return false;
+                    if(date.isBefore(DateTime.now())) return false;
 
                     if (!mShiftTypesMap.isEmpty()) {
                         Shift shiftSelected = null;
@@ -276,7 +261,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                         boolean ownShift = TextUtils.equals(userRef.getUid(), ownUid);
 
                         for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
-                            if (shift.getDate().getTime() == date.getTime()) {
+                            if (shift.getDate().getTime() == date.getMillis()) {
                                 shiftSelected = shift;
                                 break;
                             }
