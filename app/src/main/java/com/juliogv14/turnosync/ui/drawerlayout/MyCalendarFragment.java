@@ -84,7 +84,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     private final String TAG = this.getClass().getSimpleName();
 
     //Constants
-    //TODO set number of months queried to settings
     private final int QUERY_MONTH_NUMBER = 12;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
