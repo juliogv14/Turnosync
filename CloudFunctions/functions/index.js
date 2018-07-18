@@ -224,6 +224,15 @@ exports.onScheduleUpdated =
 
 exports.onChangeRequest =
     functions.firestore.document('workgroups/{workgroupId}/changerequests/{requestId}').onWrite((snap, context) => {
+        const REQUESTED = "requested";
+        const ACCEPTED_USER = "acceptedUser";
+        const ACCEPTED_MANAGER = "acceptedManager";
+        const APPROVED = "approved";
+        const CANCELLED = "cancelled";
+        const DENIED_USER = "deniedUser";
+        const DENIED_MANAGER = "deniedManager"
+
+
         const wkId = context.params.workgroupId;
         const reqId = context.params.requestId;
 
@@ -234,43 +243,55 @@ exports.onChangeRequest =
                 if(snap.after.exists){
                     const request = snap.after.data();
                     const state = request.state;
+                    const reqId = request.id;
                     var destUid;
+                    console.log("State of " + reqId + ": " + state);
+
                     //Create or update
                     switch(state) {
                         case "requested":
                             console.log("State of " + reqId + ": " + state);
                             destUid = request.otherShift.userId;
-                            sendChangeNotif(wkName, destUid, "requested");
+
+                            sendChangeNotif(wkName, destUid, reqId, REQUESTED);
                             break;
                         case "accepted":
-
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, ACCEPTED_USER);
+                            //TODO: send to manager
+                            // GET MANAGER UID
+                            // sendChangeNotif(wkName, destUid, ACCEPTED_MANAGER);
                             break;
                         case "approved":
-
-                            break;
-                    }
-                } else {
-                    //Denied
-                    const request = snap.before.data();
-                    const state = request.state;
-                    switch(state) {
-                        case "requested":
-                            console.log("State of " + reqId + ": " + state);
                             destUid = request.ownShift.userId;
-                            sendChangeNotif(wkName, destUid, "requestedDenied");
+                            sendChangeNotif(wkName, destUid, reqId, APPROVED);
+                            destUid = request.otherShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, APPROVED);
                             break;
-                        case "accepted":
+                        case "cancelled":
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, CANCELLED);
+                            destUid = request.otherShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, CANCELLED);
+                            break;
+                        case "deniedUser":
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, DENIED_USER);
+                            break;
+                        case "deniedManager":
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, DENIED_MANAGER);
+                            destUid = request.otherShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, DENIED_MANAGER);
+                            break;
 
-                            break;
                     }
-                }
-
+                 }
             }
-
         });
     });
 
-    function sendChangeNotif(wkName, destUid, change){
+    function sendChangeNotif(wkName, destUid, reqId, change){
         console.log("Dest user: " + destUid);
         const topic = "msg_" + destUid;
 
@@ -281,6 +302,7 @@ exports.onChangeRequest =
                 data: {
                     type: "change",
                     change: change,
+                    id: reqId,
                     displayName: wkName
                 }
             },

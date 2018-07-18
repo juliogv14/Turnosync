@@ -1,4 +1,4 @@
-package com.juliogv14.turnosync.ui.mycalendar;
+package com.juliogv14.turnosync.ui.mycalendar.changerequests;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -99,7 +99,7 @@ public class RequestChangeDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_requestChange_title)
                 .setView(view)
-                .setPositiveButton(R.string.Request, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.dialog_requestChange_button_request, new DialogInterface.OnClickListener() {
                     //Add user to workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

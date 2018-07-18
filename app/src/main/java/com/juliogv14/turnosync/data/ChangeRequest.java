@@ -12,9 +12,13 @@ import java.util.Date;
 
 public class ChangeRequest implements Parcelable{
     //Constants
+    // TODO: 18/07/2018 move to enum
     public static final String REQUESTED = "requested";
     public static final String ACCEPTED = "accepted";
     public static final String APPROVED = "approved";
+    public static final String CANCELLED = "cancelled";
+    public static final String DENIED_USER = "deniedUser";
+    public static final String DENIED_MANAGER = "deniedManager";
 
     private String id;
     private Date timestamp;

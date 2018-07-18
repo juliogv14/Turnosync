@@ -29,6 +29,7 @@ import com.juliogv14.turnosync.data.ChangeRequest;
 import com.juliogv14.turnosync.data.Shift;
 import com.juliogv14.turnosync.data.ShiftType;
 import com.juliogv14.turnosync.data.UserRef;
+import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.ActivityChangeRequestsBinding;
 
@@ -105,7 +106,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         mChangeRequestsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_changeRequests));
         mChangeRequestList = new ArrayList<>();
-        mChangesRequestsListener = mChangeRequestsColl.orderBy(getString(R.string.data_key_timestamp), Query.Direction.DESCENDING)
+        mChangesRequestsListener = mChangeRequestsColl.orderBy(getString(R.string.data_key_timestamp), Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
@@ -119,8 +120,9 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                         switch (docChange.getType()) {
                             case ADDED:
                                 //Added
-                                if(!TextUtils.equals(changeRequest.getState(), ChangeRequest.APPROVED)){
-                                    mChangeRequestList.add(changeRequest);
+                                if(TextUtils.equals(changeRequest.getState(), ChangeRequest.REQUESTED)
+                                        || TextUtils.equals(changeRequest.getState(), ChangeRequest.ACCEPTED)){
+                                    mChangeRequestList.add(0,changeRequest);
                                 }
                                 break;
                             case MODIFIED:
@@ -135,9 +137,11 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                                     }
                                 }
                                 if(exist){
-                                    mChangeRequestList.set(pos, changeRequest);
-                                } else {
-                                    mChangeRequestList.add(docChange.getNewIndex(), changeRequest);
+                                    if(TextUtils.equals(changeRequest.getState(), ChangeRequest.ACCEPTED)){
+                                        mChangeRequestList.set(pos, changeRequest);
+                                    } else {
+                                        mChangeRequestList.remove(pos);
+                                    }
                                 }
                                 break;
                             case REMOVED:
@@ -165,7 +169,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
     }
 
     @Override
-    public void onApproveAccepted(ChangeRequest changeRequest) {
+    public void onAcceptAccepted(ChangeRequest changeRequest) {
         final DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
         //Proceed to make the change
         final Shift ownShift = changeRequest.getOwnShift();
@@ -187,6 +191,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                         writeShift(newOwnShift);
                         removeShift(otherShift);
                         writeShift(newOtherShift);
+
                         docRef.update(getString(R.string.data_key_state), ChangeRequest.APPROVED);
                     }
                 } else {
@@ -244,14 +249,23 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
     }
 
     @Override
-    public void onDenyRequested(ChangeRequest changeRequest) {
+    public void onDenyRequested(ChangeRequest changeRequest, String uid, UserRoles role) {
         DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
-        docRef.delete();
+        if (TextUtils.equals(uid, changeRequest.getOwnShift().getUserId())){
+            docRef.delete();
+        } else {
+            docRef.update(getString(R.string.data_key_state), ChangeRequest.DENIED_USER);
+        }
     }
 
     @Override
-    public void onDenyAccepted(ChangeRequest changeRequest) {
+    public void onDenyAccepted(ChangeRequest changeRequest, String uid, UserRoles role) {
         DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
-        docRef.delete();
+
+        if(role == UserRoles.MANAGER){
+            docRef.update(getString(R.string.data_key_state), ChangeRequest.DENIED_MANAGER);
+        } else {
+            docRef.update(getString(R.string.data_key_state), ChangeRequest.CANCELLED);
+        }
     }
 }

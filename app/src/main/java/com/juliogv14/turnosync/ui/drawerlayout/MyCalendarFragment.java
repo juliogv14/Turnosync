@@ -61,6 +61,7 @@ import org.joda.time.Weeks;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -664,7 +665,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                                         if(e != null || mMadeChanges){
                                             return;
                                         }
-
                                         for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
                                             DocumentSnapshot doc = docChange.getDocument();
 
@@ -693,6 +693,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                                                 }
                                             }
                                         }
+                                        Collections.sort(userShifts);
                                         pageFragment.notifyGridDataSetChanged();
                                     }
                                 });

@@ -28,7 +28,7 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
 
     private Context mContext;
     private ChangeRequestListener mListener;
-    private String mRole;
+    private UserRoles mRole;
     private Map<String, ShiftType> mShiftTypesMap;
     private Map<String, UserRef> mUserRefsMap;
     private List<ChangeRequest> mChangeRequests;
@@ -36,7 +36,7 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
     public ChangeRequestsAdapter(Context context, ChangeRequestListener listener, String role, Map<String, ShiftType> shiftTypes, Map<String, UserRef> userRefs, List<ChangeRequest> changeRequests) {
         this.mContext = context;
         this.mListener = listener;
-        this.mRole = role;
+        this.mRole = UserRoles.valueOf(role);
         this.mShiftTypesMap = shiftTypes;
         this.mUserRefsMap = userRefs;
         this.mChangeRequests = changeRequests;
@@ -62,9 +62,9 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
 
     public interface ChangeRequestListener {
         void onAcceptRequested(ChangeRequest changeRequest);
-        void onApproveAccepted(ChangeRequest changeRequest);
-        void onDenyRequested(ChangeRequest changeRequest);
-        void onDenyAccepted(ChangeRequest changeRequest);
+        void onAcceptAccepted(ChangeRequest changeRequest);
+        void onDenyRequested(ChangeRequest changeRequest, String uid, UserRoles role);
+        void onDenyAccepted(ChangeRequest changeRequest, String uid, UserRoles role);
     }
 
     class ChangeRequestsViewHolder extends RecyclerView.ViewHolder {
@@ -103,17 +103,18 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
                     binding.textViewRequestState.setText(mContext.getString(R.string.requests_change_approved));
                     break;
             }
+            
             // TODO: 14/07/2018 Consider argument
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             //Buttons
-            if ((TextUtils.equals(state, ChangeRequest.ACCEPTED) && TextUtils.equals(mRole, UserRoles.MANAGER.toString()))
+            if ((TextUtils.equals(state, ChangeRequest.ACCEPTED) && mRole == UserRoles.MANAGER)
                     ||(TextUtils.equals(state, ChangeRequest.REQUESTED) && TextUtils.equals(otherShift.getUserId(), userId))) {
                 //Manager or user who can accept
                 binding.buttonRequestAccept.setVisibility(View.VISIBLE);
                 binding.buttonRequestDeny.setVisibility(View.VISIBLE);
-            } else if((TextUtils.equals(state, ChangeRequest.REQUESTED) && TextUtils.equals(mRole, UserRoles.MANAGER.toString()))
-                    || (!TextUtils.equals(state, ChangeRequest.APPROVED) && (TextUtils.equals(otherShift.getUserId(), userId) || TextUtils.equals(ownShift.getUserId(), userId)))){
+            } else if((!TextUtils.equals(state, ChangeRequest.APPROVED) && (TextUtils.equals(otherShift.getUserId(), userId)
+                    || TextUtils.equals(ownShift.getUserId(), userId)))){
                 binding.buttonRequestAccept.setVisibility(View.INVISIBLE);
                 binding.buttonRequestDeny.setVisibility(View.VISIBLE);
             } else {
@@ -130,7 +131,7 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
                             mListener.onAcceptRequested(changeRequest);
                             break;
                         case ChangeRequest.ACCEPTED:
-                            mListener.onApproveAccepted(changeRequest);
+                            mListener.onAcceptAccepted(changeRequest);
                             break;
                     }
                 }
@@ -140,10 +141,10 @@ public class ChangeRequestsAdapter extends RecyclerView.Adapter<ChangeRequestsAd
                 public void onClick(View v) {
                     switch (state) {
                         case ChangeRequest.REQUESTED:
-                            mListener.onDenyRequested(changeRequest);
+                            mListener.onDenyRequested(changeRequest, userId, mRole);
                             break;
                         case ChangeRequest.ACCEPTED:
-                            mListener.onDenyAccepted(changeRequest);
+                            mListener.onDenyAccepted(changeRequest, userId, mRole);
                             break;
                     }
                 }
