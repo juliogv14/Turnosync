@@ -156,22 +156,36 @@ exports.onInvite =
 	 		info : workgroup.info,
 	 		role : 'USER'
 	 	});
-	 }
+	 };
 
-exports.onNewToken =
+exports.onTokenChange =
 	 functions.firestore.document('messaging/{userId}/devices/{device}').onWrite((snap, context) => {
-	    const device = snap.after.data();
+
 	    const uid = context.params.userId;
-	    console.log(device.deviceId + "|" + device.token);
 	    const topic = "msg_" + uid;
 
-        return admin.messaging().subscribeToTopic(device.token, topic)
-            .then(function(response) {
-                console.log("[" + device.deviceId + "|" + device.token + "] subscribed to " + topic + " response: " + response);
-            })
-            .catch(function(error) {
-                console.log("[" + device.deviceId + "|" + device.token + "] error subscribing to " + topic + "with error: " + error);
-            });
+	    if(snap.after.exists){
+	        const device = snap.after.data();
+            console.log("Subscribe " + device.deviceId + "|" + device.token);
+            return admin.messaging().subscribeToTopic(device.token, topic)
+                .then(function(response) {
+                    console.log("[" + device.deviceId + "|" + device.token + "] subscribed to " + topic + " response: " + response);
+                })
+                .catch(function(error) {
+                    console.log("[" + device.deviceId + "|" + device.token + "] error subscribing to " + topic + "with error: " + error);
+                });
+	    } else {
+	        const device = snap.before.data();
+	        console.log("Unsubscribe " + device.deviceId + "|" + device.token);
+	        return admin.messaging().unsubscribeFromTopic(device.token, topic)
+                .then(function(response) {
+                    console.log("[" + device.deviceId + "|" + device.token + "] unsubscribed from " + topic + " response: " + response);
+                })
+                .catch(function(error) {
+                    console.log("[" + device.deviceId + "|" + device.token + "] error unsubscribing from " + topic + "with error: " + error);
+                });
+	    }
+
 	 });
 
 exports.onScheduleUpdated =
@@ -188,6 +202,7 @@ exports.onScheduleUpdated =
                 ttl: 3600*24*14,
                 priority: 'high',
                 data: {
+                    type: "schedule",
                     workgroupId: wkId,
                     displayName: wkName
                 }
@@ -205,4 +220,78 @@ exports.onScheduleUpdated =
                 snap.ref.delete();
             });
 	 });
+
+
+exports.onChangeRequest =
+    functions.firestore.document('workgroups/{workgroupId}/changerequests/{requestId}').onWrite((snap, context) => {
+        const wkId = context.params.workgroupId;
+        const reqId = context.params.requestId;
+
+        return admin.firestore().collection('workgroups').doc(wkId).get()
+        .then(wk => {
+            if(wk.exists){
+                const wkName = wk.data().displayName;
+                if(snap.after.exists){
+                    const request = snap.after.data();
+                    const state = request.state;
+                    var destUid;
+                    //Create or update
+                    switch(state) {
+                        case "requested":
+                            console.log("State of " + reqId + ": " + state);
+                            destUid = request.otherShift.userId;
+                            sendChangeNotif(wkName, destUid, "requested");
+                            break;
+                        case "accepted":
+
+                            break;
+                        case "approved":
+
+                            break;
+                    }
+                } else {
+                    //Denied
+                    const request = snap.before.data();
+                    const state = request.state;
+                    switch(state) {
+                        case "requested":
+                            console.log("State of " + reqId + ": " + state);
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, "requestedDenied");
+                            break;
+                        case "accepted":
+
+                            break;
+                    }
+                }
+
+            }
+
+        });
+    });
+
+    function sendChangeNotif(wkName, destUid, change){
+        console.log("Dest user: " + destUid);
+        const topic = "msg_" + destUid;
+
+        var message = {
+            android: {
+                ttl: 3600*24*14,
+                priority: 'high',
+                data: {
+                    type: "change",
+                    change: change,
+                    displayName: wkName
+                }
+            },
+            topic: topic
+        };
+        return admin.messaging().send(message)
+            .then(function(response){
+                console.log("Message sent to " + destUid + " change: " + change + " in " + wkName);
+            })
+            .catch(function(error) {
+                console.log("Error sending message to " + destUid + " change: " + change + " in " + wkName + ": " + error);
+            });
+    }
 	

@@ -394,7 +394,7 @@ public class DrawerActivity extends AppCompatActivity
     private void registerDevice(SharedPreferences sharedPreferences) {
         //Update app token
         String token = sharedPreferences.getString( getString(R.string.data_key_token),"");
-        if (!token.isEmpty()){
+        if (!token.isEmpty() && mFirebaseUser != null){
             DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_messaging)).document(mFirebaseUser.getUid());
 
             //Set user

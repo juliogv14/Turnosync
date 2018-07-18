@@ -282,13 +282,26 @@
     </string-array>
 
     <!--NOTIFICATION CHANNEL-->
-    <string name="push_channel_name">Schedule updates</string>
-    <string name="push_channel_desc">Notifies when your schedule is updated</string>
-
+    <string name="push_key_type">type</string>
+    <string name="push_key_change">change</string>
+    <string name="push_channel_updates_id">updates</string>
+    <string name="push_channel_updates_name">Schedule updates</string>
+    <string name="push_channel_updates_desc">Notifies when your schedule is updated</string>
+    <string name="push_channel_changes_id">changes</string>
+    <string name="push_channel_changes_name">Change requests</string>
+    <string name="push_channel_changes_desc">Notifies on change requests creation and updates</string>
 
     <!--PUSH NOTIFICATION -->
-    <string name="push_title_schedule">Schedule update</string>
-    <string name="push_body_workgroup">Your schedule in %1$s has been updated</string>
+    <string name="push_schedule_title">Schedule update</string>
+    <string name="push_schedule_body">Your schedule in %1$s has been updated</string>
+    <string name="push_change_requested_title">Change requested</string>
+    <string name="push_change_requested_body">You have been requested for a shift change in %1$s</string>
+    <string name="push_change_requestedDenied_title">Change requested denied</string>
+    <string name="push_change_requestedDenied_body">Your change request in %1$s has been denied</string>
+    <string name="push_change_accepted_title">Change accepted</string>
+    <string name="push_change_accepted_body">Your change request in %1$s has been accepted</string>
+    <string name="push_change_approved_title">Change approved</string>
+    <string name="push_change_approved_body">Your change request in %1$s has been approved</string>
 
     <!--reference errors-->
     <item name="visible" type="id" />
