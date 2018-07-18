@@ -79,22 +79,23 @@ public class MonthPageFragment extends Fragment {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        setRetainInstance(true);
         super.onCreate(savedInstanceState);
+    }
+
+    //Inflate view
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mViewBinding = PageMonthBinding.inflate(inflater, container, false);
         Bundle args = getArguments();
         if (args != null) {
             mMonthDate = new DateTime(args.getLong(CURRENT_MONTH_DATE_KEY));
             mShiftList = args.getParcelableArrayList(MONTH_SHIFT_LIST_KEY);
             mShiftTypesMap = (HashMap<String, ShiftType>)args.getSerializable(MONTH_SHIFT_TYPES_MAP_KEY);
         }
-    }
-
-    //Inflate view
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = PageMonthBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 
