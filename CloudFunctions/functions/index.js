@@ -16,8 +16,22 @@ exports.onCreateUser =
 
 		const email = userRecord.email;
 		const uid = userRecord.uid;
+		const displayName = userRecord.displayName;
 
 		console.log("User: " + uid + "|" + userRecord.displayName);
+        if(displayName){
+            db.collection("users").doc(uid).set({
+                'uid': uid,
+                'email' : email,
+                'displayName' : displayName
+            });
+        } else {
+            db.collection("users").doc(uid).set({
+                'uid': uid,
+                'email' : email,
+            });
+        }
+
 
 		const resolveInvite = db.collection("invites").where("email", "==", email).get()
 		.then(snapshot =>{
@@ -34,8 +48,6 @@ exports.onCreateUser =
 		 				return Promise.all([userToGlobal(uid, workgroupId), workgroupToUser(usrRef, workgroup), inv.ref.delete()]);
 		 			}
 		 		});
-			
-
 			});
 		})
 		.catch(function(error){
