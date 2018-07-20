@@ -37,9 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ActivityRegisterBinding mViewBinding;
     private FirebaseAuth mFirebaseAuth;
 
-    private String mEmail;
     private String mDisplayName;
-    private String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
                     FormUtils.closeKeyboard(RegisterActivity.this, textView);
                     attemptRegister();
                     return true;
-                } else if(keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-                    return true;
-                } else {
-                    return false;
-                }
+                } else return keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN;
 
             }
         });
@@ -84,21 +78,21 @@ public class RegisterActivity extends AppCompatActivity {
         mViewBinding.editTextLayoutPasswordRepeat.setError(null);
 
         /*get strings from editTexts*/
-        mEmail = mViewBinding.editTextEmail.getText().toString();
+        String email = mViewBinding.editTextEmail.getText().toString();
         mDisplayName = mViewBinding.editTextName.getText().toString();
-        mPassword = mViewBinding.editTextPassword.getText().toString();
+        String password = mViewBinding.editTextPassword.getText().toString();
         String passwordRepeat = mViewBinding.editTextPasswordRepeat.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         /*Check for a valid email address.*/
-        if (TextUtils.isEmpty(mEmail)) {
+        if (TextUtils.isEmpty(email)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextEmail;
             cancel = true;
-        } else if (!FormUtils.isEmailValid(mEmail)) {
+        } else if (!FormUtils.isEmailValid(email)) {
             mViewBinding.editTextLayoutEmail
                     .setError(getString(R.string.login_error_invalid_email));
             focusView = mViewBinding.editTextEmail;
@@ -119,12 +113,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for a valid password.*/
-        if (TextUtils.isEmpty(mPassword)) {
+        if (TextUtils.isEmpty(password)) {
             mViewBinding.editTextLayoutPassword
                     .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextPassword;
             cancel = true;
-        } else if (!FormUtils.isRegisterPasswordValid(mPassword)) {
+        } else if (!FormUtils.isRegisterPasswordValid(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.register_error_password));
             focusView = mViewBinding.editTextPassword;
@@ -132,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for passwords match*/
-        if (!TextUtils.equals(mPassword, passwordRepeat)) {
+        if (!TextUtils.equals(password, passwordRepeat)) {
             mViewBinding.editTextLayoutPasswordRepeat.
                     setError(getString(R.string.register_error_repeat));
             focusView = mViewBinding.editTextPasswordRepeat;
@@ -145,7 +139,7 @@ public class RegisterActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
-            mFirebaseAuth.createUserWithEmailAndPassword(mEmail, mPassword)
+            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -194,7 +188,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                     }
                                                 }
                                             });
-                                            Toast.makeText(RegisterActivity.this, "Email verification sent, please proceed to verify before sing in.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(RegisterActivity.this, "Email verification sent, please proceed to verify before sing in.", Toast.LENGTH_LONG).show();
                                             Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
                                             loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
