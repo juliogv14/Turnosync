@@ -294,20 +294,22 @@
     <!--PUSH NOTIFICATION -->
     <string name="push_schedule_title">Schedule update</string>
     <string name="push_schedule_body">Your schedule in %1$s has been updated</string>
-    <string name="push_change_requested_title">Change requested</string>
+    <string name="push_change_requested_title">Change request</string>
     <string name="push_change_requested_body">You have been requested for a shift change in %1$s</string>
-    <string name="push_change_acceptedUser_title">Change accepted</string>
+    <string name="push_change_acceptedUser_title">Change request accepted</string>
     <string name="push_change_acceptedUser_body">Your change request in %1$s has been accepted</string>
     <string name="push_change_acceptedManager_title">Approval needed</string>
     <string name="push_change_acceptedManager_body">There is a change request in %1$s that needs approval</string>
     <string name="push_change_approved_title">Change approved</string>
     <string name="push_change_approved_body">Your change request in %1$s has been approved</string>
-    <string name="push_change_deniedUser_title">Change requested denied</string>
+    <string name="push_change_deniedUser_title">Change request denied</string>
     <string name="push_change_deniedUser_body">Your change request in %1$s has been denied by the user</string>
-    <string name="push_change_deniedManager_title">Change requested denied</string>
+    <string name="push_change_deniedManager_title">Change request denied</string>
     <string name="push_change_deniedmanager_body">Your change request in %1$s has been denied by the manager</string>
-    <string name="push_change_cancelled_title">Change requested cancelled</string>
+    <string name="push_change_cancelled_title">Change request cancelled</string>
     <string name="push_change_cancelled_body">Your change request in %1$s has been cancelled by one of the users</string>
+    <string name="push_change_conflict_title">Change request conflict</string>
+    <string name="push_change_conflict_body">Your change request in %1$s has been cancelled due to a conflict with an approved request</string>
 
     <!--reference errors-->
     <item name="visible" type="id" />

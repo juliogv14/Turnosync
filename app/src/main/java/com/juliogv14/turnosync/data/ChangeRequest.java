@@ -17,6 +17,7 @@ public class ChangeRequest implements Parcelable{
     public static final String ACCEPTED = "accepted";
     public static final String APPROVED = "approved";
     public static final String CANCELLED = "cancelled";
+    public static final String CONFLICT = "conflict";
     public static final String DENIED_USER = "deniedUser";
     public static final String DENIED_MANAGER = "deniedManager";
 

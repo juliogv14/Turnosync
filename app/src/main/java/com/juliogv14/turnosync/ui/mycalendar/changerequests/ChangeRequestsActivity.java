@@ -169,7 +169,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
     }
 
     @Override
-    public void onAcceptAccepted(ChangeRequest changeRequest) {
+    public void onAcceptAccepted(final ChangeRequest changeRequest) {
         final DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
         //Proceed to make the change
         final Shift ownShift = changeRequest.getOwnShift();
@@ -191,7 +191,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                         writeShift(newOwnShift);
                         removeShift(otherShift);
                         writeShift(newOtherShift);
-
+                        resolveConflicts(changeRequest);
                         docRef.update(getString(R.string.data_key_state), ChangeRequest.APPROVED);
                     }
                 } else {
@@ -246,6 +246,26 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                 .collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shifts)).document(shift.getId());
         shiftRef.delete();
+    }
+
+    private void resolveConflicts(ChangeRequest changeRequest){
+        Shift own = changeRequest.getOwnShift();
+        Shift other = changeRequest.getOtherShift();
+
+        for (ChangeRequest req : mChangeRequestList) {
+            if(req != changeRequest && (TextUtils.equals(req.getState(), ChangeRequest.REQUESTED)
+                    || TextUtils.equals(req.getState(), ChangeRequest.ACCEPTED))){
+                Shift reqOwn = req.getOwnShift();
+                Shift reqOther = req.getOtherShift();
+                if(own.getDate().getTime() == reqOwn.getDate().getTime() || own.getDate().getTime() == reqOther.getDate().getTime()
+                        || other.getDate().getTime() == reqOwn.getDate().getTime() || other.getDate().getTime() == reqOther.getDate().getTime()){
+                    req.setState(ChangeRequest.CONFLICT);
+                    mChangeRequestsColl.document(req.getId()).update(getString(R.string.data_key_state), ChangeRequest.CONFLICT);
+
+                }
+            }
+        }
+
     }
 
     @Override

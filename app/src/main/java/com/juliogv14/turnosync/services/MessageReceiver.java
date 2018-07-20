@@ -24,6 +24,7 @@ public class MessageReceiver extends FirebaseMessagingService {
     private static final String ACCEPTED_MANAGER = "acceptedManager";
     private static final String APPROVED = "approved";
     private static final String CANCELLED = "cancelled";
+    private static final String CONFLICT = "conflict";
     private static final String DENIED_USER = "deniedUser";
     private static final String DENIED_MANAGER = "deniedManager";
 
@@ -119,6 +120,10 @@ public class MessageReceiver extends FirebaseMessagingService {
             case CANCELLED:
                 title = getString(R.string.push_change_cancelled_title);
                 body = String.format(getString(R.string.push_change_cancelled_body), wkName);
+                break;
+            case CONFLICT:
+                title = getString(R.string.push_change_conflict_title);
+                body = String.format(getString(R.string.push_change_conflict_body), wkName);
                 break;
             case DENIED_USER:
                 title = getString(R.string.push_change_deniedUser_title);

@@ -229,6 +229,7 @@ exports.onChangeRequest =
         const ACCEPTED_MANAGER = "acceptedManager";
         const APPROVED = "approved";
         const CANCELLED = "cancelled";
+        const CONFLICT = "conflict";
         const DENIED_USER = "deniedUser";
         const DENIED_MANAGER = "deniedManager"
 
@@ -274,6 +275,10 @@ exports.onChangeRequest =
                             destUid = request.otherShift.userId;
                             sendChangeNotif(wkName, destUid, reqId, CANCELLED);
                             break;
+                        case "conflict":
+                            destUid = request.ownShift.userId;
+                            sendChangeNotif(wkName, destUid, reqId, CONFLICT);
+                            break;
                         case "deniedUser":
                             destUid = request.ownShift.userId;
                             sendChangeNotif(wkName, destUid, reqId, DENIED_USER);
@@ -284,7 +289,6 @@ exports.onChangeRequest =
                             destUid = request.otherShift.userId;
                             sendChangeNotif(wkName, destUid, reqId, DENIED_MANAGER);
                             break;
-
                     }
                  }
             }
