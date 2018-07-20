@@ -28,7 +28,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
-import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -154,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     false);
                             if (task.isSuccessful()) {
 
-                                FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+                                final FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
 
                                 if (firebaseUser != null) {
                                     //Add display name to firebase user profile
@@ -187,10 +186,19 @@ public class RegisterActivity extends AppCompatActivity {
                                     alltasks.addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Intent startMainIntent = new Intent(RegisterActivity.this, DrawerActivity.class);
-                                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            startMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(startMainIntent);
+                                            firebaseUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        Log.d(TAG, "Email verification sent");
+                                                    }
+                                                }
+                                            });
+                                            Toast.makeText(RegisterActivity.this, "Email verification sent, please proceed to verify before sing in.", Toast.LENGTH_SHORT).show();
+                                            Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(loginIntent);
                                             finish();
                                         }
                                     });

@@ -34,6 +34,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
@@ -218,16 +219,7 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
-                            if (task.isSuccessful()) {
-                                Toast.makeText(LoginActivity.this,
-                                        R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
-                                Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
-                                signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(signCompleteIntent);
-                                finish();
-                            } else {
-
+                            if (!task.isSuccessful()) {
                                 if (task.getException() != null) {
                                     try {
                                         throw task.getException();
@@ -254,6 +246,26 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                         }
                     });
         }
+        mFirebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if(firebaseUser != null){
+                    if(firebaseUser.isEmailVerified()){
+                        Toast.makeText(LoginActivity.this,
+                                R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
+                        Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
+                        signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(signCompleteIntent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "This account's email hasn't been verified, please verify before sign in.", Toast.LENGTH_SHORT).show();
+                        firebaseAuth.signOut();
+                    }
+                }
+            }
+        });
     }
 
     @Override
