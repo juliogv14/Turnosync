@@ -103,7 +103,7 @@ public class RequestChangeDialog extends DialogFragment {
                     //Add user to workgroup
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mListener.onConfirmShiftChange(new ChangeRequest(mOwnShift, mOtherShift, new GregorianCalendar().getTime()));
+                        mListener.onRequestShiftChange(new ChangeRequest(mOwnShift, mOtherShift, new GregorianCalendar().getTime()));
                     }
                 })
                 .setNegativeButton(R.string.dialog_requestChange_button_cancel, new DialogInterface.OnClickListener() {
@@ -118,6 +118,12 @@ public class RequestChangeDialog extends DialogFragment {
         displayShift(mViewBinding.shiftItemOtherShift, mOtherShift);
 
         return builder.create();
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        mListener.onCancelShiftChange();
+        super.onDismiss(dialog);
     }
 
     private void displayShift(ItemChangeBinding shiftItem, Shift shift){
@@ -155,6 +161,7 @@ public class RequestChangeDialog extends DialogFragment {
     }
 
     public interface RequestChangeListener {
-        void onConfirmShiftChange(ChangeRequest changeRequest);
+        void onRequestShiftChange(ChangeRequest changeRequest);
+        void onCancelShiftChange();
     }
 }

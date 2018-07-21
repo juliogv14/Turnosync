@@ -80,7 +80,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     private DateTime mWeekDate;
     private boolean mEditMode;
     private long mWeeklyHours = -1;
-    private RequestChangeDialog requestChangeDialog;
+    private RequestChangeDialog mRequestChangeDialog;
 
     //Data lists
     private ArrayList<UserRef> mWorkgroupUsers;
@@ -141,40 +141,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mParentViewModel = ViewModelProviders.of((Fragment)mListener).get(MyCalendarVM.class);
         Boolean editmode = mParentViewModel.getEditMode().getValue();
         if(editmode != null) mEditMode = editmode;
-        mParentViewModel.getEditMode().observe(this, new Observer<Boolean>() {
-
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean != null) mEditMode = aBoolean;
-            }
-        });
-
-        mParentViewModel.getWeeklyHours().observe(this, new Observer<Long>() {
-            @Override
-            public void onChanged(@Nullable Long aLong) {
-                if(aLong != null) mWeeklyHours = aLong;
-            }
-        });
-        mParentViewModel.getOwnShift().observe(this, new Observer<Shift>() {
-            @Override
-            public void onChanged(@Nullable Shift ownShift) {
-                if(ownShift != null){
-                    mGridAdapter.notifyDataSetChanged();
-                    Shift otherShift = mParentViewModel.getOtherShift().getValue();
-                    handleChangeRequest(ownShift, otherShift);
-                }
-            }
-        });
-        mParentViewModel.getOtherShift().observe(this, new Observer<Shift>() {
-            @Override
-            public void onChanged(@Nullable Shift otherShift) {
-                if(otherShift != null){
-                    mGridAdapter.notifyDataSetChanged();
-                    Shift ownShift = mParentViewModel.getOwnShift().getValue();
-                    handleChangeRequest(ownShift, otherShift);
-                }
-            }
-        });
         mShiftTypesMap = mParentViewModel.getShiftTypes().getValue();
 
     }
@@ -184,6 +150,48 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = PageWeekBinding.inflate(inflater, container, false);
+        mParentViewModel.getEditMode().removeObservers(this);
+        mParentViewModel.getEditMode().observe(this, new Observer<Boolean>() {
+
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null) mEditMode = aBoolean;
+            }
+        });
+        mParentViewModel.getWeeklyHours().removeObservers(this);
+        mParentViewModel.getWeeklyHours().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable Long aLong) {
+                if(aLong != null) mWeeklyHours = aLong;
+            }
+        });
+        mParentViewModel.getOwnShift().removeObservers(this);
+        mParentViewModel.getOwnShift().observe(this, new Observer<Shift>() {
+            @Override
+            public void onChanged(@Nullable Shift ownShift) {
+                mGridAdapter.notifyDataSetChanged();
+                if (ownShift != null) {
+                    Shift otherShift = mParentViewModel.getOtherShift().getValue();
+                    if (otherShift != null && mRequestChangeDialog == null && !mEditMode) {
+                        handleChangeRequest(ownShift, otherShift);
+                    }
+                }
+            }
+        });
+        mParentViewModel.getOtherShift().removeObservers(this);
+        mParentViewModel.getOtherShift().observe(this, new Observer<Shift>() {
+            @Override
+            public void onChanged(@Nullable Shift otherShift) {
+                mGridAdapter.notifyDataSetChanged();
+                if(otherShift != null){
+                    Shift ownShift = mParentViewModel.getOwnShift().getValue();
+                    if(ownShift != null && mRequestChangeDialog == null && !mEditMode) {
+                        handleChangeRequest(ownShift, otherShift);
+                    }
+                }
+            }
+        });
+
         return mViewBinding.getRoot();
     }
 
@@ -203,9 +211,10 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
         //Adapter
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        mGridAdapter = new WeekAdapter(mContext, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftsMap, mShiftTypesMap);
+        mGridAdapter = new WeekAdapter(mContext, mParentViewModel, metrics, mWeekDate, mWorkgroupUsers, mUsersShiftsMap, mShiftTypesMap);
         mViewBinding.gridViewWeek.setAdapter(mGridAdapter);
 
+        mRequestChangeDialog = null;
         //createShift onclick
         mViewBinding.gridViewWeek.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -286,6 +295,11 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mContext = null;
@@ -316,19 +330,18 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     }
 
     private void handleChangeRequest(Shift ownShift, Shift otherShift){
-        if(otherShift != null && ownShift != null && requestChangeDialog == null && !mEditMode){
-            //Check for
-            if (ownShift.getDate().getTime() == otherShift.getDate().getTime()
-                    || (!mListener.hasShiftOnDate(ownShift.getUserId(), otherShift.getDate()) && !mListener.hasShiftOnDate(otherShift.getUserId(), ownShift.getDate()))){
-                requestChangeDialog = RequestChangeDialog.newInstance(ownShift, otherShift, (HashMap<String, ShiftType>) mShiftTypesMap, mWorkgroupUsers);
-                requestChangeDialog.show(getChildFragmentManager(), "requestChange");
-            } else {
-                Toast.makeText(mContext, R.string.toast_request_conflict, Toast.LENGTH_LONG).show();
-            }
 
-            mParentViewModel.setOwnShift(null);
-            mParentViewModel.setOtherShift(null);
+        //Check for
+        if (ownShift.getDate().getTime() == otherShift.getDate().getTime()
+                || (!mListener.hasShiftOnDate(ownShift.getUserId(), otherShift.getDate()) && !mListener.hasShiftOnDate(otherShift.getUserId(), ownShift.getDate()))){
+            mRequestChangeDialog = RequestChangeDialog.newInstance(ownShift, otherShift, (HashMap<String, ShiftType>) mShiftTypesMap, mWorkgroupUsers);
+            mRequestChangeDialog.show(getChildFragmentManager(), "requestChange");
+        } else {
+            Toast.makeText(mContext, R.string.toast_request_conflict, Toast.LENGTH_LONG).show();
         }
+        mParentViewModel.setOwnShift(null);
+        mParentViewModel.setOtherShift(null);
+
     }
     
 
@@ -470,9 +483,16 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
     }
 
     @Override
-    public void onConfirmShiftChange(ChangeRequest changeRequest) {
-        requestChangeDialog = null;
+    public void onRequestShiftChange(ChangeRequest changeRequest) {
+        mRequestChangeDialog = null;
         mListener.onNewChangeRequest(changeRequest);
+    }
+
+    @Override
+    public void onCancelShiftChange() {
+        mRequestChangeDialog = null;
+        mParentViewModel.setOwnShift(null);
+        mParentViewModel.setOtherShift(null);
     }
 
     public interface WeekPageListener {
