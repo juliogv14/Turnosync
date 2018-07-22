@@ -265,6 +265,9 @@ public class CreateTypeDialog extends DialogFragment {
                 mColorButtons.get(i).setChecked(false);
             }
         }
+        if(mSelectedButton == null){
+            mSelectedButton = mColorButtons.get(0);
+        }
 
 
     }

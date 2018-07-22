@@ -1,22 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--APP COLORS-->
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryLight">#5b74ff</color>
+<!--    <color name="colorPrimary">#666699</color>
+    <color name="colorPrimaryLight">#666699</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#338A3E</color>
+    <color name="colorAccent">#5FB229</color>-->
+    <!--<color name="colorPrimary">#fe9536</color>-->
+    <!--<color name="colorPrimaryLight">#feb067</color>-->
+    <!--<color name="colorPrimaryDark">#fe7b01</color>-->
+    <!--<color name="colorAccent">#5b74ff</color>-->
+    <!--TEST1-->
+    <!--<color name="colorPrimary">#C73E1A</color>
+    <color name="colorPrimaryDark">#7A1900</color>
+    <color name="colorAccent">#037A54</color>-->
+    <!--TEST2-->
+    <!--<color name="colorPrimary">#cc5c00</color>
+    <color name="colorPrimaryDark">#b35000</color>
+    <color name="colorAccent">#0a8ca1</color>-->
+    <!--TEST2-->
+    <color name="colorPrimary">#ff8c1a</color>
+    <color name="colorPrimaryDark">#e67300</color>
+    <color name="colorAccent">#0a8ca1</color>
+
+    <!--NAV DRAWER ITEM COLORS-->
+    <color name="statecolor_checked">#EEDDDDDD</color>
+    <color name="statecolor_pressed">#DDDDDD</color>
 
     <!--LINK COLORS-->
     <color name="linkColor">#0000EE</color>
     <color name="visitedLinkColor">#551A8B</color>
 
+    <!--WORKGROUP-->
+    <color name="workgroup_manager">#d64949</color>
+    <color name="workgroup_manager_bg">#e3c4c2</color>
+    <color name="workgroup_user">#5b74ff</color>
+    <color name="workgroup_user_bg">#D5F3FA</color>
+    <color name="workgroup_guest">#338A3E</color>
+
+    <!--WORKGROUP-->
+    <color name="selected_ownShift">#000000</color>
+    <color name="selected_otherShift">#00dcff</color>
+
     <!--CREATE SHIFTTYPE COLORS-->
-    <color name="customToggle1">#d05454</color>
-    <color name="customToggle2">#7CB9E8</color>
-    <color name="customToggle3">#B2BEB5</color>
+    <color name="customToggle1">#d64949</color>
+    <color name="customToggle2">#ff8c1a</color>
+    <color name="customToggle3">#7CB9E8</color>
     <color name="customToggle4">#BF94E4</color>
     <color name="customToggle5">#8DB600</color>
-    <color name="customToggle6">#FFEF00</color>
+    <color name="customToggle6">#E8CF03</color>
     <array name="shiftType_colors">
         <item>@color/customToggle1</item>
         <item>@color/customToggle2</item>
@@ -25,10 +56,5 @@
         <item>@color/customToggle5</item>
         <item>@color/customToggle6</item>
     </array>
-
-    <!--NAV DRAWER ITEM COLORS-->
-    <color name="statecolor_checked">#EEDDDDDD</color>
-    <color name="statecolor_pressed">#DDDDDD</color>
-
 
 </resources>

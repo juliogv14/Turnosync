@@ -5,18 +5,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_group_item"
+        android:background="@drawable/bg_group_item"
         android:orientation="vertical"
         android:gravity="center"
         tools:showIn="@layout/fragment_home"
         android:padding="8dp">
 
-            <TextView
-                android:id="@+id/textView_group_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                tools:text="Group name" />
+        <TextView
+            android:id="@+id/textView_group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            tools:text="Group name" />
 
         <TextView
             android:id="@+id/textView_group_level"
@@ -24,11 +24,6 @@
             android:layout_height="wrap_content"
             tools:text="Level: master" />
 
-        <TextView
-            android:id="@+id/textView_group_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="groupdID" />
 
     </LinearLayout>
 </layout>

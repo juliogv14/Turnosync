@@ -3,11 +3,12 @@ package com.juliogv14.turnosync.ui.mycalendar;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.VectorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.viewmodels.MyCalendarVM;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
+import com.juliogv14.turnosync.utils.InterfaceUtils;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -158,7 +160,12 @@ public class WeekAdapter extends BaseAdapter {
                 }
                 ItemShiftBinding mItemShiftBinding = DataBindingUtil.bind(convertView);
                 mItemShiftBinding.textViewShiftType.setText("");
-                convertView.setBackgroundColor(Color.WHITE);
+                mItemShiftBinding.imageViewChange.setImageDrawable(null);
+
+                GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.bg_shift).mutate();
+
+                background.setColor(Color.WHITE);
+                convertView.setBackground(background);
 
                 convertView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
 
@@ -174,24 +181,22 @@ public class WeekAdapter extends BaseAdapter {
                         mItemShiftBinding.textViewShiftType.setText(type.getTag());
 
                         //Check if it is selected
-                        if(shift == mCalendarVM.getOwnShift().getValue()){
-                            int color = ColorUtils.setAlphaComponent(type.getColor(), 128);
-                            GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.selected_shift);
-                            background.setColor(type.getColor());
-                            background.setAlpha(180);
-                            int strokeWidth = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, mDisplayMetrics);
-                            background.setStroke(strokeWidth, Color.BLACK);
-                            convertView.setPadding(0,0,0,0);
-                            convertView.setBackground(background);
-                        } else if (shift == mCalendarVM.getOtherShift().getValue()){
-                            GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.selected_shift);
-                            background.setColor(type.getColor());
-                            int strokeWidth = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, mDisplayMetrics);
-                            background.setStroke(strokeWidth, Color.parseColor("#faf36b"));
-                            convertView.setBackground(background);
-                        } else {
-                            convertView.setBackgroundColor(type.getColor());
+                        boolean editMode = mCalendarVM.getEditMode().getValue();
+                        if(!editMode) {
+                            VectorDrawable sync = (VectorDrawable) ContextCompat.getDrawable(mContext, R.drawable.ic_sync_black_24dp).mutate();
+                            if (shift == mCalendarVM.getOwnShift().getValue()) {
+                                convertView.setPadding(0, 0, 0, 0);
+                                background.setAlpha(180);
+                                sync.setColorFilter(ContextCompat.getColor(mContext, R.color.selected_ownShift), PorterDuff.Mode.SRC_ATOP);
+                                sync.setAlpha(180);
+                                mItemShiftBinding.imageViewChange.setImageDrawable(sync);
+                            } else if (shift == mCalendarVM.getOtherShift().getValue()) {
+                                sync.setColorFilter(ContextCompat.getColor(mContext, R.color.selected_otherShift), PorterDuff.Mode.SRC_ATOP);
+                                mItemShiftBinding.imageViewChange.setImageDrawable(sync);
+                            }
                         }
+                        background.setColor(type.getColor());
+                        convertView.setBackground(background);
                     }
                 }
 

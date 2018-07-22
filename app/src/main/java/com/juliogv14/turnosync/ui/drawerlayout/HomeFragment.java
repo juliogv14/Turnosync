@@ -6,10 +6,12 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.util.Log;
@@ -34,6 +36,7 @@ import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
 import com.juliogv14.turnosync.databinding.ItemWorkgroupBinding;
+import com.juliogv14.turnosync.utils.InterfaceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +57,10 @@ public class HomeFragment extends Fragment
     //Key constants
     private static final String WORKGROUP_LIST_KEY = "workgroupList";
 
+    //Context and listener
+    private Context mContext;
+    private OnHomeFragmentInteractionListener mListener;
+
     //Data binding
     protected FragmentHomeBinding mViewBinding;
     ToolbarActionModeCallback tb;
@@ -67,7 +74,6 @@ public class HomeFragment extends Fragment
     private ArrayList<UserWorkgroup> mWorkgroupsList;
     private ActionMode mActionMode;
     private UserWorkgroup mSelectedWorkgroup;
-    private OnHomeFragmentInteractionListener mListener;
 
     public static HomeFragment newInstance(ArrayList<UserWorkgroup> workgroupList) {
         HomeFragment f = new HomeFragment();
@@ -81,6 +87,7 @@ public class HomeFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
         if (context instanceof OnHomeFragmentInteractionListener) {
             mListener = (OnHomeFragmentInteractionListener) context;
         } else {
@@ -170,6 +177,7 @@ public class HomeFragment extends Fragment
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
@@ -184,10 +192,11 @@ public class HomeFragment extends Fragment
 
             //Global workgroup list
             DocumentReference globalWorkgroupRef = globalWorkgroupsColl.document();
-            Map<String, String> workgroupData = new HashMap<>();
+            Map<String, Object> workgroupData = new HashMap<>();
             workgroupData.put(getString(R.string.data_key_workgroupid), globalWorkgroupRef.getId());
             workgroupData.put(getString(R.string.data_key_displayname), name);
             workgroupData.put(getString(R.string.data_key_info), description);
+            workgroupData.put(getString(R.string.data_key_weeklyhours), 40);
             globalWorkgroupRef.set(workgroupData);
 
             UserRef userData = new UserRef(mFirebaseUser.getUid(), true);
@@ -212,9 +221,9 @@ public class HomeFragment extends Fragment
             mSelectedWorkgroup = workgroup;
             mSelectedWorkgroup.setSelected(true);
 
-            tb = new ToolbarActionModeCallback((Context) mListener, mSelectedWorkgroup);
+            tb = new ToolbarActionModeCallback(mContext, mSelectedWorkgroup);
             if (mActionMode == null) {
-                mActionMode = ((AppCompatActivity) mListener)
+                mActionMode = ((AppCompatActivity) mContext)
                         .startSupportActionMode(tb);
             }
             mActionMode.setTitle(workgroup.getDisplayName() + " selected");
@@ -252,15 +261,33 @@ public class HomeFragment extends Fragment
                 convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_workgroup, parent, false);
             }
             itemBinding = DataBindingUtil.bind(convertView);
-            int size = mViewBinding.gridViewGroupDisplay.getRequestedColumnWidth();
+            int size = mViewBinding.gridViewGroupDisplay.getColumnWidth();
             convertView.setLayoutParams(new GridView.LayoutParams(size, size));
 
             UserWorkgroup workgroup = getItem(position);
             if (workgroup != null) {
-                //TODO temp level display
-                String display = workgroup.getDisplayName() + "-" + workgroup.getRole();
+                String display = workgroup.getDisplayName();
                 itemBinding.textViewGroupName.setText(display);
-                itemBinding.textViewGroupId.setText(workgroup.getWorkgroupId());
+                itemBinding.textViewGroupLevel.setText(workgroup.getRole());
+                UserRoles role = UserRoles.valueOf(workgroup.getRole());
+
+                GradientDrawable background = (GradientDrawable) convertView.getBackground();
+                int strokeWidth = InterfaceUtils.dpToPx(mContext, 1.5f);
+                switch (role){
+                    case MANAGER:
+                        background.setStroke(strokeWidth, ContextCompat.getColor(mContext, R.color.workgroup_manager));
+                        background.setColor(ContextCompat.getColor(mContext, R.color.workgroup_manager_bg));
+                        itemBinding.textViewGroupLevel.setTextColor(ContextCompat.getColor(mContext, R.color.workgroup_manager));
+                        break;
+                    case USER:
+                        background.setStroke(strokeWidth, ContextCompat.getColor(mContext, R.color.workgroup_user));
+                        background.setColor(ContextCompat.getColor(mContext, R.color.workgroup_user_bg));
+                        itemBinding.textViewGroupLevel.setTextColor(ContextCompat.getColor(mContext, R.color.workgroup_user));
+                        break;
+                    case GUEST:
+                        background.setStroke(strokeWidth, ContextCompat.getColor(mContext, R.color.workgroup_guest));
+                        break;
+                }
             }
             return convertView;
         }

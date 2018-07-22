@@ -26,9 +26,9 @@
             android:layout_height="match_parent"
             android:columnWidth="140dp"
             android:gravity="center"
-            android:horizontalSpacing="10dp"
+            android:horizontalSpacing="32dp"
             android:numColumns="auto_fit"
-            android:padding="@dimen/activity_horizontal_margin"
+            android:padding="16dp"
             android:stretchMode="columnWidth"
             android:verticalSpacing="10dp"
             tools:listitem="@layout/item_workgroup" />

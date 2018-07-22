@@ -7,7 +7,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/bg_shift">
+
+        <ImageView
+            android:id="@+id/imageView_change"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -32,6 +38,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_day_month"
+                android:textStyle="bold"
                 tools:text="M" />
 
         </android.support.constraint.ConstraintLayout>
