@@ -197,6 +197,7 @@ public class HomeFragment extends Fragment
             workgroupData.put(getString(R.string.data_key_displayname), name);
             workgroupData.put(getString(R.string.data_key_info), description);
             workgroupData.put(getString(R.string.data_key_weeklyhours), 40);
+            workgroupData.put(getString(R.string.data_key_manager), userUID);
             globalWorkgroupRef.set(workgroupData);
 
             UserRef userData = new UserRef(mFirebaseUser.getUid(), true);

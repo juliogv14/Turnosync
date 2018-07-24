@@ -158,7 +158,7 @@ public class MessageReceiver extends FirebaseMessagingService {
         }
         String numbersString = requestId.replaceAll("[^0-9]", "");
         numbersString = numbersString.length() + numbersString + numbersString.length();
-        int notifId = Integer.parseInt(numbersString);
+        int notifId = Integer.parseInt(numbersString.substring(5));
 
 
         notificationManager.notify(notifId, notificationBuilder.build());

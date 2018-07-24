@@ -252,11 +252,12 @@ exports.onChangeRequest =
         return admin.firestore().collection('workgroups').doc(wkId).get()
         .then(wk => {
             if(wk.exists){
-                const wkName = wk.data().displayName;
+                const wkName = wk.get('displayName');
                 if(snap.after.exists){
                     const request = snap.after.data();
                     const state = request.state;
                     const reqId = request.id;
+                    const managerUid = wk.get('manager');
                     var destUid;
                     console.log("State of " + reqId + ": " + state);
 
@@ -271,9 +272,11 @@ exports.onChangeRequest =
                         case "accepted":
                             destUid = request.ownShift.userId;
                             sendChangeNotif(wkName, destUid, reqId, ACCEPTED_USER);
+
                             //TODO: send to manager
                             // GET MANAGER UID
-                            // sendChangeNotif(wkName, destUid, ACCEPTED_MANAGER);
+                            destUid = managerUid;
+                            sendChangeNotif(wkName, destUid, reqId, ACCEPTED_MANAGER);
                             break;
                         case "approved":
                             destUid = request.ownShift.userId;
@@ -324,6 +327,7 @@ exports.onChangeRequest =
             },
             topic: topic
         };
+        console.log("Message: [" + change +"|"+ reqId + "|"+ wkName + "]")
         return admin.messaging().send(message)
             .then(function(response){
                 console.log("Message sent to " + destUid + " change: " + change + " in " + wkName);

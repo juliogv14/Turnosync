@@ -26,6 +26,7 @@
     <string name="data_key_role" translatable="false">role</string>
     <string name="data_key_date" translatable="false">date</string>
     <string name="data_key_weeklyhours" translatable="false">weeklyHours</string>
+    <string name="data_key_manager" translatable="false">manager</string>
 
     <string name="data_key_id" translatable="false">id</string>
     <string name="data_key_timestamp" translatable="false">timestamp</string>
