@@ -85,7 +85,6 @@ public class DrawerActivity extends AppCompatActivity
     private HomeFragment mHomeFragment;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
     private UserWorkgroup mCurrentWorkgroup;
-    private boolean fromSavedInstanceState = false;
 
     //
 
@@ -97,13 +96,10 @@ public class DrawerActivity extends AppCompatActivity
             mCurrentFragmentID = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
             mMyCalendarFragment = (MyCalendarFragment) getSupportFragmentManager().getFragment(savedInstanceState, RESTORED_FRAGMENT_KEY);
             mCurrentWorkgroup = savedInstanceState.getParcelable(CURRENT_WORKGROUP_KEY);
-            fromSavedInstanceState = true;
 
         } else {
             mCurrentFragmentID = R.string.fragment_home;
         }
-
-        mCurrentFragmentID = R.string.fragment_home;
 
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_drawer);
         mFirebaseFirestore = FirebaseFirestore.getInstance();
@@ -261,7 +257,7 @@ public class DrawerActivity extends AppCompatActivity
         }
 
         //replacing the fragment
-        if (fragment != null && !fromSavedInstanceState) {
+        if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment, tag);
             ft.commit();
@@ -323,7 +319,6 @@ public class DrawerActivity extends AppCompatActivity
     //OnNavigationItemSelectedListener
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        fromSavedInstanceState = false;
         switch (item.getItemId()) {
             case R.id.nav_item_home:
                 displaySelectedScreen(R.string.fragment_home);

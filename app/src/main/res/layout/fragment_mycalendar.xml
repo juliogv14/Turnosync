@@ -16,15 +16,18 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/home_fab_margin"
             android:tint="@android:color/white"/>
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
         <android.support.v4.view.ViewPager
             android:id="@+id/viewPager_months"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
+        </ScrollView>
     </FrameLayout>
 </layout>

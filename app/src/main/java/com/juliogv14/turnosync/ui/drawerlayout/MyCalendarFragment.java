@@ -252,9 +252,18 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mPagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
-        mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
+        if(savedInstanceState != null){
+            mCurrentPosition = savedInstanceState.getInt(CURRENT_ADAPTER_POSITION);
+            mPersonalSchedule = savedInstanceState.getBoolean(CURRENT_PERSONAL_SCHEDULE);
+        } else {
+            mCurrentPosition = (QUERY_MONTH_NUMBER / 2 - 1);
+            mPersonalSchedule = true;
+        }
+        if(mPersonalSchedule){
+            mPagerAdapter = new MonthSlidePagerAdapter(getChildFragmentManager());
+        } else {
+            mPagerAdapter = new WeekSlidePagerAdapter(getChildFragmentManager());
+        }
 
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
