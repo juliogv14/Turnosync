@@ -155,7 +155,11 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean != null) mEditMode = aBoolean;
+                if(aBoolean != null){
+                    mEditMode = aBoolean;
+                    mParentViewModel.getOwnShift().postValue(null);
+                    mParentViewModel.getOtherShift().postValue(null);
+                }
             }
         });
         mParentViewModel.getWeeklyHours().removeObservers(this);
@@ -276,7 +280,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                                 break;
                             }
                         }
-                        if(shiftSelected != null){
+                        if(shiftSelected != null && !mEditMode){
                             if(ownShift){
                                 mParentViewModel.getOwnShift().postValue(shiftSelected);
                             } else {
