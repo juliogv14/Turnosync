@@ -87,10 +87,11 @@ public class MessageReceiver extends FirebaseMessagingService {
 
             if(notificationManager != null){
                 notificationManager.createNotificationChannel(channel);
+                notificationManager.notify(UPDATE_NOTIFICATION_ID, notificationBuilder.build());
             }
         }
 
-        notificationManager.notify(UPDATE_NOTIFICATION_ID, notificationBuilder.build());
+
 
     }
 
@@ -154,14 +155,15 @@ public class MessageReceiver extends FirebaseMessagingService {
 
             if(notificationManager != null){
                 notificationManager.createNotificationChannel(channel);
+
+                String numbersString = requestId.replaceAll("[^0-9]", "");
+                numbersString = numbersString.length() + numbersString + numbersString.length();
+                int notifId = Integer.parseInt(numbersString.substring(5));
+
+                notificationManager.notify(notifId, notificationBuilder.build());
             }
         }
-        String numbersString = requestId.replaceAll("[^0-9]", "");
-        numbersString = numbersString.length() + numbersString + numbersString.length();
-        int notifId = Integer.parseInt(numbersString.substring(5));
 
-
-        notificationManager.notify(notifId, notificationBuilder.build());
 
     }
 }
