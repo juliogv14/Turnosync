@@ -1,7 +1,9 @@
 package com.juliogv14.turnosync.ui.mycalendar.createshift;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -129,7 +131,9 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
 
             //Tag and color
             binding.textViewChangeTag.setText(shiftType.getTag());
-            binding.textViewChangeTag.setBackgroundColor(shiftType.getColor());
+            GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.bg_shift).mutate();
+            background.setColor(shiftType.getColor());
+            binding.textViewChangeTag.setBackground(background);
         }
     }
 }

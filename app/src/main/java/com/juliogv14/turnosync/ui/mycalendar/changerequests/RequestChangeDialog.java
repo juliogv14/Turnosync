@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -157,7 +159,9 @@ public class RequestChangeDialog extends DialogFragment {
 
         //Tag and color
         shiftItem.textViewChangeTag.setText(shiftType.getTag());
-        shiftItem.textViewChangeTag.setBackgroundColor(shiftType.getColor());
+        GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.bg_shift).mutate();
+        background.setColor(shiftType.getColor());
+        shiftItem.textViewChangeTag.setBackground(background);
     }
 
     public interface RequestChangeListener {
