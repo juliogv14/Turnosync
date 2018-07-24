@@ -5,6 +5,8 @@ import android.util.DisplayMetrics;
 
 import com.juliogv14.turnosync.R;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -86,9 +88,8 @@ public class CalendarUtils {
     }
 
 
-    public static boolean isToday(Calendar calendarToday, int day, int month, int year) {
-        return (calendarToday.get(Calendar.MONTH) == month
-                && calendarToday.get(Calendar.YEAR) == year
-                && calendarToday.get(Calendar.DAY_OF_MONTH) == day);
+    public static boolean isToday(DateTime dateTime) {
+        return dateTime.withTimeAtStartOfDay().getMillis()
+                == DateTime.now().withTimeAtStartOfDay().getMillis();
     }
 }

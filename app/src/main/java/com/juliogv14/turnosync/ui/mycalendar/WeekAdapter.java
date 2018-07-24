@@ -24,7 +24,6 @@ import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.viewmodels.MyCalendarVM;
 import com.juliogv14.turnosync.databinding.ItemShiftBinding;
 import com.juliogv14.turnosync.utils.CalendarUtils;
-import com.juliogv14.turnosync.utils.InterfaceUtils;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -117,13 +116,13 @@ public class WeekAdapter extends BaseAdapter {
         int dayCellHeight = CalendarUtils.getDayCellHeight(mDisplayMetrics);
 
         switch (itemType) {
-            case 0:             //names and first item
+            case 0:             //names
                 TextView names;
                 if (convertView == null) {
                     names = new TextView(mContext);
                     names.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                     names.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, dayCellHeight));
-                    convertView = names;
+
                 } else {
                     names = (TextView) convertView;
                 }
@@ -140,19 +139,21 @@ public class WeekAdapter extends BaseAdapter {
 
                 mDisplayDay = new DateTime(mWeekDate);
                 mCurrentShiftIndex = 0;
-                convertView.setBackgroundColor(Color.GRAY);
-
+                names.setTextColor(Color.WHITE);
+                int color = ColorUtils.blendARGB(ContextCompat.getColor(mContext, R.color.colorAccent), Color.WHITE, 0.4f);
+                names.setBackgroundColor(color);
+                convertView = names;
                 return convertView;
             case 1:             //Header with days
                 if (convertView == null) {
                     TextView days = new TextView(mContext);
                     days.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                     days.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, mTitleHeight));
-
                     days.setText(mItems.get(position));
+                    days.setTextColor(Color.WHITE);
+                    days.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorAccent));
                     convertView = days;
                 }
-                convertView.setBackgroundColor(Color.LTGRAY);
                 return convertView;
             case 2:             //Shifts
                 if (convertView == null) {
@@ -162,8 +163,8 @@ public class WeekAdapter extends BaseAdapter {
                 mItemShiftBinding.textViewShiftType.setText("");
                 mItemShiftBinding.imageViewChange.setImageDrawable(null);
 
+                //Background
                 GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.bg_shift).mutate();
-
                 background.setColor(Color.WHITE);
                 convertView.setBackground(background);
 
@@ -174,7 +175,7 @@ public class WeekAdapter extends BaseAdapter {
                     DateTime shiftDate = new DateTime(shift.getDate());
 
                     //Shfit in date
-                    if (mDisplayDay.getDayOfMonth() == shiftDate.getDayOfMonth() && mDisplayDay.getDayOfMonth()== shiftDate.getDayOfMonth()) {
+                    if (mDisplayDay.getDayOfMonth() == shiftDate.getDayOfMonth() && mDisplayDay.getMonthOfYear() == shiftDate.getMonthOfYear()) {
                         mCurrentShiftIndex++;
                         mItemShiftBinding.textViewDayMonth.setVisibility(View.GONE);
                         ShiftType type = mShiftsTypesMap.get(shift.getType());
