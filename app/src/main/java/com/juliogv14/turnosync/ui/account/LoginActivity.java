@@ -149,14 +149,13 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-
                 //Firebase sign in with google
                 mFirebaseAuth.signInWithCredential(credential).
                         addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                                 if (task.isSuccessful()) {
-                                    FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                                     Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
                                     signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -168,6 +167,8 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                                 }
                             }
                         });
+            } else {
+                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
             }
         }
     }
