@@ -56,6 +56,7 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.WorkgroupSettings
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Months;
 import org.joda.time.Weeks;
 
@@ -169,7 +170,8 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
         //Init month date
         int mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 -1);
-        mInitMonth = DateTime.now().withMillisOfDay(0);
+        DateTime now = DateTime.now();
+        mInitMonth = new DateTime().withZone(DateTimeZone.UTC).withTime(now.withTimeAtStartOfDay().toLocalTime());
         mInitMonth = mInitMonth.minusMonths(mInitMonthOffset).withDayOfMonth(1);
 
         //Init variables
