@@ -180,6 +180,10 @@
 
     <string name="dialog_requestChange_user">User</string>
 
+    <!--WORKGROUP INFO DIALOG-->
+    <string name="dialog_workgroupInfo_button_close">Close</string>
+
+
     <!--CHANGE REQUESTS STRINGS-->
     <string name="requests_user_label">User</string>
     <string name="requests_state_label">State:</string>

@@ -1,7 +1,9 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -23,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -328,7 +329,7 @@ public class HomeFragment extends Fragment
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_home_view:
-                    Toast.makeText(mContext, "wk:" + mWorkgroup.getWorkgroupId() + ": INFO BUTTON", Toast.LENGTH_SHORT).show();
+                    showInfoDialog();
                     mode.finish();
                     break;
                 default:
@@ -344,6 +345,17 @@ public class HomeFragment extends Fragment
                 mWorkgroup.setSelected(false);
                 mSelectedWorkgroup = null;
             }
+        }
+
+        private void showInfoDialog(){
+            new AlertDialog.Builder(mContext).setTitle(mSelectedWorkgroup.getDisplayName())
+                    .setMessage(mSelectedWorkgroup.getInfo())
+                    .setPositiveButton(getString(R.string.dialog_workgroupInfo_button_close), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
         }
     }
 
