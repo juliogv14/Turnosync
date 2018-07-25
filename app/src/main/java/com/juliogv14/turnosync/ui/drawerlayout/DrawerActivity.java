@@ -356,7 +356,7 @@ public class DrawerActivity extends AppCompatActivity
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(getApplicationContext(), R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(DrawerActivity.this, R.string.toast_profile_displayname, Toast.LENGTH_SHORT).show();
                             }
                         });
             }
@@ -369,10 +369,10 @@ public class DrawerActivity extends AppCompatActivity
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext().getApplicationContext(), R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DrawerActivity.this, R.string.toast_profile_email, Toast.LENGTH_SHORT).show();
                                 } else {
                                     if (task.getException() != null) {
-                                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(DrawerActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -433,7 +433,6 @@ public class DrawerActivity extends AppCompatActivity
     //OnHomeFragmentInteractionListener
     @Override
     public void onWorkgroupSelected(UserWorkgroup workgroup) {
-        Toast.makeText(this, "WK: uid: " + workgroup.getWorkgroupId(), Toast.LENGTH_SHORT).show();
         mCurrentWorkgroup = workgroup;
         displaySelectedScreen(R.string.fragment_mycalendar);
 

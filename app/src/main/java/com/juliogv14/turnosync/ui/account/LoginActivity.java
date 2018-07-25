@@ -253,8 +253,6 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if(firebaseUser != null){
                     if(firebaseUser.isEmailVerified()){
-                        Toast.makeText(LoginActivity.this,
-                                R.string.toast_sign_in_successfully, Toast.LENGTH_SHORT).show();
                         Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
                         signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -271,8 +269,6 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(LoginActivity.this,
-                R.string.toast_sign_in_canceled, Toast.LENGTH_SHORT).show();
         super.onBackPressed();
     }
 
