@@ -197,7 +197,7 @@ public class MonthAdapter extends BaseAdapter {
                     // current month
                     if (CalendarUtils.isToday(date)) {
                         //Today
-                        mItemShiftBinding.textViewDayMonth.setTextColor(Color.RED);
+                        mItemShiftBinding.textViewDayMonth.setTextColor(ContextCompat.getColor(mContext, R.color.colorAccent));
                     } else {
                         //Other day
                         mItemShiftBinding.textViewDayMonth.setTextColor(Color.BLACK);

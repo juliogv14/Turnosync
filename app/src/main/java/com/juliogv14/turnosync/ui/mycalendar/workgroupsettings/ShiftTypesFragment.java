@@ -160,7 +160,6 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_shiftTypes_newType) {
-            Toast.makeText((Context) mListener, "New type", Toast.LENGTH_SHORT).show();
             CreateTypeDialog dialog = new CreateTypeDialog();
             dialog.show(getChildFragmentManager(), "createTypeDialog");
             return true;

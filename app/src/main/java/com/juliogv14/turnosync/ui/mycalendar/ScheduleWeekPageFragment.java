@@ -232,7 +232,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                     if(!mEditMode || mWeeklyHours == -1 || date.isBefore(DateTime.now())){
                         return;
                     }
-                    if(!mShiftTypesMap.isEmpty()) {
+                    if(!mShiftTypesMap.isEmpty() && mWeeklyHours != 0 ) {
                         //Check if there is a shift there
                         Shift shiftSelected = null;
                         for (Shift shift : mUsersShiftsMap.get(userRef.getUid())) {
@@ -250,7 +250,12 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                             dialog.show(getChildFragmentManager(), "csd");
                         }
                     } else {
-                        Toast.makeText(mContext, R.string.toast_schedule_noShiftTypes, Toast.LENGTH_SHORT).show();
+                        if(mWeeklyHours == 0){
+                            Toast.makeText(mContext, R.string.toast_schedule_notLoaded, Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(mContext, R.string.toast_schedule_noShiftTypes, Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 }
             }
