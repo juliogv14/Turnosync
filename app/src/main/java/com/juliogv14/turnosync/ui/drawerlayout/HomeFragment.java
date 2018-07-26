@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
 import com.juliogv14.turnosync.databinding.FragmentHomeBinding;
 import com.juliogv14.turnosync.databinding.ItemWorkgroupBinding;
+import com.juliogv14.turnosync.utils.FormUtils;
 import com.juliogv14.turnosync.utils.InterfaceUtils;
 
 import java.util.ArrayList;
@@ -201,7 +204,25 @@ public class HomeFragment extends Fragment
             workgroupData.put(getString(R.string.data_key_manager), userUID);
             globalWorkgroupRef.set(workgroupData);
 
+            //Add user to workgroup
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             UserRef userData = new UserRef(mFirebaseUser.getUid(), true);
+            String displayName = prefs.getString(getString(R.string.data_key_displayname), "Mng");
+
+            String shortName = FormUtils.slugify(displayName);
+            String[] split = shortName.trim().split(" ");
+
+            if(split.length == 1){
+                shortName = shortName.substring(0,3);
+            } else if(split.length == 2){
+                shortName = split[0].substring(0,2);
+                shortName +=split[1].substring(0,1);
+            } else {
+                shortName = split[0].substring(0,2);
+                shortName +=split[1].substring(0,1);
+                shortName +=split[2].substring(0,1);
+            }
+            userData.setShortName(shortName);
             globalWorkgroupRef.collection(getString(R.string.data_ref_users))
                     .document(mFirebaseUser.getUid()).set(userData);
 
@@ -313,7 +334,6 @@ public class HomeFragment extends Fragment
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            //TODO add more options
             for (int i = 0; i < menu.size(); i++) {
                 Drawable icon = menu.getItem(i).getIcon();
                 if (icon != null) {

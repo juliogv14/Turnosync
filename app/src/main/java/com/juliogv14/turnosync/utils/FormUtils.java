@@ -10,6 +10,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.juliogv14.turnosync.R;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -76,6 +78,22 @@ public class FormUtils {
         }
         return false;
     }
+
+    public static String slugify (String str) {
+        Map<String, String> patterns = new HashMap<>();
+        patterns.put("a", "[áàãâÀÁÃÂ]");
+        patterns.put("e" , "[éèêÉÈÊ]");
+        patterns.put("i" , "[íìîÍÌÎ]");
+        patterns.put("o" , "[óòôõÓÒÔÕ]");
+        patterns.put("u" , "[úùûüÚÙÛÜ]");
+        patterns.put("c" , "[çÇ]");
+        patterns.put("n" , "[ñÑ]");
+
+        for (Map.Entry<String, String> entry : patterns.entrySet()) {
+            str = str.replace(entry.getValue(), entry.getKey());
+        }
+        return str;
+    };
 
     public static void checkGooglePlayServices(Context context) {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
