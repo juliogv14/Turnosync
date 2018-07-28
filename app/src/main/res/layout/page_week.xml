@@ -2,31 +2,37 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="8dp">
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/textView_week"
-            tools:text="December"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="8dp">
 
+            <TextView
+                android:id="@+id/textView_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                tools:text="December" />
 
-        <GridView
-            android:id="@+id/gridView_week"
-            tools:listitem="@layout/item_shift"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:horizontalSpacing="2dp"
-            android:verticalSpacing="2dp"
-            android:numColumns="8"
-            android:stretchMode="columnWidth" />
-    </LinearLayout>
+            <GridView
+                android:id="@+id/gridView_week"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:horizontalSpacing="2dp"
+                android:numColumns="8"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="2dp"
+                tools:listitem="@layout/item_shift" />
+
+        </LinearLayout>
+    </ScrollView>
 </layout>

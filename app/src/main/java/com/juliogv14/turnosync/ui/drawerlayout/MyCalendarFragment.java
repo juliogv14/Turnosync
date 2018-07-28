@@ -1,5 +1,6 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -249,6 +251,7 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         Log.d(TAG, "Start MyCalendarFragment");
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -267,6 +270,13 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
+        mViewBinding.viewPagerMonths.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mViewBinding.viewPagerMonths.requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
     }
 
     @Override
