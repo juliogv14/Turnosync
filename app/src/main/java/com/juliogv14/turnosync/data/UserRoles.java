@@ -1,8 +1,10 @@
 package com.juliogv14.turnosync.data;
 
 /**
- * Created by Julio on 24/03/2018.
- * UserRoles
+ * La clase UserRoles es una enumeracion usada dentro de un grupo de usuario UserWorkgroup para designar su rol
+ *
+ * @author Julio García
+ * @see UserWorkgroup
  */
 
 public enum UserRoles {

@@ -16,39 +16,61 @@ import com.juliogv14.turnosync.data.ShiftType;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * La clase MyCalendarVM se usa para manejar los datos del fragmento MyCalendarFragment y actualizar
+ * la vista acorde a sus cambios.
+ * Extiende la clase ViewModel
+ *
+ * @author Julio García
+ * @see ViewModel
+ * @see MutableLiveData
+ */
 public class MyCalendarVM extends ViewModel {
+    /** Modo editar para realizar cambios en el calendario */
     private MutableLiveData<Boolean> mEditMode = new MutableLiveData<>();;
+    /** Horas maximas semanales cargadas de base de datos*/
     private MutableLiveData<Long> mWeeklyHours = new MutableLiveData<>();
+    /** Turno propio seleccionado para solicitar un cambio */
     private MutableLiveData<Shift> mOwnShift = new MutableLiveData<>();
+    /** Turno de otro usuario seleccionado para solicitar un cambio */
     private MutableLiveData<Shift> mOtherShift = new MutableLiveData<>();
+    /** Lista de tipos de turnos cargado desde base de datos */
     private MutableLiveData<Map<String, ShiftType>> mShiftTypes;
 
-    //Setter getter editMode
+    /** Setter editMode */
     public void setEditMode(boolean value){
         mEditMode.setValue(value);
     }
+
+    /** Getter editMode live data */
     public MutableLiveData<Boolean> getEditMode() {
         return mEditMode;
     }
 
-    //Setter getter weeklyhours
+    /** Setter weeklyHours */
     public void setWeeklyHours(long value){
         mWeeklyHours.setValue(value);
     }
+
+    /** Getter weeklyHours live data */
     public MutableLiveData<Long> getWeeklyHours() {
         return mWeeklyHours;
     }
 
-    //Setter getter shiftTypes
+    /** Loads shiftTypes map */
     public ListenerRegistration loadShiftTypes(CollectionReference dataRef){
         mShiftTypes = new MutableLiveData<>();
         return queryShiftTypes(dataRef);
     }
 
+    /** Getter shiftTypes map */
     public MutableLiveData<Map<String, ShiftType>> getShiftTypes() {
         return mShiftTypes;
     }
 
+    /** Obtiene el mapa de tipos de turno y escucha por cambios en base de datos para actualizarlos en tiempo real
+     * @return ListenerRegistration de la query para poder desvincular la escucha
+     */
     private ListenerRegistration queryShiftTypes(CollectionReference dataRef) {
         final Map<String, ShiftType> shiftTypeMap = new HashMap<>();
         mShiftTypes.setValue(shiftTypeMap);
@@ -91,20 +113,22 @@ public class MyCalendarVM extends ViewModel {
         });
     }
 
-    //Setter and getter ownShift
+    /** Setter ownShift */
     public void setOwnShift(Shift shift){
         mOwnShift.setValue(shift);
     }
 
+    /** Getter ownShift live data */
     public MutableLiveData<Shift> getOwnShift() {
         return mOwnShift;
     }
 
-    //Setter and getter otherShift
+    /** Setter otherShift */
     public void setOtherShift(Shift shift){
         mOtherShift.setValue(shift);
     }
 
+    /** Getter otherShift live data */
     public MutableLiveData<Shift> getOtherShift() {
         return mOtherShift;
     }

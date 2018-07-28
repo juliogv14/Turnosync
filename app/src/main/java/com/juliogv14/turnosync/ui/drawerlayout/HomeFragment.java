@@ -34,6 +34,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.juliogv14.turnosync.R;
+import com.juliogv14.turnosync.data.GlobalWorkgroup;
 import com.juliogv14.turnosync.data.UserRef;
 import com.juliogv14.turnosync.data.UserRoles;
 import com.juliogv14.turnosync.data.UserWorkgroup;
@@ -43,9 +44,7 @@ import com.juliogv14.turnosync.utils.FormUtils;
 import com.juliogv14.turnosync.utils.InterfaceUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Julio on 26/11/2017.
@@ -196,17 +195,13 @@ public class HomeFragment extends Fragment
 
             //Global workgroup list
             DocumentReference globalWorkgroupRef = globalWorkgroupsColl.document();
-            Map<String, Object> workgroupData = new HashMap<>();
-            workgroupData.put(getString(R.string.data_key_workgroupid), globalWorkgroupRef.getId());
-            workgroupData.put(getString(R.string.data_key_displayname), name);
-            workgroupData.put(getString(R.string.data_key_info), description);
-            workgroupData.put(getString(R.string.data_key_weeklyhours), 40);
-            workgroupData.put(getString(R.string.data_key_manager), userUID);
-            globalWorkgroupRef.set(workgroupData);
+            GlobalWorkgroup workgroup = new GlobalWorkgroup(globalWorkgroupRef.getId(), name, description, (long)40, userUID);
+            globalWorkgroupRef.set(workgroup);
 
             //Add user to workgroup
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            UserRef userData = new UserRef(mFirebaseUser.getUid(), true);
+            UserRef userData = new UserRef(mFirebaseUser.getUid());
+            userData.setActive(true);
             String displayName = prefs.getString(getString(R.string.data_key_displayname), "Mng");
 
             String shortName = FormUtils.slugify(displayName);
