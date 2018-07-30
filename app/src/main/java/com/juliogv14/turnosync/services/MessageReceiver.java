@@ -14,11 +14,25 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 
+/**
+ * La clase MessageReceiver es un servicio que recibe mensajes de Firebase Cloud Messaging y muestra
+ * notificaciones en la aplicación
+ *
+ * @author Julio García
+ * @see FirebaseMessagingService
+ */
 public class MessageReceiver extends FirebaseMessagingService {
+    /** Codigo del intent en la notificacion de actualización de calendario */
     private static final int UPDATE_REQUEST_CODE = 1;
+    /** Codigo identificador de la notificacion de actualización de calendario */
     private static final int UPDATE_NOTIFICATION_ID = 1111;
+    /** Codigo del intent en la notificacion de cambio de turno */
     private static final int CHANGE_REQUEST_CODE = 2;
 
+    //@{
+    /** Constantes para identificar los distintos tipos de notificaciones.
+     * Se reciben con el mensaje del servicio de mensajeria.
+     */
     private static final String REQUESTED = "requested";
     private static final String ACCEPTED_USER = "acceptedUser";
     private static final String ACCEPTED_MANAGER = "acceptedManager";
@@ -27,12 +41,12 @@ public class MessageReceiver extends FirebaseMessagingService {
     private static final String CONFLICT = "conflict";
     private static final String DENIED_USER = "deniedUser";
     private static final String DENIED_MANAGER = "deniedManager";
+    //@}
 
-
-    public MessageReceiver() {
-        super();
-    }
-
+    /** Lifecycle callback.
+     * Se llama a onCreate de la clase de la que extiende.
+     * Fuerza al servicio a esperar al debugger cuando este está activado
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -40,6 +54,9 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
+    /** Callback que se llama cuando el servicio recibe un mensaje.
+     * Diferencia entre tipos de actualización de calendario y tipos de cambio de turnos
+     */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -61,6 +78,13 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
+    /** Metodo usado dentro de {@link #onMessageReceived} para mostrar la notificación de
+     * actualización de turnos.
+     * Crea y muestra una notificación cuando recibe un mensaje del servicio de notificaciones
+     *
+     * @param wkName Nombre del grupo del que se recibe notificación
+     * @see android.app.Notification
+     */
     private void showScheduleUpdated(String wkName) {
         Intent intent = new Intent(this, DrawerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -95,6 +119,16 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
+    /** Metodo usado dentro de {@link #onMessageReceived} para mostrar notificaciones de cambios de
+     * turnos
+     * Crea y muestra una notificación cuando recibe un mensaje del servicio de notificaciones
+     *
+     * @param wkName Nombre del grupo del que se recibe notificación
+     * @param requestId id de la solicitud de cambio ChangeRequest
+     * @param changeState estado de la solicitud de cambio ChangeRequest
+     * @see android.app.Notification
+     * @see com.juliogv14.turnosync.data.ChangeRequest
+     */
     private void showChangeRequest(String wkName, String requestId, String changeState) {
         Intent intent = new Intent(this, DrawerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

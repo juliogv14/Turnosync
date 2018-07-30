@@ -10,23 +10,29 @@ import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.juliogv14.turnosync.R;
 
 /**
- * Created by Julio on 01/12/2017.
- * SettingsFragment.class
+ * La clase SettingsFragment es responsable de manejar los cambios de configuración en la aplicación
+ * Extiende PreferenceFragmentCompat.
+ * Implementa la interfaz de escucha del cuadro de dialogo ResetPasswordDialog.
+ *
+ * @author Julio García
+ * @see PreferenceFragmentCompat
+ * @see SharedPreferences
  */
-
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
-
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
-    FirebaseAuth mFirebaseAuth;
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Se crea la ventana de configuración.
+     * @see PreferenceScreen
+     */
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_general);
-        mFirebaseAuth = FirebaseAuth.getInstance();
         PreferenceScreen prefScreen = getPreferenceScreen();
 
         int prefCount = prefScreen.getPreferenceCount();
@@ -38,6 +44,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Escucha a los cambios en la configuración y muestra el valor actual.
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference preference = findPreference(key);
@@ -46,9 +56,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 setPreferenceSummary(preference, sharedPreferences.getString(key, ""));
             }
         }
-
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Al iniciar el fragment se vincula la escucha de la configuración
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -56,6 +69,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 .registerOnSharedPreferenceChangeListener(this);
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Al parar el fragment se desvincula la escucha de la configuración
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -63,6 +80,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    /** Muestra los valores de la preferencia según el tipo que sea. Se usa la clave para obtener el valor
+     * @param p Preferencia a mostrar
+     */
     private void setPreferenceInCategory(Preference p) {
 
         SharedPreferences shrPreferences =
@@ -86,10 +106,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 setPreferenceSummary(p, stringValue);
             }
         }
-
-
     }
 
+    /** Muestra en el resumen el valor actual de la preferencia.
+     * @param preference Preferencia a mostrar el valor.
+     * @param value Objeto que se mostrara como cadena en el resumen
+     */
     private void setPreferenceSummary(Preference preference, Object value) {
         String stringValue = value.toString();
 

@@ -35,36 +35,55 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by Julio on 26/02/2018.
- * CreateWorkgroupDialog
+ * La clase CreateShiftDialog es responsable de modificar un turno ya asignado pudiendo transferirlo
+ * a otra persona o cambiar el tipo de turno. Es llamada dentro del ScheduleWeekPageFragment.
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
+ * @see ShiftType
  */
-
 public class CreateTypeDialog extends DialogFragment {
 
-    //Constants
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String TYPE_KEY = "mode";
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogCreateShiftypeBinding mViewBinding;
 
     //Parent fragment
     private Context mContext;
+    /** Contexto del fragmento */
     private CreateTypeListener mListener;
 
-    //Edit type
+    /** Tipo de turno pasado como argumento para ser editado */
     private ShiftType mShiftType;
 
-    //Variables
+    /** Nombre del turno */
     private String mName;
+    /** Abreviación para mostrar en el calendario */
     private String mTag;
+    /** Hora de inicio del turno */
     private LocalTime mTimeStart;
+    /** Hora de fin del turno */
     private LocalTime mTimeEnd;
+    /** Periodo con la duración del turno*/
     private Period mPeriod;
-
+    /** Color asociado al turno para mostrar en el calendario */
     private int mColor;
+
+    /** Lista de los botones de colores para asignar al turno */
     ArrayList<ToggleButton> mColorButtons;
+    /** Referencia del boton seleccionado */
     ToggleButton mSelectedButton;
 
+
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param type Tipo de turno a editar
+     * @return instancia de la clase CreateTypeDialog
+     */
     public static CreateTypeDialog newInstance(ShiftType type) {
         CreateTypeDialog fragment = new CreateTypeDialog();
         Bundle args = new Bundle();
@@ -73,6 +92,10 @@ public class CreateTypeDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -85,13 +108,10 @@ public class CreateTypeDialog extends DialogFragment {
         }
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mViewBinding.editTextLayoutCreateTypeName.requestFocus();
-
-    }
-
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo. Carga los datos del tipo de turno a editar si no es null.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -229,6 +249,19 @@ public class CreateTypeDialog extends DialogFragment {
         return dialog;
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Al crear la vista se centra la antención en el campo vacío.
+     */
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewBinding.editTextLayoutCreateTypeName.requestFocus();
+    }
+
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -236,6 +269,8 @@ public class CreateTypeDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Rellena la vista con los datos del tipo de turno pasado por parametro.
+     */
     private void fillDialog(){
 
         mTimeStart = mShiftType.getJodaStartTime();
@@ -268,10 +303,12 @@ public class CreateTypeDialog extends DialogFragment {
         if(mSelectedButton == null){
             mSelectedButton = mColorButtons.get(0);
         }
-
-
     }
 
+
+    /** Se intenta enviar los datos comprobando si son cadenas validas
+     * @return true si los datos son validos. False en caso contrario.
+     */
     private boolean attemptCreateType() {
         //Reset error messages
         mViewBinding.editTextLayoutCreateTypeName.setError(null);
@@ -309,6 +346,8 @@ public class CreateTypeDialog extends DialogFragment {
         return isReadyToClose;
     }
 
+    /** Actualiza el contador total de horas en la vista al cambiar las horas de inicio o fin
+     */
     private void updateTimeCount (){
         mPeriod = new Period(mTimeStart, mTimeEnd);
         if(mTimeStart.isAfter(mTimeEnd)) mPeriod = mPeriod.plusHours(24);
@@ -323,6 +362,8 @@ public class CreateTypeDialog extends DialogFragment {
 
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface CreateTypeListener {
         void onDialogPositiveClick(ShiftType shiftType);
     }

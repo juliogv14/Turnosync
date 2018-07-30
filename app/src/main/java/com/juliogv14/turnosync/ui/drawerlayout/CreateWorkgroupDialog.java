@@ -18,25 +18,34 @@ import com.juliogv14.turnosync.databinding.DialogCreateWorkgroupBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
- * Created by Julio on 26/02/2018.
- * CreateWorkgroupDialog
+ * La clase CreateWorkgroupDialog es responsable de pedir el nombre y descripcion de un grupo de trabajo.
+ * Es llamada dentro de HomeFragment.
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
  */
 
 public class CreateWorkgroupDialog extends DialogFragment {
-
+    /**
+     * Referencia a la vista con databinding */
     private DialogCreateWorkgroupBinding mViewBinding;
-    //Parent fragment
-    private CreateWorkgroupListener mListener;
-    private Context mContext;
 
-    //Strings
+
+    /** Contexto del fragmento */
+    private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
+    private CreateWorkgroupListener mListener;
+
+    /** Nombre del grupo de trabajo */
     String mName;
+    /** Descripción del grupo de trabajo */
     String mDescription;
 
-
-    public CreateWorkgroupDialog() {
-    }
-
+    /** {@inheritDoc}
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -49,12 +58,10 @@ public class CreateWorkgroupDialog extends DialogFragment {
         }
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mViewBinding.editTextWorkgroupName.requestFocus();
-    }
-
+    /** {@inheritDoc}
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -101,6 +108,19 @@ public class CreateWorkgroupDialog extends DialogFragment {
         return dialog;
     }
 
+    /** {@inheritDoc}
+     * Lifecycle callback.
+     * Al crear la vista se centra la antención en el campo vacío.
+     */
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewBinding.editTextWorkgroupName.requestFocus();
+    }
+
+    /** {@inheritDoc}
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -108,6 +128,9 @@ public class CreateWorkgroupDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Se intenta enviar los datos comprobando si son cadenas validas
+     * @return true si los datos son validos. False en caso contrario.
+     */
     private boolean attemptCreateWorkgroup() {
         Boolean isReadyToClose = true;
         //Get strings from editText
@@ -129,6 +152,8 @@ public class CreateWorkgroupDialog extends DialogFragment {
         return isReadyToClose;
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface CreateWorkgroupListener {
         void onDialogPositiveClick(String name, String description);
     }

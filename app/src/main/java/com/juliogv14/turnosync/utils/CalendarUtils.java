@@ -1,19 +1,22 @@
 package com.juliogv14.turnosync.utils;
 
-import android.content.Context;
 import android.util.DisplayMetrics;
-
-import com.juliogv14.turnosync.R;
 
 import org.joda.time.DateTime;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
+/**
+ * La clase CalendarUtils es una clase utils que contiene metodos para usados en el tratamiento
+ * del calendario.
+ *
+ * @author Julio García
+ */
 public class CalendarUtils {
 
-    private static final int[] mDaysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
+    /** Obtiene el valor de alto de la casilla de cabecera del calendario dependiendo de las medidas
+     * del dispositivo
+     * @param displayMetrics Medidas del dispositivo
+     * @return Altura de la casilla
+     */
     public static int getLabelHeight(DisplayMetrics displayMetrics) {
         int densityDpi = displayMetrics.densityDpi;
         if (densityDpi > DisplayMetrics.DENSITY_LOW && densityDpi < DisplayMetrics.DENSITY_MEDIUM) {
@@ -31,6 +34,11 @@ public class CalendarUtils {
         }
     }
 
+    /** Obtiene el valor de alto de la casilla de un turno dependiendo de las medidas
+     * del dispositivo
+     * @param displayMetrics Medidas del dispositivo
+     * @return Altura de la casilla
+     */
     public static int getDayCellHeight(DisplayMetrics displayMetrics) {
         int densityDpi = displayMetrics.densityDpi;
         if (densityDpi > DisplayMetrics.DENSITY_LOW && densityDpi < DisplayMetrics.DENSITY_MEDIUM) {
@@ -48,46 +56,10 @@ public class CalendarUtils {
         }
     }
 
-    public static int getDay(int day) {
-        switch (day) {
-            case Calendar.MONDAY:
-                return 0;
-            case Calendar.TUESDAY:
-                return 1;
-            case Calendar.WEDNESDAY:
-                return 2;
-            case Calendar.THURSDAY:
-                return 3;
-            case Calendar.FRIDAY:
-                return 4;
-            case Calendar.SATURDAY:
-                return 5;
-            case Calendar.SUNDAY:
-                return 6;
-            default:
-                return -1;
-        }
-    }
-
-    public static String getDayString(Context context, int day){
-        String[]days = context.getResources().getStringArray(R.array.calendar_days_of_week);
-        return days[day];
-    }
-
-    public static String getMonthString(Context context, int month){
-        String[]months = context.getResources().getStringArray(R.array.calendar_months_of_year);
-        return months[month];
-    }
-
-    public static int daysInMonth(Calendar calendar, int year, int month) {
-        int daysInMonth = mDaysInMonth[month];
-        GregorianCalendar gregCalendar = (GregorianCalendar) calendar;
-        if (month == 1 && gregCalendar.isLeapYear(year))
-            daysInMonth++;
-        return daysInMonth;
-    }
-
-
+    /** Comprueba si la fecha pasada como argumento coincide con el dia actual con la hora 00:00UTC
+     * @param dateTime Dia a comprobar
+     * @return True si coindice. False en caso contrario.
+     */
     public static boolean isToday(DateTime dateTime) {
         return dateTime.withTimeAtStartOfDay().getMillis()
                 == DateTime.now().withTimeAtStartOfDay().getMillis();

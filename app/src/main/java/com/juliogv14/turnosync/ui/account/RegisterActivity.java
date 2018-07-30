@@ -28,17 +28,32 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.data.User;
 import com.juliogv14.turnosync.databinding.ActivityRegisterBinding;
+import com.juliogv14.turnosync.utils.AnimationViewUtils;
 import com.juliogv14.turnosync.utils.FormUtils;
 
+/**
+ * La clase RegisterActivity es responsable de manejar el registro del usuario.
+ * Extiende AppCompatActivity
+ *
+ * @author Julio García
+ * @see AppCompatActivity
+ * @see FirebaseAuth
+ */
 public class RegisterActivity extends AppCompatActivity {
 
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
+    /** Referencia a la vista con databinding */
     private ActivityRegisterBinding mViewBinding;
+    /** Referencia al servicio de autenticación de Firebase */
     private FirebaseAuth mFirebaseAuth;
 
-    private String mDisplayName;
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Se establecen las esuchas de finalizado en el teclado y el boton de registrar
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +84,8 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    /** Intento de registro comprobando si las cadenas introducidas son validas
+     */
     private void attemptRegister() {
         /*Reset error on textInputLayouts*/
 
@@ -79,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         /*get strings from editTexts*/
         String email = mViewBinding.editTextEmail.getText().toString();
-        mDisplayName = mViewBinding.editTextName.getText().toString();
+        final String displayName = mViewBinding.editTextName.getText().toString();
         String password = mViewBinding.editTextPassword.getText().toString();
         String passwordRepeat = mViewBinding.editTextPasswordRepeat.getText().toString();
 
@@ -100,12 +117,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         /*Check for a valid displayName*/
-        if (TextUtils.isEmpty(mDisplayName)) {
+        if (TextUtils.isEmpty(displayName)) {
             mViewBinding.editTextLayoutName
                     .setError(getString(R.string.form_error_field_required));
             focusView = mViewBinding.editTextName;
             cancel = true;
-        } else if (!FormUtils.isDisplayNameValid(mDisplayName)) {
+        } else if (!FormUtils.isDisplayNameValid(displayName)) {
             mViewBinding.editTextLayoutName
                     .setError(getString(R.string.form_error_name));
             focusView = mViewBinding.editTextName;
@@ -138,12 +155,12 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                            AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (task.isSuccessful()) {
 
@@ -151,7 +168,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                                 if (firebaseUser != null) {
                                     //Add display name to firebase user profile
-                                    Task<Void> updateTask = firebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(mDisplayName).build())
+                                    Task<Void> updateTask = firebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(displayName).build())
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
@@ -162,7 +179,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             });
 
                                     CollectionReference usersReference = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users));
-                                    User user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), mDisplayName);
+                                    User user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), displayName);
 
                                     //Add user to database
                                     Task<Void> databaseTask = usersReference.document(firebaseUser.getUid()).set(user)

@@ -15,14 +15,15 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * Created by Julio on 15/11/2017.
- * ${FILE_NAME}
+ * La clase FormUtils es una clase utils que contiene metodos para usados en la entrada de datos
+ * @author Julio García
  */
-
 public class FormUtils {
 
-    //
-
+    /** Comprueba que una dirección de email está bien formada
+     * @param email Email a comprobar.
+     * @return True si es valido. False en caso contrario.
+     */
     public static boolean isEmailValid(String email) {
 
         //Regex to check if the string contains '@' and '.' as in an email.
@@ -30,35 +31,41 @@ public class FormUtils {
         return Pattern.compile(regEx).matcher(email).matches();
     }
 
-    public static boolean isLoginPasswordValid(String password) {
-
-        return password.length() >= 6;
-    }
-
+    /** Comprueba que una contraseña es sufientemente segura. Minimo 6 caracteres, un numero y una mayuscula y minuscula.
+     *
+     * @param password contrasña a comprobar.
+     * @return True si es valido. False en caso contrario.
+     */
     public static boolean isRegisterPasswordValid(String password) {
 
         String regEx = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";
         return Pattern.compile(regEx).matcher(password).matches();
     }
 
+    /** Comprueba que nombre está bien formado evitando caracteres raros. Solo se permite guión y apostrofe.
+     * @param displayName Nombre a comprobar.
+     * @return True si es valido. False en caso contrario.
+     */
     public static boolean isDisplayNameValid(String displayName) {
         String regEx = "^[\\p{L}\\p{N}-' ]+$";
         return Pattern.compile(regEx).matcher(displayName).matches();
     }
 
+    /** Comprueba que las iniciales están bien formadas. Solo se admiten letras y numeros.
+     * @param initials Iniciales a comprobar.
+     * @return True si es valido. False en caso contrario.
+     */
     public static boolean isInitialsValid(String initials){
         String regEx = "^[\\p{L}\\p{N}]+$";
         return Pattern.compile(regEx).matcher(initials).matches();
     }
 
-    public static void showLoadingIndicator(View indicatorView, boolean show) {
-        if (show) {
-            AnimationViewUtils.animateView(indicatorView, View.VISIBLE, 0.4f, 200);
-        } else {
-            AnimationViewUtils.animateView(indicatorView, View.GONE, 0, 200);
-        }
-    }
-
+    /** Oculta el teclado
+     *
+     * @param context Contexto actual
+     * @param focusView Vista con la atención
+     * @return True si tuvo exito. False en caso contrario.
+     */
     public static boolean closeKeyboard(Context context, View focusView) {
         InputMethodManager imm =
                 (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -69,6 +76,12 @@ public class FormUtils {
         return false;
     }
 
+    /** Muestra el teclado
+     *
+     * @param context Contexto actual
+     * @param focusView Vista con la atención
+     * @return True si tuvo exito. False en caso contrario.
+     */
     public static boolean openKeyboard(Context context, View focusView) {
         InputMethodManager imm =
                 (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -79,6 +92,11 @@ public class FormUtils {
         return false;
     }
 
+    /** Transforma una cadena en slug dejandola sin caracteres especiales de idioma.
+     *
+     * @param str Cadena a tratar
+     * @return Resultado del tratamiento
+     */
     public static String slugify (String str) {
         Map<String, String> patterns = new HashMap<>();
         patterns.put("a", "[áàãâÀÁÃÂ]");
@@ -95,6 +113,7 @@ public class FormUtils {
         return str;
     };
 
+    /** Comprueba el estado de los servicios de Google Play */
     public static void checkGooglePlayServices(Context context) {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int result = googleApiAvailability.isGooglePlayServicesAvailable(context);

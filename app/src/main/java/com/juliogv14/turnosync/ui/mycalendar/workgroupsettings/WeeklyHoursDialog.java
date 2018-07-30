@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,25 +14,35 @@ import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.DialogWeeklyHoursBinding;
 
 /**
- * Created by Julio on 06/07/2018.
- * WeeklyHoursDialog
+ * La clase WeeklyHoursDialog es responsable de pedir las horas semanales que se quieren establecer.
+ * Es llamada dentro de WorkgroupSettingsFragment.
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
  */
-
 public class WeeklyHoursDialog extends DialogFragment {
 
-    //Constants
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String WEEKLY_HOURS_KEY = "weeklyHours";
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogWeeklyHoursBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private WeeklyHoursDialogListener mListener;
 
-    //Variables
+    /** Horas máximas semanales */
     private long mWeeklyHours;
 
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos.
+     *
+     * @param weeklyHours Horas actualmente establecidas
+     * @return instancia de la clase WeeklyHoursDialog
+     */
     public static WeeklyHoursDialog newInstance(long weeklyHours) {
 
         Bundle args = new Bundle();
@@ -43,6 +52,10 @@ public class WeeklyHoursDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -56,6 +69,10 @@ public class WeeklyHoursDialog extends DialogFragment {
 
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -90,11 +107,9 @@ public class WeeklyHoursDialog extends DialogFragment {
         return builder.create();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -102,6 +117,8 @@ public class WeeklyHoursDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface WeeklyHoursDialogListener {
         void onSetWeekyHours(long hours);
     }

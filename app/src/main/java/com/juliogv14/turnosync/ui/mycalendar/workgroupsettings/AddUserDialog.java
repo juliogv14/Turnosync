@@ -18,22 +18,30 @@ import com.juliogv14.turnosync.databinding.DialogAddUserBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
- * Created by Julio on 26/02/2018.
- * AddUserDialog
+ * La clase AddUserDialog es responsable de pedir el email del usuario a invitar al grupo
+ * Es llamada dentro de WorkgroupSettingsFragment
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
  */
-
 public class AddUserDialog extends DialogFragment {
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogAddUserBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private AddUserListener mListener;
 
-    //Variables
+    /** Dirección de email del usuario a invitar al grupo */
     private String mEmail;
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -47,6 +55,10 @@ public class AddUserDialog extends DialogFragment {
 
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -93,12 +105,19 @@ public class AddUserDialog extends DialogFragment {
         return dialog;
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Al crear la vista se centra la antención en el campo vacío.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewBinding.editTextEmail.requestFocus();
     }
 
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -106,6 +125,9 @@ public class AddUserDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Se intenta enviar los datos comprobando si son cadenas validas
+     * @return true si los datos son validos. False en caso contrario.
+     */
     private boolean attemptAddUser() {
         Boolean isReadyToClose = true;
         //Get strings from editText
@@ -129,6 +151,8 @@ public class AddUserDialog extends DialogFragment {
         return isReadyToClose;
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface AddUserListener {
         void onClickAddUser(String email);
     }

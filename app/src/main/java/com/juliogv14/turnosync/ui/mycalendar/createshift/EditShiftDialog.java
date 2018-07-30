@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -33,36 +32,57 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Julio on 15/06/2018.
- * EditShiftDialog
+ * La clase EditShiftDialog es responsable de modificar un turno ya asignado pudiendo transferirlo
+ * a otra persona o cambiar el tipo de turno. Es llamada dentro del ScheduleWeekPageFragment.
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
+ * @see Shift
  */
-
 public class EditShiftDialog extends DialogFragment {
 
-    //Constant
+    //{@
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String DATE_KEY = "date";
     private static final String USER_REF_KEY = "userRef";
     private static final String SHIFT_TYPES_KEY = "shiftTypes";
     private static final String USERS_REF_LIST = "userList";
     private static final String SELECTED_SHIFT_KEY = "selectedShift";
+    //@}
 
-
-    //Strings
+    /** Referencia a la vista con databinding */
     private DialogEditShiftBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private EditShiftListener mListener;
 
-    //Variables
+    /** Dia seleccionado */
     private DateTime mDay;
+    /** Referencia del usuario */
     private UserRef mUserRef;
+    /** Lista de tipos de turnos */
     private ArrayList<ShiftType> mShiftTypesList;
+    /** Referencia del turno seleccionado a editar */
     private Shift mSelectedShift;
+    /** Lista de las referencias a usuarios */
     private ArrayList<UserRef> mWorkgroupUsers;
-
+    /** Periodo con la duración del turno */
     private Period mShiftPeriod;
 
+
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param date Dia seleccionado
+     * @param userRef Referencia del usuario
+     * @param shiftTypes Mapa con los tipos de turnos ShiftType
+     * @param userList Lista de las referencias a usuarios
+     * @param shift Referencia del turno seleccionado a editar
+     * @return instancia de la clase EditShiftDialog
+     */
     public static EditShiftDialog newInstance(DateTime date, UserRef userRef, Map<String, ShiftType> shiftTypes, ArrayList<UserRef> userList, Shift shift) {
         EditShiftDialog fragment = new EditShiftDialog();
         Bundle args = new Bundle();
@@ -75,6 +95,10 @@ public class EditShiftDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -88,11 +112,10 @@ public class EditShiftDialog extends DialogFragment {
 
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo. Carga los datos del turno a editar.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -198,6 +221,9 @@ public class EditShiftDialog extends DialogFragment {
         return dialog;
     }
 
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -205,6 +231,8 @@ public class EditShiftDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface EditShiftListener {
         void onEditShiftChange(Shift oldShift, Shift newShift);
         void onEditShiftRemove(Shift removedShifts);

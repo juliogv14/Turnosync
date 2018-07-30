@@ -36,40 +36,62 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Julio on 14/06/2018.
- * CreateShiftDialog
+ * La clase CreateShiftDialog es responsable de crear turnos para los usuarios a partir de una fecha
+ * y un tipo de turno. Es llamada dentro del ScheduleWeekPageFragment.
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
+ * @see Shift
  */
-
 public class CreateShiftDialog extends DialogFragment {
 
-    //Constant
+    //{@
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String DATE_KEY = "date";
     private static final String USER_REF_KEY = "userRef";
     private static final String SHIFT_TYPES_KEY = "shiftTypes";
     private static final String CURRENT_HOURS_KEY = "currentHours";
     private static final String WEEKLY_HOURS_KEY = "weeklyHours";
+    //@}
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogCreateShiftBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private CreateShiftListener mListener;
 
-    //Variables
+    /** Dia seleccionado */
     private DateTime mDay;
+    /** Referencia del usuario */
     private UserRef mUserRef;
+    /** Lista de tipos de turnos */
     private ArrayList<ShiftType> mShiftTypesList;
-
+    /** Horas máximas semanales */
     private long mWeeklyHours;
+    /** Periodo con las horas actualmente establecidas */
     private Period mSetHours;
+    /** Periodo con la duración del turno */
     private Period mShiftPeriod;
+    /** Numero de dias a añadir dentro de la semana */
     private int mAddDays = 1;
 
-
-    //Layout
+    /** Lista con los botones de los dias de la semana */
     private ArrayList<ToggleButton> mDayButtons;
 
+
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param date Dia seleccionado
+     * @param userRef Referencia del usuario
+     * @param shiftTypes Mapa con los tipos de turnos ShiftType
+     * @param currentHours Horas actualmente establecidas en milisegundos
+     * @param weeklyHours Horas maximas semanales en milisegundos
+     * @return instancia de la clase CreateShiftDialog
+     */
     public static CreateShiftDialog newInstance(DateTime date, UserRef userRef, Map<String, ShiftType> shiftTypes, long currentHours, long weeklyHours) {
         CreateShiftDialog fragment = new CreateShiftDialog();
         Bundle args = new Bundle();
@@ -82,6 +104,10 @@ public class CreateShiftDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -95,6 +121,10 @@ public class CreateShiftDialog extends DialogFragment {
 
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -147,8 +177,6 @@ public class CreateShiftDialog extends DialogFragment {
             buttonParams.height = buttonParams.width;
             button.setOnClickListener(buttonClick);
         }
-
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_createShift_title)
@@ -221,6 +249,9 @@ public class CreateShiftDialog extends DialogFragment {
         return dialog;
     }
 
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -228,6 +259,8 @@ public class CreateShiftDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Actualiza el contador total de horas en la vista al incluir nuevos dias
+     */
     private void updateTimeCount(){
 
         Period addedTime = mShiftPeriod.multipliedBy(mAddDays);
@@ -245,6 +278,8 @@ public class CreateShiftDialog extends DialogFragment {
         }
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface CreateShiftListener {
         void onCreateShiftCreate(ArrayList<Shift> newShifts);
     }

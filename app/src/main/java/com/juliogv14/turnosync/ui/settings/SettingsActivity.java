@@ -7,12 +7,20 @@ import android.view.MenuItem;
 import com.juliogv14.turnosync.R;
 
 /**
- * Created by Julio on 01/12/2017.
- * SettingsActivity.class
+ /**
+ * La clase SettingsActivity es responsable de contener el fragmento de la configuración de la
+ * aplicación.
+ * Extiende AppCompatActivity
+ *
+ * @author Julio García
+ * @see AppCompatActivity
  */
-
 public class SettingsActivity extends AppCompatActivity {
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Se establece el boton home para volver a la pantalla anterior
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +28,10 @@ public class SettingsActivity extends AppCompatActivity {
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Responde cuando se selecciona un elemento del menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

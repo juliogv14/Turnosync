@@ -39,25 +39,37 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.databinding.ActivityLoginBinding;
 import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
+import com.juliogv14.turnosync.utils.AnimationViewUtils;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
- * Created by Julio on 14/11/2017.
- * LoginActivity.java
+ * La clase LoginActivity es responsable de manejar el inicio de sesion del usuario y responder a
+ * la navegación despues de iniciar sesión, pantalla de registro y de restablecer contraseña.
+ * Extiende AppCompatActivity.
+ * Implementa la interfaz de escucha del cuadro de dialogo ResetPasswordDialog.
+ *
+ * @author Julio García
+ * @see AppCompatActivity
+ * @see ResetPasswordDialog.ResetPasswordListener
+ * @see FirebaseAuth
  */
-
 public class LoginActivity extends AppCompatActivity implements ResetPasswordDialog.ResetPasswordListener {
 
-    //Constants
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
+    /** Codigo del intent en el inicio de sesion con google */
     private static final int RC_GOOGLE_SIGN_IN = 0;
 
-    //View Binding
+    /** Referencia a la vista con databinding */
     private ActivityLoginBinding mViewBinding;
-    //Firebase auth
+    /** Referencia al servicio de autenticación de Firebase */
     private FirebaseAuth mFirebaseAuth;
-    private GoogleSignInClient mGoogleSignInClient;
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Se establecen las escuchas de finalizado en el teclado, botón de login, botón de login con google
+     * enlace de recuperacion de contraseña.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,12 +105,12 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                 .requestEmail()
                 .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        final GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
         mViewBinding.buttonGoogleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent googleSignInIntent = mGoogleSignInClient.getSignInIntent();
-                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+                Intent googleSignInIntent = googleSignInClient.getSignInIntent();
+                AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
                 startActivityForResult(googleSignInIntent, RC_GOOGLE_SIGN_IN);
             }
         });
@@ -124,12 +136,21 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         }, 0, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
+    /** {@inheritDoc}
+     * Lifecycle callback
+     * Incluye el menu desde un recurso
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Responde cuando se selecciona un elemento del menu.
+     * Redirecciona a la pantalla de registro
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -139,7 +160,9 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         return super.onOptionsItemSelected(item);
     }
 
-    /*Google sign in*/
+    /** {@inheritDoc} <br>
+     * Llamado cuando finaliza el inicio de sesion con google.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -154,7 +177,7 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                         addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
+                                AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
                                 if (task.isSuccessful()) {
                                     Intent signCompleteIntent = new Intent(getBaseContext(), DrawerActivity.class);
                                     signCompleteIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -168,11 +191,14 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                             }
                         });
             } else {
-                FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
+                AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), false);
             }
         }
     }
 
+
+    /** Intento de inicio de sesión comprobando si las cadenas introducidas son validas.
+     */
     private void attemptLogin() {
 
         //Reset error indicator
@@ -199,7 +225,7 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         }
 
         /*Check for a valid password.*/
-        if (TextUtils.isEmpty(password) && !FormUtils.isLoginPasswordValid(password)) {
+        if (TextUtils.isEmpty(password)) {
             mViewBinding.editTextLayoutPassword.
                     setError(getString(R.string.login_error_invalid_password));
             focusView = mViewBinding.editTextPassword;
@@ -213,12 +239,12 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         } else {
 
             //Firebase signin with email and password
-            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
+            AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(), true);
             mFirebaseAuth.signInWithEmailAndPassword(email, password).
                     addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            FormUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
+                            AnimationViewUtils.showLoadingIndicator(mViewBinding.layoutProgressbar.getRoot(),
                                     false);
                             if (!task.isSuccessful()) {
                                 if (task.getException() != null) {
@@ -247,6 +273,7 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
                         }
                     });
         }
+
         mFirebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -267,11 +294,11 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
+    /** Callback del dialogo de restablecer contraseña. Envia el email con en enlace para restablecer
+     * la contraseña
+     *
+     *  @param email email introducido en el dialogo
+     */
     @Override
     public void onResetPassword(String email) {
         mFirebaseAuth.sendPasswordResetEmail(email)

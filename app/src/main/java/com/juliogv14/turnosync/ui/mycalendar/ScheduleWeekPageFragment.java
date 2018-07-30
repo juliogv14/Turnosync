@@ -264,7 +264,6 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mViewBinding.gridViewWeek.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: 10/07/2018 Redundance code
                 int day = position % 8;
                 if(position > 7 && day > 0 ) {
                     DateTime date = mWeekDate.plusDays(day-1);

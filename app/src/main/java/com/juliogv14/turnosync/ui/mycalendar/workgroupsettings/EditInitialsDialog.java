@@ -19,26 +19,37 @@ import com.juliogv14.turnosync.databinding.DialogEditInitialsBinding;
 import com.juliogv14.turnosync.utils.FormUtils;
 
 /**
- * Created by Julio on 26/02/2018.
- * EditInitialsDialog
+ * La clase EditInitialsDialog es responsable de pedir la abreviación del usuario a editar
+ * Es llamada dentro de WorkgroupSettingsFragment
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
  */
-
 public class EditInitialsDialog extends DialogFragment {
 
-    //Constants
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String USER_REF_KEY = "userRef";
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogEditInitialsBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private EditInitialsListener mListener;
 
-    //Variables
+   /** Referencia del usuario a cambiar sus iniciales */
     private UserRef userRef;
+    /** Iniciales del usuario a cambiar */
     private String mInitials;
 
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param user Referencia del usuario a cambiar sus iniciales
+     * @return instancia de la clase EditInitialsDialog
+     */
     public static EditInitialsDialog newInstance(UserRef user) {
         EditInitialsDialog fragment = new EditInitialsDialog();
         Bundle args = new Bundle();
@@ -47,6 +58,10 @@ public class EditInitialsDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -59,6 +74,10 @@ public class EditInitialsDialog extends DialogFragment {
         }
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -111,13 +130,19 @@ public class EditInitialsDialog extends DialogFragment {
         return dialog;
     }
 
-
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Al crear la vista se centra la antención en el campo vacío.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewBinding.editTextName.requestFocus();
     }
 
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -125,6 +150,9 @@ public class EditInitialsDialog extends DialogFragment {
         mListener = null;
     }
 
+    /** Se intenta enviar los datos comprobando si son cadenas validas
+     * @return true si los datos son validos. False en caso contrario.
+     */
     private boolean attemptEditInitials() {
         Boolean isReadyToClose = true;
         //Get strings from editText
@@ -148,6 +176,8 @@ public class EditInitialsDialog extends DialogFragment {
         return isReadyToClose;
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface EditInitialsListener {
         void onInitialsName(UserRef userRef);
     }

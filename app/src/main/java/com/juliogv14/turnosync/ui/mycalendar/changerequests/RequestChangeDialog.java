@@ -32,27 +32,52 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * La clase ResetPasswordDialog es responsable de confirmar la solicitud de cambio de turno ChangeRequest
+ * el email de recuperación de contraseña. Es llamada dentro de ScheduleWeekPageFragment
+ * Extiende DialogFragment.
+ *
+ * @author Julio García
+ * @see DialogFragment
+ * @see ChangeRequest
+ */
 public class RequestChangeDialog extends DialogFragment {
 
-    //Keys
+    //{@
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String OWN_SHIFT_KEY = "ownShift";
     private static final String OTHER_SHIFT_KEY = "otherShift";
     private static final String SHIFT_TYPES_MAP = "shiftTypesMap";
     private static final String USER_REF_LIST = "userRefList";
+    //@}
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private DialogRequestChangeBinding mViewBinding;
 
-    //Parent fragment
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private RequestChangeListener mListener;
 
-    //Variables
+    /** Turno del solicitante */
     private Shift mOwnShift;
+    /** Turno a intercambiar */
     private Shift mOtherShift;
+    /** Mapa con los tipos de turnos ShiftType */
     private HashMap<String, ShiftType> mShiftTypesMap;
+    /** Mapa con las referencias de los usuarios UserRef */
     private HashMap<String, UserRef> mUserRefsMap;
 
+
+    /** Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param ownShift Turno del solicitante
+     * @param otherShift Turno a intercambiar
+     * @param shiftTypes Mapa con los tipos de turnos ShiftType
+     * @param userRefs Mapa con las referencias de los usuarios UserRef
+     * @return instancia de la clase RequestChangeDialog
+     */
     public static RequestChangeDialog newInstance(Shift ownShift, Shift otherShift, HashMap<String, ShiftType> shiftTypes, ArrayList<UserRef> userRefs){
         RequestChangeDialog fragment = new RequestChangeDialog();
         Bundle args = new Bundle();
@@ -64,6 +89,10 @@ public class RequestChangeDialog extends DialogFragment {
         return fragment;
     }
 
+    /** {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -77,6 +106,10 @@ public class RequestChangeDialog extends DialogFragment {
 
     }
 
+    /** {@inheritDoc} <br>
+     * Lifecycle callback.
+     * Construccion del cuadro de dialogo.
+     */
     @NonNull
     @Override
     @SuppressWarnings("unchecked")
@@ -92,8 +125,6 @@ public class RequestChangeDialog extends DialogFragment {
                 mUserRefsMap.put(userRef.getUid(), userRef);
             }
         }
-
-
 
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_request_change, null);
         mViewBinding = DialogRequestChangeBinding.bind(view);
@@ -122,12 +153,30 @@ public class RequestChangeDialog extends DialogFragment {
         return builder.create();
     }
 
+    /** {@inheritDoc} <br>
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+        mListener = null;
+    }
+
+
+    /** {@inheritDoc} <br>
+     * Cuando se cierra el cuadro de dialogo se indica por la interfaz de comunicacion
+     */
     @Override
     public void onDismiss(DialogInterface dialog) {
         mListener.onCancelShiftChange();
         super.onDismiss(dialog);
     }
 
+    /** Este metodo rellena la vista sobre un turno con el turno pasado por argumento
+     * @param shiftItem Referencia a la vista de un turno
+     * @param shift Instancia de turno
+     */
     private void displayShift(ItemChangeBinding shiftItem, Shift shift){
 
         //Label
@@ -164,6 +213,8 @@ public class RequestChangeDialog extends DialogFragment {
         shiftItem.textViewChangeTag.setBackground(background);
     }
 
+    /** Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface RequestChangeListener {
         void onRequestShiftChange(ChangeRequest changeRequest);
         void onCancelShiftChange();
