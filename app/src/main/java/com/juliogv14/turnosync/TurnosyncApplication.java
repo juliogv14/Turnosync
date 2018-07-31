@@ -6,11 +6,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 /**
- * Created by Julio on 26/01/2018.
- * TurnosyncApplication.java
+ * La clase TurnosyncApplication extiende la clase Application
+ * para realizar configuraciones al ejecutar la aplicacion
+ *
+ * @author Julio García
+ * @see Application
  */
-
 public class TurnosyncApplication extends Application {
+
+    /**
+     * {@inheritDoc}
+     * Lifecycle callback.
+     * Se configura Firebase Cloud Firestore para tener acceso a la cache de la base de datos sin
+     * conexión a internet
+     */
     @Override
     public void onCreate() {
         super.onCreate();
