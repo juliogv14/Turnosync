@@ -18,7 +18,7 @@ import com.juliogv14.turnosync.R;
 public class SettingsActivity extends AppCompatActivity {
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Se establece el boton home para volver a la pantalla anterior
      */
     @Override
@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Responde cuando se selecciona un elemento del menu.
      */
     @Override

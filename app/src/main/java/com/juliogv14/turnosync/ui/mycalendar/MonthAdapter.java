@@ -23,42 +23,56 @@ import com.juliogv14.turnosync.utils.CalendarUtils;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Julio on 08/02/2018.
- * MonthAdapter
+ * La clase MonthAdapter es la clase encargada de proporcionar la vista en forma de cuadricula
+ * que representa el calendario de un mes. Se muestran los turnos asignados al usuario conectado en la aplicación.
+ * Extiende BaseAdapter
+ *
+ * @author Julio García
+ * @see BaseAdapter
  */
-
 public class MonthAdapter extends BaseAdapter {
-    private Calendar mCalendar;
+    /** Fecha del primer dia del mes */
     private DateTime mMonthDate;
-    private Calendar mCalendarToday;
+    /** Contexto */
     private Context mContext;
+    /** Medidas del dispositivo */
     private DisplayMetrics mDisplayMetrics;
+    /** Lista de los elementos del adaptador */
     private List<String> mItems;
-    private int mMonth;
-    private int mYear;
-    private int mDaysShown;
+    /** Numero de dias que se muestran del mes anterior */
     private int mDaysLastMonth;
+    /** Numero de dias que se muestran del mes posterior */
     private int mDaysNextMonth;
+    /** Tamaño de las casillas del encabezado con los numeros */
     private int mTitleHeight;
+    /** Vector con los dias de la semana */
     private String[] mDays;
 
+    /** Listado con los turnos asociados al usuario del mes correspondiente */
     private ArrayList<Shift> mShiftsList;
+    /** Mapa con los tipos de turno */
     private Map<String, ShiftType> mShiftsTypesMap;
+    /** Indice para recorrer el vector de turnos */
     private int mCurrentShiftIndex;
 
 
-    public MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts, Map<String, ShiftType> types) {
+    /**
+     * Constructor del adaptador
+     * @param c Contexto
+     * @param monthDate Fecha del primer dia del mes
+     * @param metrics Medidas del dispositivo
+     * @param shifts Listado con los turnos asociados al usuario del mes correspondiente
+     * @param types Mapa con los tipos de turno
+     */
+    MonthAdapter(Context c, Date monthDate, DisplayMetrics metrics, ArrayList<Shift> shifts, Map<String, ShiftType> types) {
         mContext = c;
-        mCalendar = Calendar.getInstance();
-        mCalendar.setTime(monthDate);
         mMonthDate = new DateTime(monthDate);
-        mCalendarToday = Calendar.getInstance();
         mDisplayMetrics = metrics;
         mDays = mContext.getResources().getStringArray(R.array.calendar_days_of_week);
 
@@ -67,23 +81,18 @@ public class MonthAdapter extends BaseAdapter {
         populateMonth();
     }
 
+    /**
+     * Calcula los dias que se deben mostrar en el calendario
+     */
     private void populateMonth() {
-        
-        mYear = mCalendar.get(Calendar.YEAR);
-        mCalendar.add(Calendar.DAY_OF_MONTH, 7);
-        mMonth = mCalendar.get(Calendar.MONTH);
 
         //Header with day names
         mItems = new ArrayList<>();
-        for (String day : mDays) {
-            mItems.add(day);
-            mDaysShown++;
-        }
+        Collections.addAll(mItems, mDays);
 
         //Days last month
         int firstDayWeek = mMonthDate.getDayOfWeek();
         mDaysLastMonth = firstDayWeek-1;
-        mDaysShown += mDaysLastMonth;
         int firstDayDisplay = mMonthDate.minusDays(firstDayWeek-1).getDayOfMonth();
         for (int i = 0; i < mDaysLastMonth; i++) {
             mItems.add(String.valueOf(firstDayDisplay+i));
@@ -91,7 +100,6 @@ public class MonthAdapter extends BaseAdapter {
 
         //Days current month
         int daysThisMonth = mMonthDate.dayOfMonth().getMaximumValue();
-        mDaysShown += daysThisMonth;
         for (int i = 1; i <= daysThisMonth; i++) {
             mItems.add(String.valueOf(i));
         }
@@ -99,47 +107,19 @@ public class MonthAdapter extends BaseAdapter {
         //Days next month
         int lastDayWeek = mMonthDate.withDayOfMonth(mMonthDate.dayOfMonth().getMaximumValue()).getDayOfWeek();
         mDaysNextMonth = 7 - lastDayWeek;
-        mDaysShown += mDaysNextMonth;
 
         for (int i = 1; i <= mDaysNextMonth; i++) {
             mItems.add(String.valueOf(i));
         }
-
-         /*   mCalendar.set(Calendar.DAY_OF_MONTH, 1);
-            int firstDay = CalendarUtils.getDay(mCalendar.get(Calendar.DAY_OF_WEEK));
-            int prevDay;
-            if (mMonth == 0) {
-                mCalendar.set(Calendar.MONTH, 11);
-                prevDay = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH) - firstDay + 1;
-            } else {
-                mCalendar.set(Calendar.MONTH, mMonth - 1);
-                prevDay = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH) - firstDay + 1;
-            }
-            for (int i = 0; i < firstDay; i++) {
-                mItems.add(String.valueOf(prevDay + i));
-                mDaysLastMonth++;
-                mDaysShown++;
-            }
-            mCalendar.set(Calendar.MONTH, mMonth);
-            int daysInMonth = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-            for (int i = 1; i <= daysInMonth; i++) {
-                mItems.add(String.valueOf(i));
-                mDaysShown++;
-            }
-
-            mDaysNextMonth = 1;
-            while (mDaysShown % 7 != 0) {
-                mItems.add(String.valueOf(mDaysNextMonth));
-                mDaysShown++;
-                mDaysNextMonth++;
-            }
-        */
-
-        
         
         mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
     }
 
+    /**
+     * Devuelve una fecha a partir de una posición del adaptador
+     * @param position Posición del adaptador
+     * @return Fecha correspondiente
+     */
     private DateTime getDate(int position) {
         //monthDate is the first day of the month
         int header = 7;
@@ -147,6 +127,18 @@ public class MonthAdapter extends BaseAdapter {
         return mMonthDate.plusDays(position-monthDatePos);
     }
 
+
+    /**
+     * Metodo en el que se construye la vista del elemento a dibujar.
+     * Se infla un elemento de la vista bajo la vista padre
+     * Se crea la referencia de la vista mediante databinding.
+     * Se rellenan los datos de la vista según el tipo de casilla, Encabezado o dia del mes.
+     *
+     * @param position Posición del elemento
+     * @param convertView Vista del elemento
+     * @param parent Vista padre
+     * @return Vista del elemento a dibujar
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -226,11 +218,20 @@ public class MonthAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Devuelve el numero total de elementos
+     * @return Tamaño total de casillas de la cuadricula
+     */
     @Override
     public int getCount() {
         return mItems.size();
     }
 
+    /**
+     * Permite identificar el tipo de vista correspondiente a la posición
+     * @param position Posición a comprobar
+     * @return Identificador del tipo de vista
+     */
     @Override
     public int getItemViewType(int position) {
         if (position < 7) {
@@ -240,15 +241,25 @@ public class MonthAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Devuelve el numero total de tipos de vistas distintas.
+     * @return Numero total de tipos de vistas distintas
+     */
     @Override
     public int getViewTypeCount() {
         return 2;
     }
 
+    /**
+     * Obtiene el elemento correspondiente a la posición proporcionada.
+     * @param position Posición del elemento
+     * @return Elemento de la lista en la posición dada.
+     */
     @Override
     public Object getItem(int position) {
         return mItems.get(position);
     }
+
 
     @Override
     public long getItemId(int position) {

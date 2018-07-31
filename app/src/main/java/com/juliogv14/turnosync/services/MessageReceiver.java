@@ -43,7 +43,8 @@ public class MessageReceiver extends FirebaseMessagingService {
     private static final String DENIED_MANAGER = "deniedManager";
     //@}
 
-    /** Lifecycle callback.
+    /**
+     * Callback del ciclo de vida.
      * Se llama a onCreate de la clase de la que extiende.
      * Fuerza al servicio a esperar al debugger cuando este está activado
      */
@@ -54,7 +55,8 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
-    /** Callback que se llama cuando el servicio recibe un mensaje.
+    /**
+     * Callback que se llama cuando el servicio recibe un mensaje.
      * Diferencia entre tipos de actualización de calendario y tipos de cambio de turnos
      */
     @Override
@@ -78,7 +80,8 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
-    /** Metodo usado dentro de {@link #onMessageReceived} para mostrar la notificación de
+    /**
+     * Metodo usado dentro de {@link #onMessageReceived} para mostrar la notificación de
      * actualización de turnos.
      * Crea y muestra una notificación cuando recibe un mensaje del servicio de notificaciones
      *
@@ -119,7 +122,8 @@ public class MessageReceiver extends FirebaseMessagingService {
 
     }
 
-    /** Metodo usado dentro de {@link #onMessageReceived} para mostrar notificaciones de cambios de
+    /**
+     * Metodo usado dentro de {@link #onMessageReceived} para mostrar notificaciones de cambios de
      * turnos
      * Crea y muestra una notificación cuando recibe un mensaje del servicio de notificaciones
      *
@@ -197,7 +201,5 @@ public class MessageReceiver extends FirebaseMessagingService {
                 notificationManager.notify(notifId, notificationBuilder.build());
             }
         }
-
-
     }
 }

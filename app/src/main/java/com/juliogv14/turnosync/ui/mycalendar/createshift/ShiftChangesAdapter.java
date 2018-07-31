@@ -25,20 +25,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * La clase ShiftChangesAdapter es la clase encargada de proporcionar la vista en forma de lista de elementos
+ * de turnos a cambiar antes de confirmar los cambios.
+ * Extiende RecyclerView.Adapter.
+ *
+ * @author Julio García
+ * @see RecyclerView.Adapter
+ * @see RecyclerView.ViewHolder
+ */
 public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapter.ShiftChangesViewHolder>{
 
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Mapa de las listas de cambios segun el tipo de cambio */
     private HashMap<String, ArrayList<Shift>> mShiftChanges;
+    /** Mapa con los tipos de turno */
     private HashMap<String, ShiftType> mShiftTypes;
+    /** Mapa con las referencias a los usuarios */
     private HashMap<String, UserRef> mUserRefs;
 
-    public ShiftChangesAdapter(Context context, HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes, HashMap<String, UserRef> userRefs) {
+
+    /**
+     * Constructor del adaptador
+     * @param context Contexto
+     * @param shiftChanges Mapa de las listas de cambios segun el tipo de cambio
+     * @param shiftTypes Mapa con los tipos de turno
+     * @param userRefs Mapa con las referencias a los usuarios
+     */
+    ShiftChangesAdapter(Context context, HashMap<String, ArrayList<Shift>> shiftChanges, HashMap<String, ShiftType> shiftTypes, HashMap<String, UserRef> userRefs) {
         this.mContext = context;
         this.mShiftChanges = shiftChanges;
         this.mShiftTypes = shiftTypes;
         this.mUserRefs = userRefs;
     }
 
+    /**
+     * Infla la vista del elemento de un ViewHolder
+     * @param parent Vista padre
+     * @param viewType Tipo de vista
+     * @return ViewHolder del elemento
+     */
     @NonNull
     @Override
     public ShiftChangesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -46,6 +73,11 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
         return new ShiftChangesViewHolder(itemBinding);
     }
 
+    /**
+     * Rellena la vista con el elemento correspondiente a partir de la posición y los datos.
+     * @param holder Elemento
+     * @param position Posición
+     */
     @Override
     public void onBindViewHolder(@NonNull ShiftChangesViewHolder holder, int position) {
         List<Shift> listAdded = mShiftChanges.get(mContext.getString(R.string.data_changes_added));
@@ -69,6 +101,10 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
         }
     }
 
+    /**
+     * Devuelve el numero total de elementos
+     * @return Tamaño total de los cambios de turno en el calendario
+     */
     @Override
     public int getItemCount() {
         return  mShiftChanges.get(mContext.getString(R.string.data_changes_added)).size()
@@ -76,9 +112,16 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
                 + mShiftChanges.get(mContext.getString(R.string.data_changes_editedNew)).size()
                 + mShiftChanges.get(mContext.getString(R.string.data_changes_editedOld)).size();
     }
-
+    /**
+     * Esta clase representa la vista de un elemento dentro de un recyclerview.
+     * Extiende ViewHolder
+     *
+     * @author Julio García
+     * @see RecyclerView.ViewHolder
+     */
     class ShiftChangesViewHolder extends RecyclerView.ViewHolder {
-
+        /**
+         * Referencia a la vista del elemento */
         ItemChangeBinding binding;
 
         ShiftChangesViewHolder(ItemChangeBinding viewBinding) {
@@ -86,6 +129,12 @@ public class ShiftChangesAdapter extends RecyclerView.Adapter<ShiftChangesAdapte
             this.binding = viewBinding;
         }
 
+
+        /**
+         * Se rellena la vista
+         * @param change Tipo de cambio
+         * @param shift Turno a mostrar
+         */
         public void bind (int change, Shift shift){
             //Label
             String changeLabel = "";

@@ -49,45 +49,78 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * La clase DrawerActivity es la clase principal de la aplicación y que sirve de entrada.
+ * Si el usuario aun no ha iniciado sesión se navega hasta LoginActivity para ello antes de interactuar
+ * con la aplicación. Es la encargada de controlar el panel lateral de navegación.
+ * Esta activa en la mayor parte de la aplicación y las vistas se intercambian mediante fragmentos Fragment.
+ * Extiende AppCompatActivity.
+ * Implementa la interfaz de escucha del fragmento HomeFragment para cambiar de vista.
+ * Implementa la escucha de la vista de navegacion NavigationDrawer para cambiar de vista
+ * Implementa la escucha de camibos en la configuración de la aplicación para cambiar los datos del usuario.
+ *
+ * @author Julio García
+ * @see AppCompatActivity
+ * @see Fragment
+ * @see FirebaseAuth
+ * @see FirebaseFirestore
+ * @see NavigationView
+ * @see SharedPreferences
+ */
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
         HomeFragment.OnHomeFragmentInteractionListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Activity views
+    /** Referencia a la vista con databinding */
     protected ActivityDrawerBinding mViewBinding;
 
-    //Firebase Auth
+    /** Referencia al servicio de autenticación de Firebase */
     private FirebaseAuth mFirebaseAuth;
+    /** Escucha de cambios del estado de sesión del usuario */
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    /** Referencia al usuario conectado */
     private FirebaseUser mFirebaseUser;
 
-    //Firebase Firestore
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Registro de escucha en la peticion de grupos de trabajo */
     private ListenerRegistration mWorkgroupsListener;
+    /** Lista de grupos de trabajo del usuario */
     private ArrayList<UserWorkgroup> mWorkgroupsList;
 
-
-    //drawer
+    /** Referencia al panel lateral */
     private DrawerLayout mDrawerLayout;
+    /** Referencia a la vista del encabezado del panel lateral */
     private HeaderDrawerBinding mHeaderBinding;
+    /** Referencia a la barra de acciones */
     private ActionBar mToolbar;
 
-    //SavedInstanceState
+    //@{
+    /** Claves para conservar datos al recrear la actividad */
     private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
     private static final String RESTORED_FRAGMENT_KEY = "restoredFragment";
-
-    private int mCurrentFragmentID;
-    private MyCalendarFragment mMyCalendarFragment;
-    private HomeFragment mHomeFragment;
     private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    //@}
+
+    /** Identificador del fragmento actual */
+    private int mCurrentFragmentID;
+    /** Referencia al fragmento MyCalendarFragment */
+    private MyCalendarFragment mMyCalendarFragment;
+    /** Referencia al fragmento HomeFragment */
+    private HomeFragment mHomeFragment;
+    /** Referencia al grupo seleccionado actualmente */
     private UserWorkgroup mCurrentWorkgroup;
 
-    //
-
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al crearse se inicializa la vista. Recupera los datos guarados en {@link #onSaveInstanceState} Se establecen las escuchas del panel lateral y de
+     * cambio de configuración. Se crea la escucha de estado de sesión.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +141,6 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = mViewBinding.toolbar;
         setSupportActionBar(toolbar);
         mToolbar = getSupportActionBar();
-
 
         mDrawerLayout = (DrawerLayout) mViewBinding.getRoot();
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -155,7 +187,11 @@ public class DrawerActivity extends AppCompatActivity
 
 
     }
-
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al principio y al volver desde otra vista.
+     * Al iniciar se vincula la escucha de cambio de sesión y se muestra el fragmento actual
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -167,12 +203,22 @@ public class DrawerActivity extends AppCompatActivity
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al principio y al volver desde otra vistad.
+     * Comprobación de la versión de Google Play Services
+     */
     @Override
     protected void onResume() {
         super.onResume();
         FormUtils.checkGooglePlayServices(this);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al parar la aplicación al ocultarla.
+     * Se desvinculan las escuchas del estado de sesión y de la petición de los grupos
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -185,6 +231,11 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al destruirse la actividad.
+     * Se desvincula la escucha de cambios de configuracón
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -193,6 +244,10 @@ public class DrawerActivity extends AppCompatActivity
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    /** {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama antes de destruirse la actividad
+     * Se guardan los datos para poder ser restablecidos al volver a la actividad.
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -201,6 +256,12 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al pulsar el boton de atras del dispositivo.
+     * Se cierra el panel si está abierto, vuelve al fragmento principal HomeFragment desde MyCalendarFragment
+     * o si no continua con la llamada por defecto.
+     */
     @Override
     public void onBackPressed() {
 
@@ -215,6 +276,13 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Inicializa la vista despues de que un usuario se conecta. Se vincula la escucha de la
+     * petición de grupos del usuario, se muestra el fragmento principal por defecto y se registra el
+     * dispositivo para enviar notificaciones.
+     *
+     * @param user Usuario conectado
+     */
     private void onSignedInInitialize(FirebaseUser user) {
         SharedPreferences shrPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = shrPreferences.edit();
@@ -229,10 +297,19 @@ public class DrawerActivity extends AppCompatActivity
         registerDevice(shrPreferences);
     }
 
+    /**
+     * Limpia la vista al desconectarse un usuario.
+     */
     private void onSignedOutCleanup() {
         mHeaderBinding.textViewDisplayName.setText("");
     }
 
+
+    /**
+     * Crea el fragmento correspondiente segun el argumento y lo carga.
+     * Se llama dentro de {@link #onSignedInInitialize} ,{@link #onNavigationItemSelected} y {@link #onWorkgroupSelected(UserWorkgroup)}
+     * @param itemId Identificador del fragmento a cargar.
+     */
     private void displaySelectedScreen(int itemId) {
 
         mCurrentFragmentID = itemId;
@@ -264,6 +341,10 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Vincula la escucha de la petición de grupos del usuario, los cambios se obtienen en tiempo real.
+     * LLamado dentro de {@link #onSignedInInitialize}
+     */
     private void attatchWorkgroupsListener() {
 
         CollectionReference userGroupsRef = mFirebaseFirestore.collection(getString(R.string.data_ref_users)).document(mFirebaseUser.getUid())
@@ -316,7 +397,14 @@ public class DrawerActivity extends AppCompatActivity
 
     //Interfaces implementation
 
-    //OnNavigationItemSelectedListener
+
+    /**
+     * Implementación de la escucha al seleccionar una opcion del panel de navegación.
+     * Cambia la vista segun la opción seleccionada. Desconecta al usuario de la aplicación y
+     * quita el registro para notificaciones.
+     * @param item boton del menu
+     * @return True
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -337,12 +425,17 @@ public class DrawerActivity extends AppCompatActivity
                 break;
         }
 
-
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    //OnSharedPreferenceChangeListener
+
+    /**
+     * Se llama cuando un elemento de la configuración cambia. Responde a cambios del nombre
+     * o email de usuario actualizandolos en base de datos y al cambiar el token de registro.
+     * @param sharedPreferences configuración de la aplicación
+     * @param key clave del elemento que ha cambiado
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
@@ -380,12 +473,18 @@ public class DrawerActivity extends AppCompatActivity
                         });
             }
         } else if (TextUtils.equals(key, getString(R.string.data_key_token))){
-
             registerDevice(sharedPreferences);
 
         }
     }
 
+
+    /**
+     * Registra la aplicación para poder recibir notificaciónes desde Firebase Cloud Messaging.
+     * Esto se hace escribiendo en la base de datos que activa el registro desde la parte del servidor.
+     * Se llama desde {@link #onSharedPreferenceChanged} y {@link #onSignedInInitialize}
+     * @param sharedPreferences configuración de la aplicación
+     */
     private void registerDevice(SharedPreferences sharedPreferences) {
         //Update app token
         String token = sharedPreferences.getString( getString(R.string.data_key_token),"");
@@ -407,6 +506,11 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
+
+    /**
+     * Quita el registro para recibir notificaciones.
+     * Se llama desde{@link #onNavigationItemSelected}
+     */
     private void unregisterDevice(){
         String appId = FirebaseInstanceId.getInstance().getId();
         DocumentReference userRef = mFirebaseFirestore.collection(getString(R.string.data_ref_messaging)).document(mFirebaseUser.getUid())
@@ -415,7 +519,12 @@ public class DrawerActivity extends AppCompatActivity
 
     }
 
-    //OnFragmentInteractionListener
+
+    /**
+     * Implementación de la interfaz de comunicación para fragmentos
+     * Cambia el titulo de la barra de la aplicacion y marca el elemento selecionado en el panel lateral.
+     * @param fragmentId identificador de fragmento
+     */
     @Override
     public void onFragmentSwapped(int fragmentId) {
         switch (fragmentId) {
@@ -430,12 +539,17 @@ public class DrawerActivity extends AppCompatActivity
         }
     }
 
-    //OnHomeFragmentInteractionListener
+
+    /**
+     * Implementación de la interfaz de comunicacion con HomeFragment
+     * Cambia el fragmento actual por MyCalendarFragment con el grupo de trabajo seleccionado.
+     * @see HomeFragment.OnHomeFragmentInteractionListener
+     * @param workgroup grupo de trabajo seleccionado
+     */
     @Override
     public void onWorkgroupSelected(UserWorkgroup workgroup) {
         mCurrentWorkgroup = workgroup;
         displaySelectedScreen(R.string.fragment_mycalendar);
-
     }
 
 }

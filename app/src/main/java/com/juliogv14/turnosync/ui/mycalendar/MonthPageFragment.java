@@ -30,61 +30,93 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Julio on 18/02/2018.
- * MonthPageFragment
+ * La clase MonthPageFragment es el fragmento que representa una pagina del view pager conteniendo un mes del calendario
+ *
+ * Extiende Fragment.
+ *
+ * @author Julio García
+ * @see Fragment
  */
-
 public class MonthPageFragment extends Fragment {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Constants
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    //{@
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String CURRENT_MONTH_DATE_KEY = "currentMonthDate";
     private static final String MONTH_SHIFT_LIST_KEY = "shiftList";
     private static final String MONTH_SHIFT_TYPES_MAP_KEY = "shiftTypesMap";
+    //@}
 
-    //Binding
+    /** Referencia a la vista con databinding */
     protected PageMonthBinding mViewBinding;
 
-    //Context and listener
+    /** Contexto del fragmento */
     private Context mContext;
 
-    //GridAdapter
+    /** Referencia al adaptador del Gridview */
     private BaseAdapter mGridAdapter;
+
+    /** Fecha del primer dia del mes */
+    private DateTime mMonthDate;
+    /** Lista de turnos del usuario */
     private ArrayList<Shift> mShiftList;
+    /** Mapa con los tipos de turnos */
     private Map<String, ShiftType> mShiftTypesMap;
 
-    //Variables
-    private DateTime mMonthDate;
+
+    /** Tiempo acumulado total de los turnos del mes */
     private Period mMonthHours;
 
 
-    public static MonthPageFragment newInstance(DateTime monthCalendar, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param monthDate Fecha del primer dia del mes
+     * @param shiftList Lista de turnos del usuario
+     * @param shiftTypes Mapa con los tipos de turnos
+     * @return instancia de la clase HomeFragment
+     */
+    public static MonthPageFragment newInstance(DateTime monthDate, ArrayList<Shift> shiftList, HashMap<String, ShiftType> shiftTypes) {
         MonthPageFragment f = new MonthPageFragment();
-        // Supply index input as an argument.
+
         Bundle args = new Bundle();
-        args.putLong(CURRENT_MONTH_DATE_KEY, monthCalendar.getMillis());
+        args.putLong(CURRENT_MONTH_DATE_KEY, monthDate.getMillis());
         args.putParcelableArrayList(MONTH_SHIFT_LIST_KEY, shiftList);
         args.putSerializable(MONTH_SHIFT_TYPES_MAP_KEY, shiftTypes);
         f.setArguments(args);
         return f;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se marca el indicador para mantener el estado al recrearse.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setRetainInstance(true);
         super.onCreate(savedInstanceState);
     }
 
-    //Inflate view
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     */
     @Nullable
     @Override
     @SuppressWarnings("unchecked")
@@ -99,6 +131,12 @@ public class MonthPageFragment extends Fragment {
         return mViewBinding.getRoot();
     }
 
+
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se inicializa la vista y las variables. Se crea el adaptador del grid view que crea el calendario.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -113,12 +151,20 @@ public class MonthPageFragment extends Fragment {
         mViewBinding.gridViewCalendar.setAdapter(mGridAdapter);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mContext = null;
     }
 
+    /**
+     * Permite notificar al adaptador que recargue la vista mediante la referencia al fragmento.
+     */
     public void notifyGridDataSetChanged() {
         if (mContext != null) {
             ((AppCompatActivity) mContext).runOnUiThread(new Runnable() {
@@ -141,6 +187,10 @@ public class MonthPageFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Recalcula la suma total de horas de los turnos del mes del usuario
+     */
     private void calculateMonthHours (){
         mMonthHours = new Period();
         DateTime firstDay = mMonthDate.toDateTime().withDayOfMonth(1).minusDays(1);

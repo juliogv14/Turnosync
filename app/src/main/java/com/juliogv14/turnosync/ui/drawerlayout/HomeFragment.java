@@ -47,46 +47,73 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Julio on 26/11/2017.
- * HomeFragment.class
+ * La clase HomeFragment es el fragmento por defecto usado en DrawerActivity. Muestra el listado de grupos
+ * del usuario y permite seleccionar un grupo navegando a la pantalla de calendario MyCalendarFragment del grupo.
+ * Permite crear nuevos grupos de trabajo.
+ * Permite seleccionar un grupo para mostrar el campo información.
+ * Extiende Fragment.
+ * Implementa la interfaz de escucha de CreateWorkgroupDialog.
+ *
+ * @author Julio García
+ * @see Fragment
+ * @see DrawerActivity
+ * @see CreateWorkgroupDialog.CreateWorkgroupListener
+ * @see GroupItemsAdapter
+ * @see ActionMode
  */
-
 public class HomeFragment extends Fragment
         implements CreateWorkgroupDialog.CreateWorkgroupListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Key constants
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String WORKGROUP_LIST_KEY = "workgroupList";
 
-    //Context and listener
+    /** Referencia a la vista con databinding */
+    protected FragmentHomeBinding mViewBinding;
+
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private OnHomeFragmentInteractionListener mListener;
 
-    //Data binding
-    protected FragmentHomeBinding mViewBinding;
-    ToolbarActionModeCallback tb;
-
-    //Firebase
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Referencia al usuario conectado */
     private FirebaseUser mFirebaseUser;
 
-    //GridAdapter
+    /** Referencia al adaptador del Gridview */
     private GroupItemsAdapter mGridAdapter;
+    /** Lista de grupos del usuario*/
     private ArrayList<UserWorkgroup> mWorkgroupsList;
+    /** Menu contextual que aprece al mantener pulsado un grupo */
     private ActionMode mActionMode;
+    /** Grupo seleccionado con el menú contextual  */
     private UserWorkgroup mSelectedWorkgroup;
 
+
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param workgroupList Lista de grupos del usuario
+     * @return instancia de la clase HomeFragment
+     */
     public static HomeFragment newInstance(ArrayList<UserWorkgroup> workgroupList) {
         HomeFragment f = new HomeFragment();
-        // Supply index input as an argument.
+
         Bundle args = new Bundle();
         args.putParcelableArrayList(WORKGROUP_LIST_KEY, workgroupList);
         f.setArguments(args);
         return f;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -99,7 +126,11 @@ public class HomeFragment extends Fragment
         }
     }
 
-    //Create objects obj = new obj()
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,16 +141,24 @@ public class HomeFragment extends Fragment
 
     }
 
-    //Inflate view
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Infla la vista y se referencia mediante Databinding.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
-        mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
         return mViewBinding.getRoot();
     }
 
-    //View setup, same as onCreate
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se inicializa la vista y las variables. Se crea el adaptadorSe vinculan las escuchas del boton para crear grupos y
+     * de pulsar sobre un grupò en el adaptador.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -166,17 +205,22 @@ public class HomeFragment extends Fragment
         Log.d(TAG, "Start HomeFragment");
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se notifica al adaptador para que recargue la vista.
+     */
     @Override
     public void onResume() {
         super.onResume();
         mGridAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -184,6 +228,14 @@ public class HomeFragment extends Fragment
         mListener = null;
     }
 
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo CreateWorkgroupDialog
+     * @see CreateWorkgroupDialog.CreateWorkgroupListener
+     * Crea el grupo a partir de los datos proporcionados
+     *
+     * @param name Nombre del grupo
+     * @param description Descripción del grupo
+     */
     @Override
     public void onDialogPositiveClick(String name, String description) {
         if (mFirebaseUser != null) {
@@ -230,6 +282,13 @@ public class HomeFragment extends Fragment
         }
     }
 
+    /**
+     * Maneja los cambios en la vista cuando se mantiene seleccionado un grupo.
+     * Muestra el menu contextual.
+     * @see ActionMode
+     *
+     * @param workgroup Grupo seleccionado.
+     */
     private void handleSelectedWorkgroup(UserWorkgroup workgroup) {
 
         if (!workgroup.isSelected()) {
@@ -239,7 +298,7 @@ public class HomeFragment extends Fragment
             mSelectedWorkgroup = workgroup;
             mSelectedWorkgroup.setSelected(true);
 
-            tb = new ToolbarActionModeCallback(mContext, mSelectedWorkgroup);
+            ToolbarActionModeCallback tb = new ToolbarActionModeCallback(mContext, mSelectedWorkgroup);
             if (mActionMode == null) {
                 mActionMode = ((AppCompatActivity) mContext)
                         .startSupportActionMode(tb);
@@ -252,25 +311,54 @@ public class HomeFragment extends Fragment
         }
     }
 
+    /**
+     * Permite notificar al adaptador que recargue la vista mediante la referencia al fragmento.
+     */
     public void notifyGridDataSetChanged() {
         if (mGridAdapter != null) {
             mGridAdapter.notifyDataSetChanged();
         }
     }
 
+    /**
+     * Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface OnHomeFragmentInteractionListener extends OnFragmentInteractionListener {
         void onWorkgroupSelected(UserWorkgroup workgroup);
     }
 
+    /**
+     * La clase GroupItemAdapter es la clase encargada de proporcionar la vista en cuadricula con los grupos
+     * de usuario.
+     * Extiende ArrayAdapter.
+     *
+     * @author Julio García
+     * @see ArrayAdapter
+     */
     private class GroupItemsAdapter extends ArrayAdapter<UserWorkgroup> {
 
+        /** Referencia a la vista del elemento con databinding */
         private ItemWorkgroupBinding itemBinding;
 
 
+        /**
+         * Constructor por defecto pasando argumentos a la clase de la que hereda.
+         */
         GroupItemsAdapter(@NonNull Context context, int resource, @NonNull List<UserWorkgroup> objects) {
             super(context, resource, objects);
         }
 
+        /**
+         * Metodo en el que se construye la vista del elemento a dibujar.
+         * Se infla un elemento de la vista bajo la vista padre
+         * Se crea la referencia de la vista mediante databinding.
+         * Se rellenan los datos de la vista con el grupo correspondiente a la posición.
+         *
+         * @param position Posición del elemento
+         * @param convertView Vista del elemento
+         * @param parent Vista padre
+         * @return Vista del elemento a dibujar
+         */
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -311,22 +399,46 @@ public class HomeFragment extends Fragment
         }
     }
 
+    /**
+     * La clase ToolbarActionModeCallback es la clase encargada de manejar el menu contextual al seleccionar
+     * un grupo.
+     * Extiende ActionMode.Callback.
+     *
+     * @author Julio García
+     * @see ActionMode.Callback
+     */
     public class ToolbarActionModeCallback implements ActionMode.Callback {
 
+        /** Grupo seleccionado */
         UserWorkgroup mWorkgroup;
+        /** Contexto */
         private Context mContext;
 
+
+        /**
+         * Instancia la clase con los argumentos.
+         * @param mContext Contexto
+         * @param workgroup Grupo seleccionado
+         */
         ToolbarActionModeCallback(Context mContext, UserWorkgroup workgroup) {
             this.mContext = mContext;
             this.mWorkgroup = workgroup;
         }
 
+        /**
+         * Callback del menu contextual.
+         * Creación del menu contextual inflando la vista
+         */
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.menu_home, menu);
             return true;
         }
 
+        /**
+         * Callback del menu contextual. Se llama cuando se invalida el menu o despues de crease por primera vez
+         * Se prepara la vista cambiando el color de los iconos a blanco.
+         */
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             for (int i = 0; i < menu.size(); i++) {
@@ -340,6 +452,10 @@ public class HomeFragment extends Fragment
             return true;
         }
 
+        /**
+         * Callback del menu contextual. Se llama al seleccionar una opcion del menu
+         * Muestra la informacion del grupo seleccionado.
+         */
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
@@ -353,6 +469,11 @@ public class HomeFragment extends Fragment
             return true;
         }
 
+        /**
+         * Callback del menu contextual.
+         * Al destruirse el menu contextual se invalida la referencia al grupo seleccionado y
+         * la referencia del menu contextual.
+         */
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (mActionMode != null) {
@@ -362,6 +483,10 @@ public class HomeFragment extends Fragment
             }
         }
 
+
+        /**
+         * Se crea un cuadro de dialogo mostrando el campo información del grupo seleccionado
+         */
         private void showInfoDialog(){
             new AlertDialog.Builder(mContext).setTitle(mSelectedWorkgroup.getDisplayName())
                     .setMessage(mSelectedWorkgroup.getInfo())

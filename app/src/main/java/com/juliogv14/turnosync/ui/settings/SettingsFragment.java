@@ -26,7 +26,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private final String TAG = this.getClass().getSimpleName();
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Se crea la ventana de configuración.
      * @see PreferenceScreen
      */
@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Escucha a los cambios en la configuración y muestra el valor actual.
      */
     @Override
@@ -59,7 +59,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Al iniciar el fragment se vincula la escucha de la configuración
      */
     @Override
@@ -70,7 +70,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Al parar el fragment se desvincula la escucha de la configuración
      */
     @Override

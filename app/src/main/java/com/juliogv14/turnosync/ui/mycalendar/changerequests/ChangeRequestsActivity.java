@@ -38,25 +38,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * La clase ChangeRequestsActivity es una actividad encargada de manejar la vista con las solicitudes
+ * de cambios de turnos. Muestra la lista y efectua los cambios en el estado de las solicitudes.
+ * Extiende AppCompatActivity
+ * Implementa la interfaz de comunicación de ChangeRequestsAdapter
+ *
+ * @author Julio García
+ * @see AppCompatActivity
+ * @see ChangeRequestsAdapter.ChangeRequestListener
+ */
 public class ChangeRequestsActivity extends AppCompatActivity implements ChangeRequestsAdapter.ChangeRequestListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private ActivityChangeRequestsBinding mViewBinding;
 
-    //Firebase
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Referencia a la colección de las solicitudes en base de datos */
     private CollectionReference mChangeRequestsColl;
+    /** Registro de escucha de la petición de solicitudes de cambios */
     private ListenerRegistration mChangesRequestsListener;
 
-    //Intent data
+    /** Referencia al grupo */
     private UserWorkgroup mWorkgroup;
+    /** Mapa con los tipos de turnos */
     private Map<String, ShiftType> mShiftTypesMap;
+    /** Mapa con los usuarios del grupo */
     private Map<String, UserRef> mUserRefsMap;
+    /** Listado de las solicitudes de cambio */
     private ArrayList<ChangeRequest> mChangeRequestList;
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al crearse se inicializa la vista. Se crea el adaptador para el recycler view que lista las solicitudes.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,6 +104,11 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         mViewBinding.recyclerChangeRequests.setAdapter(adapter);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al destruirse la actividad.
+     * Se desvincula la escucha de solicitudes de cambios
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -92,6 +117,11 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Responde cuando se selecciona un elemento del menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -102,6 +132,11 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Vincula la escucha de la petición de usuarios dentro del grupo, los cambios se obtienen en tiempo real.
+     * Llamado dentro de {@link #onCreate}
+     */
+    // TODO: 31/07/2018 Si un cambio no esta resuelto y la fecha es antigua se deben cancelar
     private void attatchChangeRequestsListener (){
         mChangeRequestsColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_changeRequests));
@@ -162,12 +197,26 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         });
     }
 
+    /**
+     * Implementacion de la interfaz de escucha de ChangeRequestsAdapter
+     * El usuario acepta desde el estado de solicitado
+     * Se cambia el estado de solicitado a aceptado
+     * @param changeRequest Solicitud de cambio
+     */
     @Override
     public void onAcceptRequested(ChangeRequest changeRequest) {
         DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
         docRef.update(getString(R.string.data_key_state), ChangeRequest.ACCEPTED);
     }
 
+    /**
+     * Implementacion de la interfaz de escucha de ChangeRequestsAdapter
+     * El usuario acepta desde el estado de aceptado
+     * Se cambia el estado de aceptado a aprovado y se efectuan los cambios comprobando que no haya conflicto
+     * por modificaciones del calendaro posteriores.
+     *
+     * @param changeRequest Solicitud de cambio
+     */
     @Override
     public void onAcceptAccepted(final ChangeRequest changeRequest) {
         final DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
@@ -204,6 +253,16 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
 
     }
 
+
+
+    /**
+     *  Comprobación de si alguno de los dos turnos implicados han dejado de existir
+     *
+     * @param shift Turno a comprobar
+     * @param sameShifts Vector de booleanos para indicar el resultado
+     * @param pos Posicion dentro del vector
+     * @return Tarea de la petición
+     */
     private Task<QuerySnapshot> getShiftRef(Shift shift, final boolean[] sameShifts, final int pos){
         Task<QuerySnapshot> shiftQuery =  mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
@@ -231,6 +290,10 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         return shiftQuery;
     }
 
+    /**
+     * Escribe un turno en base de datos
+     * @param shift Turno a escribir
+     */
     private void writeShift(Shift shift){
         DocumentReference shiftRef =  mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
@@ -240,6 +303,10 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         shiftRef.set(shift);
     }
 
+    /**
+     * Borra un turno en base de datos
+     * @param shift Turno a borrar
+     */
     private void removeShift(Shift shift){
         DocumentReference shiftRef =  mFirebaseFirestore
                 .collection(getString(R.string.data_ref_users)).document(shift.getUserId())
@@ -248,6 +315,11 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
         shiftRef.delete();
     }
 
+    /**
+     * Resuelve los conflictos de una solicitud de cambio aprobada cancelando las demas que tuvieran alguno
+     * de los dos turnos implicados
+     * @param changeRequest Solicitud de cambio de turno
+     */
     private void resolveConflicts(ChangeRequest changeRequest){
         Shift own = changeRequest.getOwnShift();
         Shift other = changeRequest.getOtherShift();
@@ -268,16 +340,32 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
 
     }
 
+    /**
+     * Implementacion de la interfaz de escucha de ChangeRequestsAdapter
+     * El usuario rechaza desde el estado de solicitado
+     * Dependiendo del usario se cambia el estado a rechazado o cancelado
+     * @param changeRequest Solicitud de cambio
+     * @param uid Indentificador del usuario que lleva a cabo la accion
+     * @param role Rol del usuario
+     */
     @Override
     public void onDenyRequested(ChangeRequest changeRequest, String uid, UserRoles role) {
         DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());
         if (TextUtils.equals(uid, changeRequest.getOwnShift().getUserId())){
-            docRef.delete();
+            docRef.update(getString(R.string.data_key_state), ChangeRequest.CANCELLED);
         } else {
             docRef.update(getString(R.string.data_key_state), ChangeRequest.DENIED_USER);
         }
     }
 
+    /**
+     * Implementacion de la interfaz de escucha de ChangeRequestsAdapter
+     * El usuario rechaza desde el estado de aceptado
+     * Dependiendo del usario se cambia el estado a rechazado o cancelado
+     * @param changeRequest Solicitud de cambio
+     * @param uid Indentificador del usuario que lleva a cabo la accion
+     * @param role Rol del usuario
+     */
     @Override
     public void onDenyAccepted(ChangeRequest changeRequest, String uid, UserRoles role) {
         DocumentReference docRef = mChangeRequestsColl.document(changeRequest.getId());

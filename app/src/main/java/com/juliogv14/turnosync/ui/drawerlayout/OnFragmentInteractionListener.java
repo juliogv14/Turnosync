@@ -1,11 +1,9 @@
 package com.juliogv14.turnosync.ui.drawerlayout;
 
 /**
- * Created by Julio on 24/01/2018.
- * OnFragmentInteractionListener.java
+ * Interfaz de comunicación con fragmentos.
+ * se indica cuando un fragmento se ha intercambiado
  */
-
 public interface OnFragmentInteractionListener {
     void onFragmentSwapped(int fragmentId);
-    //void onFragmentSwapped(int fragmentId);
 }

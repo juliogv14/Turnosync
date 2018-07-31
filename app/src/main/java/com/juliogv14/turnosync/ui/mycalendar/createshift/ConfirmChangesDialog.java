@@ -90,7 +90,7 @@ public class ConfirmChangesDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo. Se muestran los turnos a confirmar
      */
     @NonNull

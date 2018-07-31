@@ -30,7 +30,8 @@ public class InstanceIDService extends FirebaseInstanceIdService {
         saveToken(token);
     }
 
-    /** Guarda el token en SharedPrefenreces para ser usado en la aplicación
+    /**
+     * Guarda el token en SharedPrefenreces para ser usado en la aplicación
      * @param token Token identificador para enviar notificaciones
      * @see SharedPreferences
      */

@@ -20,13 +20,34 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * La clase ShiftTypesAdapter es la clase encargada de proporcionar la vista en forma de lista de elementos
+ * de tipos de turnos.
+ * Extiende RecyclerView.Adapter.
+ *
+ * @author Julio García
+ * @see RecyclerView.Adapter
+ * @see RecyclerView.ViewHolder
+ */
 public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.ShiftTypeViewHolder>{
-
+    /**
+     * Contexto del fragmento */
     private Context mContext;
-    private List<ShiftType> mShiftTypesList;
+    /** Clase que implementa la interfaz de escucha */
     private TypeOnClickListener mTypeOnClickListener;
+    /** Rol del usuario actual */
     private String mRole;
+    /** Listado de los tipos de turnos */
+    private List<ShiftType> mShiftTypesList;
 
+
+    /**
+     * Constructor del adaptador
+     * @param context Contexto
+     * @param listener Clase que implementa la interfaz
+     * @param shiftTypesList Listado de los tipos de turnos
+     * @param role Rol del usuario
+     */
     public ShiftTypesAdapter(Context context, TypeOnClickListener listener, ArrayList<ShiftType> shiftTypesList, String role) {
         this.mContext = context;
         this.mTypeOnClickListener = listener;
@@ -35,6 +56,12 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
 
     }
 
+    /**
+     * Infla la vista del elemento de un ViewHolder
+     * @param parent Vista padre
+     * @param viewType Tipo de vista
+     * @return ViewHolder del elemento
+     */
     @NonNull
     @Override
     public ShiftTypeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -42,22 +69,42 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
         return new ShiftTypeViewHolder(itemBinding);
     }
 
+    /** Rellena la vista con el elemento correspondiente a partir de la posición y los datos.
+     * @param holder Elemento
+     * @param position Posición
+     */
     @Override
     public void onBindViewHolder(@NonNull ShiftTypeViewHolder holder, int position) {
         holder.bind(mShiftTypesList.get(position));
     }
 
+    /**
+     * Devuelve el numero total de elementos
+     * @return Tamaño total de la lista de tipos de turno
+     */
     @Override
     public int getItemCount() {
         return mShiftTypesList.size();
     }
 
+    /**
+     * Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface TypeOnClickListener {
         void onClickEditType(ShiftType type);
         void onClickRemoveType(ShiftType type);
     }
 
+    /**
+     * Esta clase representa la vista de un elemento dentro de un recyclerview.
+     * Extiende ViewHolder
+     *
+     * @author Julio García
+     * @see RecyclerView.ViewHolder
+     */
     class ShiftTypeViewHolder extends RecyclerView.ViewHolder {
+
+        /** Referencia a la vista del elemento */
         ItemShifttypeBinding binding;
 
         ShiftTypeViewHolder(ItemShifttypeBinding viewBinding) {
@@ -83,6 +130,10 @@ public class ShiftTypesAdapter extends RecyclerView.Adapter<ShiftTypesAdapter.Sh
             });
         }
 
+        /**
+         * Se rellena la vista
+         * @param shiftType Tipo de turno
+         */
         public void bind(ShiftType shiftType){
             if(!mRole.equals(UserRoles.MANAGER.toString())){
                 binding.buttonShiftTypeRemove.setVisibility(View.GONE);

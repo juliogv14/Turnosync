@@ -109,7 +109,7 @@ public class CreateTypeDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo. Carga los datos del tipo de turno a editar si no es null.
      */
     @NonNull
@@ -250,7 +250,7 @@ public class CreateTypeDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Al crear la vista se centra la antención en el campo vacío.
      */
     @Override

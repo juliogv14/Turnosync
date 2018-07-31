@@ -122,7 +122,7 @@ public class CreateShiftDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo.
      */
     @NonNull
@@ -267,11 +267,11 @@ public class CreateShiftDialog extends DialogFragment {
 
         PeriodFormatter formatter = new PeriodFormatterBuilder()
                 .appendHours()
-                .appendSuffix(" h")
+                .appendSuffix(" h ")
                 .appendMinutes()
                 .appendSuffix(" min")
                 .toFormatter();
-        String hourCountDisplay = formatter.print(mSetHours) + " +" + formatter.print(addedTime);
+        String hourCountDisplay = formatter.print(mSetHours) + " + " + formatter.print(addedTime);
         mViewBinding.textViewCreateShiftHours.setText(hourCountDisplay);
         if(mSetHours.plus(addedTime).getHours() > mWeeklyHours){
             Toast.makeText(mContext, "Current weekly hours are above the limit. Limit: " + mWeeklyHours, Toast.LENGTH_LONG).show();

@@ -65,8 +65,9 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
     /** Referencia al servicio de autenticación de Firebase */
     private FirebaseAuth mFirebaseAuth;
 
-    /** {@inheritDoc} <br>
-     * Lifecycle callback.
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
      * Se establecen las escuchas de finalizado en el teclado, botón de login, botón de login con google
      * enlace de recuperacion de contraseña.
      */
@@ -136,9 +137,10 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         }, 0, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    /** {@inheritDoc}
-     * Lifecycle callback
-     * Incluye el menu desde un recurso
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Infla la vista del menu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,8 +148,9 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         return true;
     }
 
-    /** {@inheritDoc} <br>
-     * Lifecycle callback.
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
      * Responde cuando se selecciona un elemento del menu.
      * Redirecciona a la pantalla de registro
      */
@@ -160,7 +163,8 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         return super.onOptionsItemSelected(item);
     }
 
-    /** {@inheritDoc} <br>
+    /**
+     * {@inheritDoc} <br>
      * Llamado cuando finaliza el inicio de sesion con google.
      */
     @Override
@@ -197,7 +201,8 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
     }
 
 
-    /** Intento de inicio de sesión comprobando si las cadenas introducidas son validas.
+    /**
+     * ntento de inicio de sesión comprobando si las cadenas introducidas son validas
      */
     private void attemptLogin() {
 
@@ -294,8 +299,8 @@ public class LoginActivity extends AppCompatActivity implements ResetPasswordDia
         });
     }
 
-    /** Callback del dialogo de restablecer contraseña. Envia el email con en enlace para restablecer
-     * la contraseña
+    /**
+     * Callback del dialogo de restablecer contraseña. Envia el email con en enlace para restablecer la contraseña
      *
      *  @param email email introducido en el dialogo
      */

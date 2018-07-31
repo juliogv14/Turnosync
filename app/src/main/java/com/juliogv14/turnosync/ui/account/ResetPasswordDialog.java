@@ -56,7 +56,7 @@ public class ResetPasswordDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo.
      */
     @NonNull
@@ -106,7 +106,7 @@ public class ResetPasswordDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Al crear la vista se centra la antención en el campo vacío.
      */
     @Override

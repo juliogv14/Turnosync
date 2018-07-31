@@ -113,7 +113,7 @@ public class EditShiftDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo. Carga los datos del turno a editar.
      */
     @NonNull

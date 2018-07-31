@@ -33,31 +33,56 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * La clase WeekAdapter es la clase encargada de proporcionar la vista en forma de cuadricula
+ * que representa el calendario de una semana. Se muestran los turnos asignados a los usuarios del grupo
+ * para la semana correspondiente.
+ * Extiende BaseAdapter
+ *
+ * @author Julio García
+ * @see BaseAdapter
+ */
 public class WeekAdapter extends BaseAdapter {
-    //Arguments
+    /** Contexto */
     private Context mContext;
+    /** ViewModel de MyCalendarFragment con los datos de su vista */
     private MyCalendarVM mCalendarVM;
+    /** Medidas del dispositivo */
     private DisplayMetrics mDisplayMetrics;
+    /** Listado de usuarios del grupo */
     private ArrayList<UserRef> mGroupUsers;
+    /** Mapa de listados de turnos de los usuarios con su identificador como clave */
     private Map<String, ArrayList<Shift>> mUserShiftMap;
+    /** Mapa de tipos de turno */
     private Map<String, ShiftType> mShiftsTypesMap;
+    /** Fecha del primer dia de la semana */
     private DateTime mWeekDate;
 
-    //Day item variables
+    /** Lista de los elementos del adaptador */
     private List<String> mItems;
+    /** Tamaño de las casillas del encabezado con los numeros */
     private int mTitleHeight;
+    /** Vector con los dias de la semana */
     private String[] mDays;
+    /** Fecha del dia de la semana a mostrar */
     private DateTime mDisplayDay;
-
-    //Per user shifts
-    private Iterator<Map.Entry<String, ArrayList<Shift>>> mShiftIterator;
+    /** Iterador para recorrer los usuarios del grupo */
+    private Iterator<UserRef> mUsersIterator;
+    /** Identificador del usuario correspondiente a la fila a dibujar */
     private String mCurrentUid;
+    /** Indice para recorrer la lista de turnos */
     private int mCurrentShiftIndex;
 
-    //Selected shift day
-    private Shift ownShift;
-    private Shift otherShift;
-
+    /**
+     * Constructor del adaptador
+     * @param c Contexto
+     * @param calendarVM ViewModel de MyCalendarFragment
+     * @param metrics Medidas del dispositivo
+     * @param weekDate Fecha del primer dia de la semana
+     * @param groupUsers Listado de usuarios del grupo
+     * @param userShifts Mapa de listados de turnos de los usuarios
+     * @param shiftTypes Mapa de tipos de turno
+     */
     WeekAdapter(Context c, MyCalendarVM calendarVM, DisplayMetrics metrics, DateTime weekDate, ArrayList<UserRef> groupUsers, Map<String, ArrayList<Shift>> userShifts, Map<String, ShiftType> shiftTypes) {
         mContext = c;
         mCalendarVM = calendarVM;
@@ -73,6 +98,9 @@ public class WeekAdapter extends BaseAdapter {
         populateMonth();
     }
 
+    /**
+     * Calcula los dias que se deben mostrar en el calendario
+     */
     private void populateMonth() {
 
         /* Label items */
@@ -95,20 +123,22 @@ public class WeekAdapter extends BaseAdapter {
 
         }
 
-        /*for (Map.Entry<String, ArrayList<Shift>> entry : mUserShiftMap.entrySet()) {
-            //User name item
-            mItems.add(entry.getKey());
-
-            //Week days
-            for (int i = 0; i < 7; i++) {
-                mItems.add("");
-            }
-        }*/
-
-        mShiftIterator = mUserShiftMap.entrySet().iterator();
+        mUsersIterator = mGroupUsers.iterator();
         mTitleHeight = CalendarUtils.getLabelHeight(mDisplayMetrics);
     }
 
+
+    /**
+     * Metodo en el que se construye la vista del elemento a dibujar.
+     * Se infla un elemento de la vista bajo la vista padre
+     * Se crea la referencia de la vista mediante databinding.
+     * Se rellenan los datos de la vista según el tipo de casilla, Encabezado o dia de la semana.
+     *
+     * @param position Posición del elemento
+     * @param convertView Vista del elemento
+     * @param parent Vista padre
+     * @return Vista del elemento a dibujar
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         int itemType = getItemViewType(position);
@@ -127,14 +157,14 @@ public class WeekAdapter extends BaseAdapter {
                     names = (TextView) convertView;
                 }
 
-                if (mShiftIterator.hasNext()) {
-                    Map.Entry<String, ArrayList<Shift>> entry = mShiftIterator.next();
+                if (mUsersIterator.hasNext()) {
+                    UserRef entry = mUsersIterator.next();
                     names.setText(mItems.get(position));
-                    mCurrentUid = entry.getKey();
+                    mCurrentUid = entry.getUid();
 
                 }
-                if(!mShiftIterator.hasNext()){
-                    mShiftIterator = mUserShiftMap.entrySet().iterator();
+                if (!mUsersIterator.hasNext()){
+                    mUsersIterator = mGroupUsers.iterator();
                 }
 
                 mDisplayDay = new DateTime(mWeekDate);
@@ -210,10 +240,13 @@ public class WeekAdapter extends BaseAdapter {
                 convertView = error;
                 return convertView;
         }
-
-
     }
 
+    /**
+     * Permite identificar el tipo de vista correspondiente a la posición
+     * @param position Posición a comprobar
+     * @return Identificador del tipo de vista
+     */
     @Override
     public int getItemViewType(int position) {
 
@@ -226,11 +259,20 @@ public class WeekAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Devuelve el numero total de tipos de vistas distintas.
+     * @return Numero total de tipos de vistas distintas
+     */
     @Override
     public int getViewTypeCount() {
         return 3;
     }
 
+    /**
+     * Obtiene el elemento correspondiente a la posición proporcionada.
+     * @param position Posición del elemento
+     * @return Elemento de la lista en la posición dada.
+     */
     @Override
     public Object getItem(int position) {
         return mItems.get(position);
@@ -241,6 +283,10 @@ public class WeekAdapter extends BaseAdapter {
         return position;
     }
 
+    /**
+     * Devuelve el numero total de elementos
+     * @return Tamaño total de casillas de la cuadricula
+     */
     @Override
     public int getCount() {
         return mItems.size();

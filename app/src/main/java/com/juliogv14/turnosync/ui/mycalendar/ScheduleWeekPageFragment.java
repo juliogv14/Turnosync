@@ -45,53 +45,82 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Julio on 11/05/2018.
- * ScheduleWeekPageFragment
+ * La clase ScheduleWeekPageFragment es el fragmento que representa una pagina del view pager conteniendo una
+ * semana del calendario. Desde esta pantalla el manager puede crear turnos para los usuarios, los usuarios pueden
+ * solicitar cambios con otros usuarios.
+ * Extiende Fragment.
+ * Implementa la interfaz de escucha de CreateShiftDialog.
+ * Implementa la interfaz de escucha de EditShiftDialog.
+ * Implementa la interfaz de escucha de RequestChangeDialog.
+ *
+ * @author Julio García
+ * @see Fragment
  */
-
 public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDialog.CreateShiftListener, EditShiftDialog.EditShiftListener, RequestChangeDialog.RequestChangeListener {
 
-    //Keys
+    /** Tag de clase */
+    private final String TAG = this.getClass().getSimpleName();
+
+    //{@
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String POSITION_KEY = "position";
     private static final String ROLE_KEY = "currentCalendar";
     private static final String CURRENT_WEEK_DATE_KEY = "weekDate";
     private static final String WORKGROUP_USERS_KEY = "workgroupUsers";
     private static final String USERS_SHIFT_MAP_KEY = "userShiftMap";
-    private static final String SHIFT_TYPES_MAP_KEY = "shiftTypesMap";
     private static final String SHIFT_CHANGES_MAP_KEY = "shiftChangesMap";
-    private static final String EDIT_MODE_KEY = "editMode";
-    private static final String WEEKLY_HOURS_KEY = "weeklyHours";
+    //@}
 
-
-    private final String TAG = this.getClass().getSimpleName();
-    //Binding
+    /** Referencia a la vista con databinding */
     protected PageWeekBinding mViewBinding;
 
-    //Context and listener
+    /** Contexto del fragmento */
     private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
     private WeekPageListener mListener;
 
-    //Parent ViewModel
-    MyCalendarVM mParentViewModel;
+    /** Referencia al view model de MyCalendarFragment*/
+    private MyCalendarVM mParentViewModel;
 
-    //Variables
+    /** Posicion de la pagina en el view pager */
     private int mPosition;
+    /** Rol del usuario */
     private UserRoles mRole;
+    /** Fecha del primer dia de la semana */
     private DateTime mWeekDate;
+    /** Indicador del modo edición */
     private boolean mEditMode;
+    /** Horas máximas semanales */
     private long mWeeklyHours = -1;
+    /** Referencia al cuadro de dialogo de solicitud de cambio de turno */
     private RequestChangeDialog mRequestChangeDialog;
 
-    //Data lists
+    /** Lista de usuarios del grupo */
     private ArrayList<UserRef> mWorkgroupUsers;
+    /** Mapa de listados de turnos de los usuarios con su identificador como clave */
     private Map<String, ArrayList<Shift>> mUsersShiftsMap;
+    /** Mapa de tipos de turno */
     private Map<String, ShiftType> mShiftTypesMap;
+    /** Mapa con los cambios del calendario efectuados */
     private Map<String, ArrayList<Shift>> mShiftChanges;
+    /** Mapa de horas asignadas a los usuarios en la semana */
     private Map<String, Period> mUsersHourCount;
 
-    //GridAdapter
+    /** Referencia al adaptador del Gridview */
     private BaseAdapter mGridAdapter;
 
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param position Posicion de la pagina en el view pager
+     * @param role Rol del usuario
+     * @param weekDate Fecha del primer dia de la semana
+     * @param workgroupUsers Lista de usuarios del grupo
+     * @param userShifts Mapa de listados de turnos de los usuarios
+     * @param shiftChanges Mapa con los cambios del calendario efectuados
+     * @return instancia de la clase HomeFragment
+     */
     public static ScheduleWeekPageFragment newInstance(int position,
                                                        String role,
                                                        DateTime weekDate,
@@ -100,7 +129,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
                                                        HashMap<String, ArrayList<Shift>> shiftChanges) {
 
         ScheduleWeekPageFragment f = new ScheduleWeekPageFragment();
-        // Supply index input as an argument.
+
         Bundle args = new Bundle();
         args.putInt(POSITION_KEY, position);
         args.putString(ROLE_KEY, role);
@@ -112,6 +141,11 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         return f;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -124,12 +158,35 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se obtiene el viewmodel de MyCalendar y se inicializan las referencias
+     */
     @Override
-    @SuppressWarnings("unchecked")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
         setRetainInstance(true);
+
+        mParentViewModel = ViewModelProviders.of((Fragment)mListener).get(MyCalendarVM.class);
+        Boolean editmode = mParentViewModel.getEditMode().getValue();
+        if(editmode != null) mEditMode = editmode;
+        mShiftTypesMap = mParentViewModel.getShiftTypes().getValue();
+
+    }
+
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     * Se vinculan los observadores del viewmodel actualizando las variables de clase.
+     */
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mViewBinding = PageWeekBinding.inflate(inflater, container, false);
+        Bundle args = getArguments();
         if (args != null) {
             mPosition = args.getInt(POSITION_KEY);
             mRole = UserRoles.valueOf(args.getString(ROLE_KEY));
@@ -138,18 +195,7 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
             mWeekDate = new DateTime(args.getLong(CURRENT_WEEK_DATE_KEY));
             mShiftChanges = (Map<String, ArrayList<Shift>>) args.getSerializable(SHIFT_CHANGES_MAP_KEY);
         }
-        mParentViewModel = ViewModelProviders.of((Fragment)mListener).get(MyCalendarVM.class);
-        Boolean editmode = mParentViewModel.getEditMode().getValue();
-        if(editmode != null) mEditMode = editmode;
-        mShiftTypesMap = mParentViewModel.getShiftTypes().getValue();
 
-    }
-
-    //Inflate view
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewBinding = PageWeekBinding.inflate(inflater, container, false);
         mParentViewModel.getEditMode().removeObservers(this);
         mParentViewModel.getEditMode().observe(this, new Observer<Boolean>() {
 
@@ -199,6 +245,11 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         return mViewBinding.getRoot();
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se inicializa la vista y las variables. Se crea el adaptador del grid view que crea el calendario semanal.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -302,17 +353,20 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mContext = null;
     }
 
+    /**
+     * Permite notificar al adaptador que recargue la vista mediante la referencia al fragmento.
+     */
     public void notifyGridDataSetChanged() {
         if (mContext != null) {
             ((SupportActivity) mContext).runOnUiThread(new Runnable() {
@@ -324,6 +378,9 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         }
     }
 
+    /**
+     * Recalcula la suma total de horas de los turnos de la semana de los usuarios
+     */
     private void recalculateHours(){
         mUsersHourCount = new HashMap<>();
         for (Map.Entry<String, ArrayList<Shift>> entry : mUsersShiftsMap.entrySet()) {
@@ -337,6 +394,12 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         }
     }
 
+    /**
+     * Procesa la solicitud de cambio de turno llamando al cuadro de dialogo RequestChangeDialog para
+     * confirmar el cambio.
+     * @param ownShift Turno propio del usuario
+     * @param otherShift Turno a intercambiar
+     */
     private void handleChangeRequest(Shift ownShift, Shift otherShift){
 
         //Check for
@@ -351,53 +414,16 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mParentViewModel.setOtherShift(null);
 
     }
-    
 
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo CreateShiftDialog
+     * Efectúa la creación de los turnos a los usuarios definidos en CreateShiftDialog.
+     * Evita los conflictos comprobando si existen turnos ya definidos para las fechas dadas.
+     *
+     * @param newShifts Lista de turnos nuevos del usuario.
+     */
     @Override
     public void onCreateShiftCreate(final ArrayList<Shift> newShifts) {
-        //TODO: consider other weeks
-        /*Date dateFrom = newShifts.get(0).getDate();
-        Date dateTo = newShifts.get(newShifts.size()-1).getDate();
-
-        String dateKey = getString(R.string.data_key_date);
-        CollectionReference shiftsColl = FirebaseFirestore.getInstance().collection(getString(R.string.data_ref_users)).document(newShifts.get(0).getUserId())
-                .collection(getString(R.string.data_ref_workgroups)).document("udDHaY6rNMg0bi8koxxl").collection(getString(R.string.data_ref_shifts));
-        shiftsColl.whereGreaterThanOrEqualTo(dateKey, dateFrom).whereLessThanOrEqualTo(dateKey, dateTo)
-                .orderBy(dateKey, Query.Direction.ASCENDING)
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    int i = 0;
-                    int j = 0;
-                    List<Shift> userList = task.getResult().toObjects(Shift.class);
-
-                    while (i < newShifts.size()) {
-                        Shift newShift = newShifts.get(i);
-                        if (j == userList.size()) {
-                            mUsersShiftsMap.get(newShift.getUserId()).add(0,newShift);
-                            mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
-                            i++;
-                        } else if (j < userList.size()) {
-                            if (newShift.getDate().getTime() < userList.get(j).getDate().getTime()) {
-                                mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
-                                mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
-                                i++;
-                            } else if (newShift.getDate().getTime() == userList.get(j).getDate().getTime()) {
-                                i++;
-                                j++;
-                            } else {
-                                while (j+1 != userList.size() && newShift.getDate().getTime() > userList.get(j).getDate().getTime()) {
-                                    j++;
-                                }
-                            }
-                        }
-                    }
-                    Collections.sort(mUsersShiftsMap.get(newShifts.get(0).getUserId()));
-                    notifyGridDataSetChanged();
-                }
-            }
-        });*/
 
         int i = 0;
         int j = 0;
@@ -432,6 +458,13 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
 
     }
 
+
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo EditShiftDialog
+     * Efectúa la modificación del turno comprobando que no entre en conflicto con otro turno ya definido.
+     * @param oldShift Turno antes de la edición
+     * @param newShift Turno despues de la edición
+     */
     @Override
     public void onEditShiftChange(Shift oldShift, Shift newShift) {
         if(oldShift != newShift){
@@ -471,6 +504,12 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mGridAdapter.notifyDataSetChanged();
     }
 
+
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo EditShiftDialog
+     * Efectúa el borrado del turno seleccionado.
+     * @param removedShift Turno a borrar
+     */
     @Override
     public void onEditShiftRemove(Shift removedShift) {
         mUsersShiftsMap.get(removedShift.getUserId()).remove(removedShift);
@@ -490,12 +529,23 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mGridAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo RequestChangeDialog
+     * Efectúa la solicitud de cambio de turno comunicandose con MyCalendarFragment a través de la interfaz
+     * de comunicación.
+     * @param changeRequest Solicitud de cambio
+     */
     @Override
     public void onRequestShiftChange(ChangeRequest changeRequest) {
         mRequestChangeDialog = null;
         mListener.onNewChangeRequest(changeRequest);
     }
 
+
+    /**
+     * Implementación de la interfaz de escucha con el cuadro de dialogo RequestChangeDialog
+     * Reinicia las referencias al cancelar la solicitud de cambio
+     */
     @Override
     public void onCancelShiftChange() {
         mRequestChangeDialog = null;
@@ -503,6 +553,9 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         mParentViewModel.setOtherShift(null);
     }
 
+    /**
+     * Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface WeekPageListener {
         void onNewChangeRequest(ChangeRequest request);
         boolean hasShiftOnDate(String uid, Date date);

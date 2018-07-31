@@ -43,31 +43,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * La clase WorkgroupSettingsFragment es el fragmento por defecto usado en WorkgroupSettingsActivity.
+ * Es el fragmento encargado de manejar la vista donde se muestran los usuarios del grupo siendo posible
+ * añadir, editar el nombre a mostrar y eliminar usuarios.
+ * Ademas se puede configurar el numero máximo de horas semanales y Contiene la navegación a ShiftTypesFragment.
+ * Extiende Fragment.
+ * Implementa la interfaz de escucha de GroupUsersAdapter.
+ * Implementa la interfaz de escucha de AddUserDialog.
+ * Implementa la interfaz de escucha de EditInitialsDialog.
+ * Implementa la interfaz de escucha de WeeklyHoursDialog.
+ *
+ * @author Julio García
+ * @see Fragment
+ * @see GroupUsersAdapter.UserOnClickListener
+ * @see AddUserDialog.AddUserListener
+ * @see EditInitialsDialog.EditInitialsListener
+ * @see WeeklyHoursDialog.WeeklyHoursDialogListener
+
+ */
 public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAdapter.UserOnClickListener,
         AddUserDialog.AddUserListener, EditInitialsDialog.EditInitialsListener, WeeklyHoursDialog.WeeklyHoursDialogListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Constants
+    //@{
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String WORKGROUP_KEY = "workgroup";
     private static final String WEEKLY_HOURS_KEY = "weeklyHours";
+    //@}
 
-    //Listener
-    WorkgroupSettingsListener mListener;
+    /** Referencia a la vista con databinding */
+    private FragmentWorkgroupSettingsBinding mViewBinding;
 
-    //Binding
-    FragmentWorkgroupSettingsBinding mViewBinding;
+    /** Contexto del fragmento */
+    private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
+    private WorkgroupSettingsListener mListener;
 
-    //Firebase Firestore
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Registro de escucha de la petición de usuarios del grupo */
     private ListenerRegistration mGroupUsersListener;
 
-    //Variables
+    /** Referencia al grupo */
     private UserWorkgroup mWorkgroup;
+    /** Horas máximas semanales */
     private AtomicLong mWeeklyHours;
+    /** Lista de usuarios del grupo */
     private ArrayList<UserRef> mUserList;
 
+
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param workgroup Grupo en cuestión
+     * @param weeklyHours Horas máximas semanales
+     * @return instancia de la clase WorkgroupSettingsFragment
+     */
     public static WorkgroupSettingsFragment newInstance(UserWorkgroup workgroup, AtomicLong weeklyHours) {
         WorkgroupSettingsFragment f = new WorkgroupSettingsFragment();
 
@@ -78,8 +113,14 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         return f;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
         if (context instanceof WorkgroupSettingsListener) {
             mListener = (WorkgroupSettingsListener) context;
         } else {
@@ -88,6 +129,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +144,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Infla la vista y se referencia mediante Databinding.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,6 +158,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         return mViewBinding.getRoot();
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se inicializa la vista y las variables. Se crea el adaptador para el recycler view que lista los usuarios
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,10 +176,10 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
         //RecyclerView
         LinearLayoutManager layoutManager =
-                new LinearLayoutManager((Context)mListener, LinearLayoutManager.VERTICAL, false);
+                new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         mViewBinding.recyclerUsers.setLayoutManager(layoutManager);
         mViewBinding.recyclerUsers.setHasFixedSize(true);
-        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter((Context) mListener, this, mUserList, mWorkgroup.getRole());
+        GroupUsersAdapter recyclerAdapter = new GroupUsersAdapter(mContext, this, mUserList, mWorkgroup.getRole());
         mViewBinding.recyclerUsers.setAdapter(recyclerAdapter);
 
         mViewBinding.settingsItemShiftTypes.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +202,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al destruirse la vista.
+     * Se desvincula la escucha de tipos de turno
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -154,17 +215,34 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Infla la vista del menu
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_workgroup_settings, menu);
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Se prepara la vista cambiando el color de los iconos a blanco.
+     * Dependiendo del rol se ocultan botones
+     */
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
@@ -180,6 +258,11 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Responde cuando se selecciona un elemento del menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_wkSettings_addUser) {
@@ -190,6 +273,10 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         return false;
     }
 
+    /**
+     * Vincula la escucha de la petición de usuarios del grupo, los cambios se obtienen en tiempo real.
+     * Llamado dentro de {@link #onViewCreated}
+     */
     private void attatchWorkgroupUsersListener() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
@@ -206,16 +293,24 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
 
     }
 
+    /**
+     * Actualiza el numero de horas máximas semanales en la vista.
+     */
     private void updateWeeklyHours (){
         String weeklyHours = getString(R.string.wkSettings_label_weeklyHours);
         mViewBinding.settingsItemShiftWeekly.setText(Html.fromHtml(weeklyHours + " <b>" + mWeeklyHours.get() + " h</b>" ));
     }
 
-    //Interfaces implementation
+    /**
+     * Implementacion de la interfaz de comunicación de GroupUsersAdapter
+     * Elimina un usuario del grupo mostrando una advertencia primero
+     * @param uid Identificador del usuario a quitar
+     * @see GroupUsersAdapter
+     */
     @Override
     public void onClickRemoveUser(final String uid) {
 
-        new AlertDialog.Builder((Context)mListener).setTitle(getString(R.string.dialog_removeUser_title))
+        new AlertDialog.Builder(mContext).setTitle(getString(R.string.dialog_removeUser_title))
                 .setMessage(getString(R.string.dialog_removeUser_message))
                 .setPositiveButton(getString(R.string.dialog_removeUser_button_remove), new DialogInterface.OnClickListener() {
                     @Override
@@ -235,6 +330,13 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 }).show();
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de GroupUsersAdapter
+     * Permite editar el nombre de un usuario del grupo llamando a cuadro de dialogo EditInitialsDialog
+     * @param pos Posición del usuario en la lista
+     * @see GroupUsersAdapter
+     * @see EditInitialsDialog
+     */
     @Override
     public void onClickEditUser(int pos) {
         UserRef userRef = mUserList.get(pos);
@@ -242,6 +344,12 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         dialog.show(getChildFragmentManager(), "editInitials");
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de EditInitialsDialog
+     * Efectúa el cambio de nombre dado en EditInitialsDialog
+     * @param userRef Referencia del usuario
+     * @see EditInitialsDialog
+     */
     @Override
     public void onInitialsName(UserRef userRef) {
         CollectionReference workgroupUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups))
@@ -250,6 +358,12 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
         mViewBinding.recyclerUsers.getAdapter().notifyDataSetChanged();
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de AddUserDialog
+     * Invita a un usuario al grupo
+     * @param email Email del usuario a invitar
+     * @see AddUserDialog
+     */
     @Override
     public void onClickAddUser(String email) {
 
@@ -270,6 +384,12 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 });
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de WeeklyHoursDialog
+     * Efectúa el cambio de las horas máximas semanales recibidas de WeeklyHoursDialog
+     * @param hours Nuevo valor de las horas máximas semanalaes
+     * @see WeeklyHoursDialog
+     */
     @Override
     public void onSetWeekyHours(long hours) {
         mWeeklyHours.set(hours);
@@ -278,6 +398,9 @@ public class WorkgroupSettingsFragment extends Fragment implements GroupUsersAda
                 .update(getString(R.string.data_key_weeklyhours), mWeeklyHours.get());
     }
 
+    /**
+     * Interfaz de escucha para comunicarse con la actividad o fragmento contenedor.
+     */
     public interface WorkgroupSettingsListener extends OnFragmentInteractionListener {
         void swapFragment(int fragmentId);
     }

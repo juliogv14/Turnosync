@@ -59,7 +59,7 @@ public class CreateWorkgroupDialog extends DialogFragment {
     }
 
     /** {@inheritDoc}
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo.
      */
     @NonNull
@@ -109,7 +109,7 @@ public class CreateWorkgroupDialog extends DialogFragment {
     }
 
     /** {@inheritDoc}
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Al crear la vista se centra la antención en el campo vacío.
      */
     @Override

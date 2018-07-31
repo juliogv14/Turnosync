@@ -17,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -40,34 +39,53 @@ import com.juliogv14.turnosync.ui.mycalendar.workgroupsettings.shifttypes.ShiftT
 import java.util.ArrayList;
 
 /**
- * Created by Julio on 08/06/2018.
- * ShiftTypesFragmentFragment
+ * La clase ShiftTypesFragment es el fragmento encargado de la gestion de los tipos de turno. Permite crearlos
+ * modificarlos y eliminarlos. Utiliza un RecyclerView para mostrarlos
+ * Extiende Fragment.
+ * Implementa la interfaz de escucha de CreateTypeDialog.
+ * * Implementa la interfaz de escucha de ShiftTypesAdapter.
+ *
+ * @author Julio García
+ * @see Fragment
+ * @see CreateTypeDialog.CreateTypeListener
+ * @see ShiftTypesAdapter.TypeOnClickListener
  */
 public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.TypeOnClickListener, CreateTypeDialog.CreateTypeListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Constants
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
     private static final String WORKGROUP_KEY = "workgroup";
 
-    //Binding
+    /** Referencia a la vista con databinding */
     private FragmentShiftTypesBinding mViewBinding;
 
-    //Listener
-    private OnShiftTypesListener mListener;
+    /** Contexto del fragmento */
+    private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
+    private OnFragmentInteractionListener mListener;
 
-    //Firebase Firestore
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Registro de escucha de la petición de los tipos de turnos */
     private ListenerRegistration mShiftTypesListener;
 
-    //Workgroup
+    /** Referencia al grupo */
     private UserWorkgroup mWorkgroup;
+    /** Listado de tipos de turno */
     private ArrayList<ShiftType> shifTypesList;
 
     public ShiftTypesFragment() {
     }
 
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param workgroup Grupo de trabajo en cuestión
+     * @return instancia de la clase ShiftTypesFragment
+     */
     public static ShiftTypesFragment newInstance(UserWorkgroup workgroup) {
         ShiftTypesFragment fragment = new ShiftTypesFragment();
         Bundle args = new Bundle();
@@ -76,17 +94,28 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         return fragment;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnShiftTypesListener) {
-            mListener = (OnShiftTypesListener) context;
+        mContext = context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +125,11 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Infla la vista y se referencia mediante Databinding.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -105,6 +139,11 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         return mViewBinding.getRoot();
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Se inicializa la vista y las variables. Se crea el adaptador para el recycler view que lista los tipos de turno
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -114,15 +153,20 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
 
         //RecyclerView
         LinearLayoutManager layoutManager =
-                new LinearLayoutManager((Context) mListener, LinearLayoutManager.VERTICAL, false);
+                new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
         mViewBinding.recyclerShiftTypes.setLayoutManager(layoutManager);
         mViewBinding.recyclerShiftTypes.setHasFixedSize(true);
-        ShiftTypesAdapter adapter = new ShiftTypesAdapter((Context) mListener, this, shifTypesList, mWorkgroup.getRole());
+        ShiftTypesAdapter adapter = new ShiftTypesAdapter(mContext, this, shifTypesList, mWorkgroup.getRole());
         mViewBinding.recyclerShiftTypes.setAdapter(adapter);
 
 
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al destruirse la vista.
+     * Se desvincula la escucha de tipos de turno
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -131,17 +175,34 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
+        mContext = null;
         mListener = null;
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Infla la vista del menu
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_shifttypes, menu);
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Se prepara la vista cambiando el color de los iconos a blanco.
+     * Dependiendo del rol se ocultan botones
+     */
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
@@ -157,6 +218,11 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Responde cuando se selecciona un elemento del menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_shiftTypes_newType) {
@@ -168,6 +234,10 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
         return false;
     }
 
+    /**
+     * Vincula la escucha de la petición de tipos de turno, los cambios se obtienen en tiempo real.
+     * Llamado dentro de {@link #onViewCreated}
+     */
     private void attatchShiftTypesListener() {
         CollectionReference shiftTypesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
@@ -222,17 +292,28 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
 
     }
 
+
+    /**
+     * Implementacion de la interfaz de comunicación de ShiftTypesAdapter
+     * Abre el cuadro de dialogo para poder editar el turno.
+     * @param type Tipo de turno seleccionado
+     * @see CreateTypeDialog
+     */
     @Override
     public void onClickEditType(ShiftType type) {
-        Toast.makeText((Context) mListener, "Edit type" + type.getId(), Toast.LENGTH_SHORT).show();
         CreateTypeDialog dialog = CreateTypeDialog.newInstance(type);
         dialog.show(getChildFragmentManager(), "createTypeDialog");
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de ShiftTypesAdapter
+     * Abre el cuadro de dialogo para avisar de las consecuencias de borrar el tipo de turno
+     * @param type Tipo de turno seleccionado
+     */
     @Override
     public void onClickRemoveType(final ShiftType type) {
 
-        new AlertDialog.Builder((Context)mListener).setTitle(getString(R.string.dialog_removeType_title))
+        new AlertDialog.Builder(mContext).setTitle(getString(R.string.dialog_removeType_title))
                 .setMessage(getString(R.string.dialog_removeType_message))
                 .setPositiveButton(getString(R.string.dialog_removeType_button_remove), new DialogInterface.OnClickListener() {
                     @Override
@@ -253,6 +334,11 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
 
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de CreateTypeDialog
+     * Efectúa la creación o edición del tipo de turno
+     * @param shiftType Tipo de turno seleccionado
+     */
     @Override
     public void onDialogPositiveClick(ShiftType shiftType) {
         CollectionReference shiftTypesColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
@@ -269,9 +355,5 @@ public class ShiftTypesFragment extends Fragment implements ShiftTypesAdapter.Ty
             docRef = shiftTypesColl.document(shiftType.getId());
         }
         docRef.set(shiftType);
-    }
-
-    public interface OnShiftTypesListener extends OnFragmentInteractionListener {
-
     }
 }

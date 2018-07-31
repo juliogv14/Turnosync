@@ -2,6 +2,7 @@ package com.juliogv14.turnosync.ui.drawerlayout;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -63,10 +63,8 @@ import org.joda.time.Months;
 import org.joda.time.Weeks;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -76,58 +74,98 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by Julio on 20/01/2018.
- * MyCalendarFragment.java
+ * La clase MyCalendarFragment es el fragmento que contiene la vista del calendario personal del usuario
+ * y del calendario grupal. Contiene un navegador de paginas para cambiar entre meses del calenario personal
+ * y entre semanas del calendario grupal.
+ * Se ocupa de efectuar los cambios creados desde el calendario grupal.
+ * Desde el menu permite la navegación hacia el listado de cambios en proceso, cambio estre los dos
+ * tipos del calendario y a la actividad de configuración del grupo.
+ * Extiende Fragment.
+ * Implementa la interfaz de escucha de cuadro de dialogo ConfirmChangesDialog y del fragmento ScheduleWeekPageFragment.
+ *
+ * @author Julio García
+ * @see Fragment
+ * @see ConfirmChangesDialog.ConfirmChangesListener
+ * @see ScheduleWeekPageFragment.WeekPageListener
+ * @see ViewModel
+ * @see PagerAdapter
  */
 
-public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog.ConfirmChangesListener, ScheduleWeekPageFragment.WeekPageListener {
+public class MyCalendarFragment extends Fragment implements
+        ConfirmChangesDialog.ConfirmChangesListener, ScheduleWeekPageFragment.WeekPageListener {
 
-
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Constants
-    private final int QUERY_MONTH_NUMBER = 12;
-    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
+    //@{
+    /** Claves para conservar datos al recrear la actividad */
     private static final String CURRENT_ADAPTER_POSITION = "currentPosition";
     private static final String CURRENT_PERSONAL_SCHEDULE = "currentPersonalSchedule";
+    //@}
+    /** Numero de meses s mostrar */
+    private final int QUERY_MONTH_NUMBER = 12;
+    /** Claves para guardar los parametros en el Bundle asociado a la instancia */
+    private static final String CURRENT_WORKGROUP_KEY = "currentWorkgroup";
 
-    //Context and Listener
-    private Context mContext;
-    private OnFragmentInteractionListener mListener;
-
-    //Binding and viewModel
+    /** Referencia a la vista con databinding */
     private FragmentMycalendarBinding mViewBinding;
+    /** Referencia al view model */
     private MyCalendarVM mViewModel;
 
-    //Firebase Firestore
+    /** Contexto del fragmento */
+    private Context mContext;
+    /** Clase que implementa la interfaz de escucha */
+    private OnFragmentInteractionListener mListener;
+
+
+    /** Referencia al servicio de base de datos de Firebase Cloud Firestore */
     private FirebaseFirestore mFirebaseFirestore;
+    /** Registro de escucha en la peticion de usuarios del grupo */
     private ListenerRegistration mGroupUsersListener;
+    /** Registro de escucha en la peticion de tipos de turnos */
     private ListenerRegistration mShiftTypesListener;
+    /** Listado de registros de escucha en las peticiones de turnos de los usuarios */
     private ArrayList<ListenerRegistration> mUserShiftsListeners;
 
-    //Firebase Auth
+    /** Referencia al usuario conectado */
     private FirebaseUser mFirebaseUser;
+    /** Referencia al grupo de trabajo*/
     private UserWorkgroup mWorkgroup;
 
-    //Calendar var
+    /** Numero de semanas del año actual */
     private int mTotalWeeks;
+    /** Posición actual del view pager */
     private int mCurrentPosition;
+    /** Fecha del primer dia que se llega a mostrar en el view pager */
     private DateTime mInitMonth;
 
+    /** Referencia al adaptador del view pager */
     PagerAdapter mPagerAdapter;
 
-    //Runtime variables
+    /** Indicador para identificar el tipo de calendario actual */
     private boolean mPersonalSchedule = true;
+    /** Indicador para comprobar cuando se hicieron cambios en el calendario */
     private boolean mMadeChanges;
+    /** Horas maximas semanales */
     private AtomicLong mWeeklyHours;
+    /** Indicador del modo edición */
     private boolean mEditMode;
 
-    //Data lists
+    /** Listado de usuarios del grupo */
     private ArrayList<UserRef> mGroupUsersRef;
+    /** Mapa con los tipos de turnos */
     private Map<String, ShiftType> mShiftTypes;
+    /** Mapa con las listas segun los tipos de cambios */
     private HashMap<String, ArrayList<Shift>> mShiftChanges;
 
+
+    /**
+     * Metodo estático para crear instancias de la clase y pasar argumentos. Necesaria para permitir
+     * la recreación por parte del sistema y no perder los argumentos
+     *
+     * @param workgroup Grupo de trabajo del calendario
+     * @return instancia de la clase MyCalendarFragment
+     */
     public static MyCalendarFragment newInstance(UserWorkgroup workgroup) {
         MyCalendarFragment f = new MyCalendarFragment();
 
@@ -137,6 +175,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         return f;
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Al vincularse al contexto se obtienen referencias al contexto y la clase de escucha.
+     * @see Context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -149,6 +192,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Recupera los argumentos pasados en {@link #newInstance}
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,19 +208,22 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     }
 
-    //Inflate view
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Infla la vista y se referencia mediante Databinding.
+     * Se reserva memoria y se vinculan observadores del view model MyCalendarVM
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = FragmentMycalendarBinding.inflate(inflater, container, false);
         setHasOptionsMenu(true);
 
-        Calendar cal = new GregorianCalendar();
-        mTotalWeeks = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
-
         //Init month date
         int mInitMonthOffset = (QUERY_MONTH_NUMBER / 2 -1);
         DateTime now = DateTime.now();
+        mTotalWeeks = now.weekyear().getMaximumValue();
         mInitMonth = new DateTime().withZone(DateTimeZone.UTC).withTime(now.withTimeAtStartOfDay().toLocalTime());
         mInitMonth = mInitMonth.minusMonths(mInitMonthOffset).withDayOfMonth(1);
 
@@ -237,6 +288,12 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         return mViewBinding.getRoot();
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Llamado despues de crear la vista
+     * Se inicializan datos, se vincula las escucha de la peticion de usuarios del grupo y se hace una petición
+     * para obtener los tipos de turnos y las horas máximas semanales
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -245,12 +302,18 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         queryWeeklyHours();
-        queryWorkgroupUsers();
+        attatchWorkgroupUsersListener();
         queryShiftTypes();
 
         Log.d(TAG, "Start MyCalendarFragment");
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Llamado despues de onViewCreated.
+     * Recupera los datos guarados en {@link #onSaveInstanceState}.
+     * Dependiendo de {@link #mPersonalSchedule} se crea un adaptador para meses o para semanas
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -270,15 +333,13 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
         mViewBinding.viewPagerMonths.setAdapter(mPagerAdapter);
         mViewBinding.viewPagerMonths.setCurrentItem(mCurrentPosition);
-        mViewBinding.viewPagerMonths.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mViewBinding.viewPagerMonths.requestDisallowInterceptTouchEvent(true);
-                return false;
-            }
-        });
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama antes de destruirse la actividad
+     * Se guardan los datos para poder ser restablecidos al volver a la actividad.
+     */
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -287,6 +348,10 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     }
 
+    /** {@inheritDoc} <br>
+     * Callback del ciclo de vida. Se llama al destruirse la vista.
+     * Se desvinculan todas las escuchas.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -305,6 +370,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al desvincularse de la actividad se ponen a null las referencias
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -312,11 +382,22 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mListener = null;
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Infla la vista del menu
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_mycalendar, menu);
     }
 
+    /**
+     * {@inheritDoc}
+     * Callback del ciclo de vida
+     * Se prepara la vista cambiando el color de los iconos a blanco.
+     * Dependiendo del tipo de calendario actual se cambia el icono.
+     */
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
@@ -336,6 +417,13 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Responde cuando se selecciona un elemento del menu.
+     * Redirecciona a las pantallas de lista de solicitudes de turnos, al otro tipo de calendario y
+     * a la actividad de configuración del grupo.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
@@ -376,6 +464,10 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     }
 
+    /**
+     * Este metodo aplica los cambios de calendario una vez se han confirmado en el cuadro de dialogo ConfirmChangesDialog
+     * Escribe en base de datos. Llamado en {@link #onConfirmChanges}
+     */
     private void applyChanges() {
 
         HashSet<String> changedUsers = new HashSet<>();
@@ -438,6 +530,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
+    /**
+     * Este metodo devuelve el adaptador apropiado y calcula la posición correcta cuando se cambia de un tipo
+     * de calendario a otro. Llamado en {@link #onOptionsItemSelected}
+     * @return Adaptador del view pager
+     */
     private PagerAdapter changeAdapter() {
         PagerAdapter pagerAdapter;
         mViewModel.setEditMode(false);
@@ -474,7 +571,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         return pagerAdapter;
     }
 
-    private void queryWorkgroupUsers() {
+    /**
+     * Vincula la escucha de la petición de usuarios dentro del grupo, los cambios se obtienen en tiempo real.
+     * Llamado dentro de {@link #onViewCreated}
+     */
+    private void attatchWorkgroupUsersListener() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_users));
         mGroupUsersRef = new ArrayList<>();
@@ -516,6 +617,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     }
 
+    /**
+     * Hace una petición a base de datos de los tipos de turnos. Llamado dentro de {@link #onViewCreated}
+     */
     private void queryShiftTypes() {
         CollectionReference workgroupsUsersColl = mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
                 .collection(getString(R.string.data_ref_shiftTypes));
@@ -524,6 +628,9 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         mShiftTypes = mViewModel.getShiftTypes().getValue();
     }
 
+    /**
+     * Hace una petición a base de datos de el maximo de horas semanales. Llamado dentro de {@link #onViewCreated}
+     */
     private void queryWeeklyHours(){
         final String weeeklyHoursKey = getString(R.string.data_key_weeklyhours);
         mFirebaseFirestore.collection(getString(R.string.data_ref_workgroups)).document(mWorkgroup.getWorkgroupId())
@@ -538,6 +645,10 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         });
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de ConfirmChangesDialog.
+     * Una vez se confirman se aplican en base de datos.
+     */
     @Override
     public void onConfirmChanges() {
         applyChanges();
@@ -547,6 +658,11 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
 
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de WeekPageListener.
+     * Una vez se confirma la solicitud se escribe en base de datos.
+     * @param request Solicitud de cambio de turno
+     */
     @Override
     public void onNewChangeRequest(ChangeRequest request) {
         CollectionReference changeRequestsColl = mFirebaseFirestore
@@ -557,6 +673,12 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         docRef.set(request);
     }
 
+    /**
+     * Implementacion de la interfaz de comunicación de WeekPageListener.
+     * Se pide comprobar si hay un turno existente en la fecha proporcionada
+     * @param uid Identificador del usuario
+     * @param date Fecha del dia a comprobar
+     */
     @Override
     public boolean hasShiftOnDate(String uid, Date date) {
         DateTime shiftWeek = new DateTime(date).withDayOfWeek(DateTimeConstants.MONDAY);
@@ -574,12 +696,30 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         return hasShift;
     }
 
+    /**
+     * La clase MonthSlidePagerAdapter es una clase adaptador de view pager encargada de proporcionar los datos a la vista.
+     * Cada pagina es un fragment que representa un mes, se hace la petición de los datos de lo que abarca cada pagina.
+     * Extiende FragmentStatePagerAdapter
+     *
+     * @author Julio García
+     * @see FragmentStatePagerAdapter
+     */
     private class MonthSlidePagerAdapter extends FragmentStatePagerAdapter {
 
+        /**
+         * Constructor por defecto para pasarle argumentos a la clase de la que hereda
+         * @param fm Manager de fragmentos
+         */
         MonthSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        /**
+         * Construye el fragmento de cada pagina. Cada fragmento contiene los datos de un mes ademas
+         * de los dias de principio de semana del mes anterior y de final de semana del mes siguiente.
+         * @param position Posición de la pagina
+         * @return Fragmento de cada pagina
+         */
         @Override
         public Fragment getItem(int position) {
 
@@ -592,11 +732,22 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             return pageFragment;
         }
 
+        /**
+         * Devuelve el numero de paginas
+         * Se construye un total de 12 meses siendo el actual el mes central.
+         * @return Numero de paginas
+         */
         @Override
         public int getCount() {
             return QUERY_MONTH_NUMBER;
         }
 
+        /**
+         * Petición a base de datos de los turnso del usuario desde el lunes de la primera semana al domingo de la ultima semana.
+         * @param pageFragment Referencia al fragmento
+         * @param month Fecha del primer dia del mes correspondiente.
+         * @param shiftList Referencia de la lista de turnos a rellenar.
+         */
         private void queryShiftData(final MonthPageFragment pageFragment, DateTime month, final ArrayList<Shift> shiftList) {
 
             if (mFirebaseUser != null) {
@@ -630,6 +781,15 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
         }
     }
 
+    /**
+     * La clase MonthSlidePagerAdapter es una clase adaptador de view pager encargada de proporcionar los datos a la vista.
+     * Cada pagina es un fragment que representa una semana, se hace la petición de los datos de lo que abarca cada pagina.
+     * Se obtienen los datos de todos los usuarios del grupo para la semana correspondiente..
+     * Extiende FragmentStatePagerAdapter
+     *
+     * @author Julio García
+     * @see FragmentStatePagerAdapter
+     */
     private class WeekSlidePagerAdapter extends FragmentStatePagerAdapter {
 
         SparseArray<ScheduleWeekPageFragment> fragmentsRef = new SparseArray<>();
@@ -638,6 +798,12 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             super(fm);
         }
 
+        /**
+         * Construye el fragmento de cada pagina. Cada fragmento contiene los datos de una semana de
+         * todos los usuarios del grupo.
+         * @param position Posición de la pagina
+         * @return Fragmento de cada pagina
+         */
         @Override
         public Fragment getItem(int position) {
 
@@ -654,11 +820,22 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
             return fragmentsRef.get(position);
         }
 
+        /**
+         * Devuelve el numero de paginas
+         * Se construye el mismo numero de paginas como de semanas hay en el año.
+         * @return Numero de paginas
+         */
         @Override
         public int getCount() {
             return mTotalWeeks;
         }
 
+        /**
+         * Petición a base de datos desde el lunes al domingo de la semana correspondiente
+         * @param pageFragment Referencia al fragmento
+         * @param date Fecha del lunes de la semana correspondiente
+         * @param shiftListMap Mapa del listado de turnos con el identificador del usuario como clave a rellenar.
+         */
         private void queryScheduleData(final ScheduleWeekPageFragment pageFragment, DateTime date, Map<String, ArrayList<Shift>> shiftListMap) {
 
             for (UserRef userUid : mGroupUsersRef) {
@@ -720,7 +897,6 @@ public class MyCalendarFragment extends Fragment implements ConfirmChangesDialog
                 mUserShiftsListeners.add(userShiftListener);
             }
         }
-
         SparseArray<LinkedHashMap<String, ArrayList<Shift>>> getShiftListMapRef() {
             return shiftListMapRef;
         }

@@ -70,7 +70,7 @@ public class WeeklyHoursDialog extends DialogFragment {
     }
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Construccion del cuadro de dialogo.
      */
     @NonNull

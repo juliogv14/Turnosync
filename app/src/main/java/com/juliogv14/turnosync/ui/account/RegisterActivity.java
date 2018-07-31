@@ -51,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     /** {@inheritDoc} <br>
-     * Lifecycle callback.
+     * Callback del ciclo de vida.
      * Se establecen las esuchas de finalizado en el teclado y el boton de registrar
      */
     @Override

@@ -13,19 +13,38 @@ import com.juliogv14.turnosync.databinding.ActivityWorkgroupSettingsBinding;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class WorkgroupSettingsActivity extends AppCompatActivity implements WorkgroupSettingsFragment.WorkgroupSettingsListener, ShiftTypesFragment.OnShiftTypesListener {
+/**
+ * La clase WorkgroupSettingsActivity es una actividad encargada de manejar la vista de la configuración
+ * Contiene el fragmento WorkgroupSettingsFragment donde se muestran los usuarios del grupo siendo posible
+ * añadir, editar el nombre a mostrar y eliminar usuarios.
+ * Ademas se puede configurar el numero máximo de horas semanales. Contiene la navegación a ShiftTypesFragment.
+ * Contiene el fragmento ShiftTypesFragment que maneja la creación edición y eliminación de tipos de turno.
+ * Extiende AppCompatActivity
+ * Implementa la interfaz de comunicación de WorkgroupSettingsFragment
+ *
+ * @author Julio García
+ * @see AppCompatActivity
+ * @see WorkgroupSettingsFragment.WorkgroupSettingsListener
+ * @see WorkgroupSettingsFragment
+ * @see ShiftTypesFragment
+ */
+public class WorkgroupSettingsActivity extends AppCompatActivity implements WorkgroupSettingsFragment.WorkgroupSettingsListener {
 
-    //Log TAG
+    /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
-    //Activity views
+    /** Referencia a la vista con databinding */
     ActivityWorkgroupSettingsBinding mViewBinding;
 
-    //Intent data
+    /** Referencia al Grupo */
     private UserWorkgroup mWorkgroup;
 
-    //WorkgroupSettingsFragment mSettingsFragment;
-
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Al crearse se inicializa la vista. Se muestra el fragmentoo
+     */
+    // TODO: 31/07/2018 Mantener fragmento
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +60,11 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
         displaySelectedScreen(fragment);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Callback del ciclo de vida.
+     * Responde cuando se selecciona un elemento del menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -51,6 +75,10 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Muestra el fragmento pasado por argumento. Llamado en {@link #swapFragment}
+     * @param fragment Fragmento que sustituye al actual.
+     */
     private void displaySelectedScreen(Fragment fragment) {
 
         //replacing the fragment
@@ -71,6 +99,11 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
         }
     }
 
+    /**
+     * Implementación de la interfaz de comunicación con fragmentos
+     * Cambia el titulo de la barra de aplicación
+     * @param fragmentId Identificador del fragmento
+     */
     @Override
     public void onFragmentSwapped(int fragmentId) {
         switch (fragmentId) {
@@ -83,6 +116,11 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
         }
     }
 
+    /**
+     * Implementación de la interfaz de comunicación de WorkgroupSettingsFragment
+     * Responde a la navegación hacia ShiftTypesFragment
+     * @param fragmentId Identificador del fragmento.
+     */
     @Override
     public void swapFragment(int fragmentId) {
         switch (fragmentId) {
