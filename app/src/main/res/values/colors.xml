@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--APP COLORS-->
-<!--    <color name="colorPrimary">#666699</color>
-    <color name="colorPrimaryLight">#666699</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#5FB229</color>-->
-    <!--<color name="colorPrimary">#fe9536</color>-->
-    <!--<color name="colorPrimaryLight">#feb067</color>-->
-    <!--<color name="colorPrimaryDark">#fe7b01</color>-->
-    <!--<color name="colorAccent">#5b74ff</color>-->
-    <!--TEST1-->
-    <!--<color name="colorPrimary">#C73E1A</color>
-    <color name="colorPrimaryDark">#7A1900</color>
-    <color name="colorAccent">#037A54</color>-->
-    <!--TEST2-->
-    <!--<color name="colorPrimary">#cc5c00</color>
-    <color name="colorPrimaryDark">#b35000</color>
-    <color name="colorAccent">#0a8ca1</color>-->
-    <!--TEST2-->
+
     <color name="colorPrimary">#ff8c1a</color>
     <color name="colorPrimaryDark">#e67300</color>
+    <color name="colorPrimaryLight">#ffcc99</color>
     <color name="colorAccent">#0a8ca1</color>
 
     <!--NAV DRAWER ITEM COLORS-->

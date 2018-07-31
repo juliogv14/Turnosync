@@ -33,31 +33,49 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
     /** Tag de clase */
     private final String TAG = this.getClass().getSimpleName();
 
+    /** Claves para conservar datos al recrear la actividad */
+    private static final String CURRENT_FRAGMENT_KEY = "currentFragment";
+
     /** Referencia a la vista con databinding */
     ActivityWorkgroupSettingsBinding mViewBinding;
 
     /** Referencia al Grupo */
     private UserWorkgroup mWorkgroup;
+    /** Numero máximo de horas */
+    private AtomicLong weeklyHours;
+
+    /** Identificador del fragmento actual  */
+    private int mCurrentFragmentId;
 
     /**
      * {@inheritDoc} <br>
      * Callback del ciclo de vida.
      * Al crearse se inicializa la vista. Se muestra el fragmentoo
      */
-    // TODO: 31/07/2018 Mantener fragmento
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workgroup_settings);
 
+        if(savedInstanceState != null){
+            mCurrentFragmentId = savedInstanceState.getInt(CURRENT_FRAGMENT_KEY);
+        } else {
+            mCurrentFragmentId = R.string.fragment_workgroupSettings;
+        }
+
         //Init
         mViewBinding = DataBindingUtil.setContentView(this, R.layout.activity_workgroup_settings);
         mWorkgroup = getIntent().getParcelableExtra(getString(R.string.data_int_workgroup));
-        AtomicLong weeklyHours = (AtomicLong) getIntent().getSerializableExtra(getString(R.string.data_int_hours));
-        //ArrayList<UserRef> userlist = getIntent().getParcelableArrayListExtra(getString(R.string.data_int_users));
-        //mSettingsFragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, userlist);
-        Fragment fragment = WorkgroupSettingsFragment.newInstance(mWorkgroup, weeklyHours);
-        displaySelectedScreen(fragment);
+        weeklyHours = (AtomicLong) getIntent().getSerializableExtra(getString(R.string.data_int_hours));
+
+        swapFragment(mCurrentFragmentId);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_FRAGMENT_KEY, mCurrentFragmentId);
     }
 
     /**
@@ -124,9 +142,13 @@ public class WorkgroupSettingsActivity extends AppCompatActivity implements Work
     @Override
     public void swapFragment(int fragmentId) {
         switch (fragmentId) {
+            case R.string.fragment_workgroupSettings:
+                mCurrentFragmentId = R.string.fragment_workgroupSettings;
+                displaySelectedScreen(WorkgroupSettingsFragment.newInstance(mWorkgroup, weeklyHours));
+                break;
             case R.string.fragment_shiftTypes:
-                Fragment fragment = ShiftTypesFragment.newInstance(mWorkgroup);
-                displaySelectedScreen(fragment);
+                mCurrentFragmentId = R.string.fragment_shiftTypes;
+                displaySelectedScreen(ShiftTypesFragment.newInstance(mWorkgroup));
                 break;
         }
     }

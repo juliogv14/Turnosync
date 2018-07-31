@@ -165,7 +165,7 @@ public class ChangeRequestsActivity extends AppCompatActivity implements ChangeR
                                 int pos = 0;
                                 for (int i = 0; i < mChangeRequestList.size(); i++) {
                                     ChangeRequest change = mChangeRequestList.get(i);
-                                    if (TextUtils.equals(change.getId(), change.getId())) {
+                                    if (TextUtils.equals(changeRequest.getId(), change.getId())) {
                                         exist = true;
                                         pos = i;
                                         break;
