@@ -6,7 +6,6 @@ import android.view.MenuItem;
 
 import com.juliogv14.turnosync.R;
 
-/**
  /**
  * La clase SettingsActivity es responsable de contener el fragmento de la configuración de la
  * aplicación.
