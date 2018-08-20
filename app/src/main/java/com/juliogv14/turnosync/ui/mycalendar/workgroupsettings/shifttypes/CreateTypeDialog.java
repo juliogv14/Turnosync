@@ -165,12 +165,14 @@ public class CreateTypeDialog extends DialogFragment {
         mColorButtons.add(mViewBinding.buttonCreateTypeColor6);
 
         int positiveButton;
+        int title;
         //Create or edit mode
         if(mShiftType != null){
             fillDialog();
-            //Set positive button
+            title = R.string.dialog_createType_title_edit;
             positiveButton = R.string.dialog_createType_button_edit;
         } else {
+            title = R.string.dialog_createType_title_new;
             positiveButton = R.string.dialog_createType_button_create;
             mSelectedButton = mColorButtons.get(0);
             mColor = getResources().getColor(R.color.customToggle1);
@@ -202,7 +204,7 @@ public class CreateTypeDialog extends DialogFragment {
 
         //Dialog builder
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.dialog_createType_title)
+                .setTitle(title)
                 .setView(view)
                 .setPositiveButton(positiveButton, new DialogInterface.OnClickListener() {
                     //Add user to workgroup

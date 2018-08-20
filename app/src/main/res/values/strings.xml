@@ -56,7 +56,7 @@
     <string name="toast_register_failed">This email is already in use</string>
     <string name="toast_update_services">Please update Google Play Services</string>
     <string name="toast_generic_error">An error occurred:</string>
-    <string name="toast_schedule_noShiftTypes">You need to create a shift type before setting shifts</string>
+    <string name="toast_schedule_noShiftTypes">You need to create a shift type before setting shifts. To do this go to the workgroup settings screen.</string>
     <string name="toast_schedule_notLoaded">Data not loaded yet, try again in a moment.</string>
     <string name="toast_schedule_conflict">Can\'t assign shift to target user, date conflict</string>
     <string name="toast_request_conflict">Shift conflict, one of the users already has a shift on the exchanged date</string>
@@ -106,7 +106,8 @@
     <string name="dialog_removeUser_button_cancel">Cancel</string>
 
     <!--CREATE NEW TYPE DIALOG-->
-    <string name="dialog_createType_title">Create new shift type</string>
+    <string name="dialog_createType_title_new">Create new shift type</string>
+    <string name="dialog_createType_title_edit">Edit shift type</string>
     <string name="dialog_createType_button_create">Create</string>
     <string name="dialog_createType_button_edit">Edit</string>
     <string name="dialog_createType_button_cancel">Cancel</string>
