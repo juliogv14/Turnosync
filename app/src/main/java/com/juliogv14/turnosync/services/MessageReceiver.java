@@ -14,6 +14,8 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.juliogv14.turnosync.R;
 import com.juliogv14.turnosync.ui.drawerlayout.DrawerActivity;
 
+import java.util.Random;
+
 /**
  * La clase MessageReceiver es un servicio que recibe mensajes de Firebase Cloud Messaging y muestra
  * notificaciones en la aplicación
@@ -199,11 +201,8 @@ public class MessageReceiver extends FirebaseMessagingService {
             }
         }
         if(notificationManager != null){
-            String numbersString = requestId.replaceAll("[^0-9]", "");
-            numbersString = numbersString.length() + numbersString + numbersString.length();
-            int notifId = Integer.parseInt(numbersString.substring(5));
 
-            notificationManager.notify(notifId, notificationBuilder.build());
+            notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
         }
     }
 }
