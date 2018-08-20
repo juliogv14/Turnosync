@@ -169,6 +169,7 @@ public class MonthAdapter extends BaseAdapter {
                 convertView.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, dayCellHeight));
                 String stringDayInMonth = mItems.get(position);
                 mItemShiftBinding.textViewDayMonth.setText(stringDayInMonth);
+                mItemShiftBinding.textViewShiftType.setText("");
 
                 //Background
                 GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.bg_shift).mutate();

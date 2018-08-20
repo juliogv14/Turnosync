@@ -759,22 +759,43 @@ public class MyCalendarFragment extends Fragment implements
                 Date firstDay = month.withDayOfWeek(DateTimeConstants.MONDAY).toDate();
                 Date lastDay =  month.dayOfMonth().withMaximumValue().withDayOfWeek(DateTimeConstants.SUNDAY).toDate();
                 String dateKey = getString(R.string.data_key_date);
-                shiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay).orderBy(dateKey, Query.Direction.ASCENDING).get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                shiftsColl.whereGreaterThanOrEqualTo(dateKey, firstDay).whereLessThanOrEqualTo(dateKey, lastDay)
+                        .orderBy(dateKey, Query.Direction.ASCENDING)
+                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (DocumentSnapshot doc : task.getResult()) {
-                                        if (doc != null && doc.exists()) {
-                                            shiftList.add(doc.toObject(Shift.class));
+                            public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
+                                if(e != null){
+                                    return;
+                                }
+                                for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
+                                    DocumentSnapshot doc = docChange.getDocument();
+
+                                    if (doc.exists()) {
+                                        Shift shift = doc.toObject(Shift.class);
+
+                                        switch (docChange.getType()) {
+                                            case ADDED:
+                                                //Added
+                                                shiftList.add(shift);
+                                                break;
+                                            case MODIFIED:
+                                                if (docChange.getOldIndex() == docChange.getNewIndex()) {
+                                                    //Modified, same position
+                                                    shiftList.set(docChange.getOldIndex(), shift);
+                                                } else {
+                                                    //Modified, differnt position
+                                                    shiftList.remove(docChange.getOldIndex());
+                                                    shiftList.add(docChange.getNewIndex(), shift);
+                                                }
+                                                break;
+                                            case REMOVED:
+                                                //Removed
+                                                shiftList.remove(docChange.getOldIndex());
+                                                break;
                                         }
                                     }
-                                    pageFragment.notifyGridDataSetChanged();
-                                } else {
-                                    if (task.getException() != null) {
-                                        Log.e(TAG, task.getException().getMessage());
-                                    }
                                 }
+                                pageFragment.notifyGridDataSetChanged();
                             }
                         });
             }

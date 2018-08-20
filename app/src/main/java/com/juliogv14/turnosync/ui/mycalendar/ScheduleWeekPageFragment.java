@@ -467,17 +467,17 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
      */
     @Override
     public void onEditShiftChange(Shift oldShift, Shift newShift) {
-        if(oldShift != newShift){
+        if (oldShift != newShift) {
             //Check if target user has already a shift that date
             List<Shift> userList = mUsersShiftsMap.get(newShift.getUserId());
             boolean exists = false;
             for (Shift shift : userList) {
-                if (shift.getDate().getTime() == newShift.getDate().getTime()){
+                if (shift.getDate().getTime() == newShift.getDate().getTime()) {
                     exists = true;
                     break;
                 }
             }
-            if(!exists){
+            if (!exists) {
                 mUsersShiftsMap.get(oldShift.getUserId()).remove(oldShift);
                 mUsersShiftsMap.get(newShift.getUserId()).add(newShift);
                 Collections.sort(mUsersShiftsMap.get(newShift.getUserId()));
@@ -488,16 +488,19 @@ public class ScheduleWeekPageFragment extends Fragment implements CreateShiftDia
         }
 
         //If undo change
-        if(mShiftChanges.get(getString(R.string.data_changes_editedNew)).contains(oldShift)){
+        if (mShiftChanges.get(getString(R.string.data_changes_editedNew)).contains(oldShift)) {
             mShiftChanges.get(getString(R.string.data_changes_editedNew)).remove(oldShift);
 
             List<Shift> editedOld = mShiftChanges.get(getString(R.string.data_changes_editedOld));
             for (Shift shift : editedOld) {
-                    if(shift.getUserId().equals(newShift.getUserId()) && shift.getDate().getTime() == newShift.getDate().getTime()){
-                        editedOld.remove(shift);
-                    }
+                if (shift.getUserId().equals(newShift.getUserId()) && shift.getDate().getTime() == newShift.getDate().getTime()) {
+                    editedOld.remove(shift);
+                }
             }
-        } else {
+        } else if (mShiftChanges.get(getString(R.string.data_changes_added)).contains(oldShift)){
+            mShiftChanges.get(getString(R.string.data_changes_added)).remove(oldShift);
+            mShiftChanges.get(getString(R.string.data_changes_added)).add(newShift);
+        }else {
             mShiftChanges.get(getString(R.string.data_changes_editedNew)).add(newShift);
             mShiftChanges.get(getString(R.string.data_changes_editedOld)).add(oldShift);
         }
