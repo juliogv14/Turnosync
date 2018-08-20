@@ -327,7 +327,12 @@ public class DrawerActivity extends AppCompatActivity
                 tag = "mycalendar";
                 fragment = getSupportFragmentManager().findFragmentByTag(tag);
                 if(fragment == null){
-                    mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                    if(mCurrentWorkgroup != null){
+                        mMyCalendarFragment = MyCalendarFragment.newInstance(mCurrentWorkgroup);
+                    } else {
+                        Toast.makeText(this, R.string.toast_drawer_noWorkgroup, Toast.LENGTH_LONG).show();
+                    }
+                    
                 }
                 fragment = mMyCalendarFragment;
                 break;
@@ -358,14 +363,12 @@ public class DrawerActivity extends AppCompatActivity
                 }
                 for (DocumentChange docChange : documentSnapshots.getDocumentChanges()) {
                     DocumentSnapshot document = docChange.getDocument();
-
                     if (document.exists()) {
                         UserWorkgroup userWorkgroup = document.toObject(UserWorkgroup.class);
 
                         if (mCurrentWorkgroup == null) {
                             mCurrentWorkgroup = userWorkgroup;
                         }
-
                         switch (docChange.getType()) {
                             case ADDED:
                                 //Added
