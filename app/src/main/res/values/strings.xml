@@ -60,6 +60,7 @@
     <string name="toast_schedule_notLoaded">Data not loaded yet, try again in a moment.</string>
     <string name="toast_schedule_conflict">Can\'t assign shift to target user, date conflict</string>
     <string name="toast_request_conflict">Shift conflict, one of the users already has a shift on the exchanged date</string>
+    <string name="toast_drawer_noWorkgroup">You currently have no workgroups to access its calendar</string>
 
 
     <!--ACTIVITY LABELS-->

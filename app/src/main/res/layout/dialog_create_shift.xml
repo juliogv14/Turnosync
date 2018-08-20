@@ -138,6 +138,7 @@
             android:layout_height="40dp"
             android:textOff=""
             android:textOn=""
+            android:background="@drawable/toggle_weekday"
             app:layout_constraintEnd_toStartOf="@+id/button_createShift_5"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_createShift_3"
